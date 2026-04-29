@@ -1,52 +1,142 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Input Form</title>
+  <title>Survey Entry Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body { font-family: Arial; padding:20px; background:#f4f6f9; }
-    .box { max-width:600px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
-    input, select { width:100%; padding:10px; margin:5px 0; }
-    button { padding:10px; background:green; color:#fff; border:none; width:100%; }
+    body { font-family: Arial; background:#f4f6f9; padding:20px; }
+    .box { max-width:900px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
+
+    input, select {
+      width:100%;
+      padding:8px;
+      margin:5px 0;
+    }
+
+    table {
+      width:100%;
+      border-collapse: collapse;
+      margin-top:10px;
+    }
+
+    table, th, td {
+      border:1px solid black;
+      text-align:center;
+      font-size:12px;
+    }
+
+    button {
+      margin-top:10px;
+      padding:10px;
+      background:green;
+      color:white;
+      border:none;
+      width:100%;
+    }
   </style>
 </head>
 
 <body>
 
 <div class="box">
-  <h2>Farmer Entry Form</h2>
 
-  <input id="name" placeholder="Name">
-  <input id="reg" placeholder="Registration">
-  <input type="number" step="any" id="qty" placeholder="Qty">
-  <input type="number" step="any" id="moisture" placeholder="Moisture">
+<h2>Survey Entry Form</h2>
 
-  <select id="status">
-    <option>FAQ</option>
-    <option>Non FAQ</option>
-  </select>
+<!-- HEADER FIELDS -->
+<input id="grader" placeholder="Grader/Surveyor Name">
+<input id="warehouse" placeholder="Warehouse Name & Location">
+<input id="society" placeholder="Society / Procurement Centre">
+<input type="date" id="date">
 
-  <button onclick="goNext()">Submit</button>
+<!-- TABLE -->
+<table>
+<tr>
+<th>Sr No</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damage 2%</th>
+<th>Slight 4%</th>
+<th>Damage 6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
+</tr>
+
+<!-- 5 Rows Example -->
+<tbody id="tableBody"></tbody>
+
+</table>
+
+<input id="sign1" placeholder="Signature of Surveyor">
+<input id="sign2" placeholder="Signature of Warehouse Manager">
+
+<button onclick="saveData()">Submit</button>
+
 </div>
 
 <script>
-function goNext() {
+
+// CREATE 5 ROWS AUTO
+const body = document.getElementById("tableBody");
+
+for(let i=1;i<=5;i++){
+  body.innerHTML += `
+  <tr>
+    <td>${i}</td>
+    <td><input id="name${i}"></td>
+    <td><input id="reg${i}"></td>
+    <td><input type="number" step="any" id="qty${i}"></td>
+    <td><input type="number" step="any" id="f${i}"></td>
+    <td><input type="number" step="any" id="o${i}"></td>
+    <td><input type="number" step="any" id="d2${i}"></td>
+    <td><input type="number" step="any" id="d4${i}"></td>
+    <td><input type="number" step="any" id="d6${i}"></td>
+    <td><input type="number" step="any" id="m${i}"></td>
+    <td><input id="s${i}"></td>
+    <td><input id="r${i}"></td>
+  </tr>
+  `;
+}
+
+function saveData(){
+
+  let rows = [];
+
+  for(let i=1;i<=5;i++){
+    rows.push({
+      name: document.getElementById("name"+i).value,
+      reg: document.getElementById("reg"+i).value,
+      qty: document.getElementById("qty"+i).value,
+      f: document.getElementById("f"+i).value,
+      o: document.getElementById("o"+i).value,
+      d2: document.getElementById("d2"+i).value,
+      d4: document.getElementById("d4"+i).value,
+      d6: document.getElementById("d6"+i).value,
+      m: document.getElementById("m"+i).value,
+      s: document.getElementById("s"+i).value,
+      r: document.getElementById("r"+i).value
+    });
+  }
 
   const data = {
-    name: document.getElementById("name").value,
-    reg: document.getElementById("reg").value,
-    qty: document.getElementById("qty").value,
-    moisture: document.getElementById("moisture").value,
-    status: document.getElementById("status").value
+    grader: document.getElementById("grader").value,
+    warehouse: document.getElementById("warehouse").value,
+    society: document.getElementById("society").value,
+    date: document.getElementById("date").value,
+    sign1: document.getElementById("sign1").value,
+    sign2: document.getElementById("sign2").value,
+    rows: rows
   };
 
-  // Save locally
-  localStorage.setItem("formData", JSON.stringify(data));
+  localStorage.setItem("reportData", JSON.stringify(data));
 
-  // Redirect
   window.location.href = "report.html";
 }
+
 </script>
 
 </body>
