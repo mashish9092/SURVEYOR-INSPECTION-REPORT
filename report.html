@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Report</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    body { font-family: Arial; padding:20px; }
+    table { width:100%; border-collapse: collapse; }
+    table, th, td { border:1px solid black; text-align:center; font-size:12px; }
+  </style>
+</head>
+
+<body>
+
+<div id="report">
+
+<h2 style="text-align:center;">SURVEYOR INSPECTION REPORT</h2>
+
+<p><b>Grader:</b> <span id="grader"></span></p>
+<p><b>Warehouse:</b> <span id="warehouse"></span></p>
+<p><b>Society:</b> <span id="society"></span></p>
+<p><b>Date:</b> <span id="date"></span></p>
+
+<table>
+<tr>
+<th>Sr No</th>
+<th>Name</th>
+<th>Reg</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>D2</th>
+<th>D4</th>
+<th>D6</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
+</tr>
+
+<tbody id="table"></tbody>
+
+</table>
+
+<br>
+<p><b>Surveyor Sign:</b> <span id="sign1"></span></p>
+<p><b>Manager Sign:</b> <span id="sign2"></span></p>
+
+</div>
+
+<button onclick="downloadPDF()">Download PDF</button>
+
+<script>
+
+const data = JSON.parse(localStorage.getItem("reportData"));
+
+document.getElementById("grader").innerText = data.grader;
+document.getElementById("warehouse").innerText = data.warehouse;
+document.getElementById("society").innerText = data.society;
+document.getElementById("date").innerText = data.date;
+document.getElementById("sign1").innerText = data.sign1;
+document.getElementById("sign2").innerText = data.sign2;
+
+let table = "";
+
+data.rows.forEach((r, i)=>{
+  table += `
+  <tr>
+    <td>${i+1}</td>
+    <td>${r.name}</td>
+    <td>${r.reg}</td>
+    <td>${r.qty}</td>
+    <td>${r.f}</td>
+    <td>${r.o}</td>
+    <td>${r.d2}</td>
+    <td>${r.d4}</td>
+    <td>${r.d6}</td>
+    <td>${r.m}</td>
+    <td>${r.s}</td>
+    <td>${r.r}</td>
+  </tr>
+  `;
+});
+
+document.getElementById("table").innerHTML = table;
+
+function downloadPDF(){
+  html2pdf().from(document.getElementById("report")).save();
+}
+
+</script>
+
+</body>
+</html>
