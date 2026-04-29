@@ -1,87 +1,180 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Farmer Entry Form</title>
+  <title>Surveyor Inspection Report</title>
+
+  <!-- Mobile View -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PDF Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
   <style>
-    body { font-family: Arial; padding: 20px; background:#f5f5f5; }
-    form { background:#fff; padding:20px; border-radius:10px; max-width:500px; margin:auto; }
-    input, select, button {
-      width:100%; margin:8px 0; padding:10px;
-      border-radius:5px; border:1px solid #ccc;
+    body {
+      font-family: 'Segoe UI';
+      background: #f4f6f9;
+      padding: 20px;
     }
-    button { background:#28a745; color:#fff; border:none; cursor:pointer; }
-    button:hover { background:#218838; }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h2, h3 {
+      text-align: center;
+    }
+
+    input, select {
+      padding: 6px;
+      margin: 4px;
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+    }
+
+    th, td {
+      padding: 5px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+
+    .btn {
+      margin-top: 10px;
+      padding: 10px;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+
+    .save { background: green; }
+    .pdf { background: blue; }
+
   </style>
 </head>
 
 <body>
 
-<h2 style="text-align:center;">Farmer Inspection Form</h2>
+<div class="container" id="report">
 
-<form id="farmerForm">
+  <h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+  <h3>SURVEYOR INSPECTION REPORT</h3>
 
-  <input type="number" id="sr_no" placeholder="Sr No" required>
-  <input type="text" id="name" placeholder="Farmer Name" required>
-  <input type="text" id="registration" placeholder="Farmer Registration">
+  <div>
+    District: <input id="district">
+    Date: <input type="date" id="date"><br>
 
-  <input type="number" id="qty" placeholder="Qty (Quintals)">
-  <input type="number" id="foreign" placeholder="Foreign Matter (%)">
-  <input type="number" id="other" placeholder="Other Food Grains (%)">
-  <input type="number" id="damage2" placeholder="Damaged 2%">
-  <input type="number" id="slight4" placeholder="Slight Damaged 4%">
-  <input type="number" id="damage6" placeholder="Damaged 6%">
-  <input type="number" id="moisture" placeholder="Moisture %">
+    Warehouse: <input id="warehouse">
+    Society: <input id="society"><br>
 
-  <select id="status">
-    <option value="FAQ">FAQ</option>
-    <option value="Non FAQ">Non FAQ</option>
-  </select>
+    Surveyor Name: <input id="surveyor">
+  </div>
 
-  <input type="text" id="remark" placeholder="Remark">
+  <table>
+    <tr>
+      <th>Sr No</th>
+      <th>Name</th>
+      <th>Registration</th>
+      <th>Qty</th>
+      <th>Foreign</th>
+      <th>Other</th>
+      <th>Damage 2%</th>
+      <th>Slight 4%</th>
+      <th>Damage 6%</th>
+      <th>Moisture</th>
+      <th>Status</th>
+      <th>Remark</th>
+    </tr>
 
-  <button type="submit">Submit</button>
+    <tr>
+      <td><input id="sr_no"></td>
+      <td><input id="name"></td>
+      <td><input id="reg"></td>
 
-</form>
+      <!-- IMPORTANT step="any" -->
+      <td><input type="number" step="any" id="qty"></td>
+      <td><input type="number" step="any" id="foreign"></td>
+      <td><input type="number" step="any" id="other"></td>
+      <td><input type="number" step="any" id="d2"></td>
+      <td><input type="number" step="any" id="d4"></td>
+      <td><input type="number" step="any" id="d6"></td>
+      <td><input type="number" step="any" id="moisture"></td>
+
+      <td>
+        <select id="status">
+          <option>FAQ</option>
+          <option>Non FAQ</option>
+        </select>
+      </td>
+
+      <td><input id="remark"></td>
+    </tr>
+  </table>
+
+  <button class="btn save" onclick="saveData()">Submit</button>
+  <button class="btn pdf" onclick="downloadPDF()">Export PDF</button>
+
+</div>
 
 <script>
-document.getElementById("farmerForm").addEventListener("submit", function(e) {
-  e.preventDefault();
 
-  const url = "https://script.google.com/macros/s/AKfycbze1dASGrpGt8VYXvfCU8AE6S8royeqBHBUTswXbU0Aq3qpOgDEqPC-SySn7FavByQm/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbze1dASGrpGt8VYXvfCU8AE6S8royeqBHBUTswXbU0Aq3qpOgDEqPC-SySn7FavByQm/exec";
+
+// SAVE DATA
+function saveData() {
 
   const data = {
     sr_no: document.getElementById("sr_no").value,
     name: document.getElementById("name").value,
-    registration: document.getElementById("registration").value,
-    qty: document.getElementById("qty").value,
-    foreign: document.getElementById("foreign").value,
-    other: document.getElementById("other").value,
-    damage2: document.getElementById("damage2").value,
-    slight4: document.getElementById("slight4").value,
-    damage6: document.getElementById("damage6").value,
-    moisture: document.getElementById("moisture").value,
+    registration: document.getElementById("reg").value,
+    qty: parseFloat(document.getElementById("qty").value) || 0,
+    foreign: parseFloat(document.getElementById("foreign").value) || 0,
+    other: parseFloat(document.getElementById("other").value) || 0,
+    damage2: parseFloat(document.getElementById("d2").value) || 0,
+    slight4: parseFloat(document.getElementById("d4").value) || 0,
+    damage6: parseFloat(document.getElementById("d6").value) || 0,
+    moisture: parseFloat(document.getElementById("moisture").value) || 0,
     status: document.getElementById("status").value,
     remark: document.getElementById("remark").value
   };
 
-  fetch(url, {
+  fetch(API_URL, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: JSON.stringify(data)
   })
-  .then(res => res.text())
-  .then(response => {
-    alert("✅ Data Saved Successfully!");
-    document.getElementById("farmerForm").reset();
+  .then(() => {
+    alert("✅ Data Saved");
   })
-  .catch(err => {
-    alert("❌ Error saving data");
-    console.error(err);
+  .catch(() => {
+    alert("❌ Error");
   });
+}
 
-});
+// PDF DOWNLOAD
+function downloadPDF() {
+  const element = document.getElementById("report");
+  html2pdf().from(element).save("Surveyor_Report.pdf");
+}
+
 </script>
 
 </body>
