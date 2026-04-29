@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Farmer Entry Form</title>
+  <style>
+    body { font-family: Arial; padding: 20px; background:#f5f5f5; }
+    form { background:#fff; padding:20px; border-radius:10px; max-width:500px; margin:auto; }
+    input, select, button {
+      width:100%; margin:8px 0; padding:10px;
+      border-radius:5px; border:1px solid #ccc;
+    }
+    button { background:#28a745; color:#fff; border:none; cursor:pointer; }
+    button:hover { background:#218838; }
+  </style>
+</head>
+
+<body>
+
+<h2 style="text-align:center;">Farmer Inspection Form</h2>
+
+<form id="farmerForm">
+
+  <input type="number" id="sr_no" placeholder="Sr No" required>
+  <input type="text" id="name" placeholder="Farmer Name" required>
+  <input type="text" id="registration" placeholder="Farmer Registration">
+
+  <input type="number" id="qty" placeholder="Qty (Quintals)">
+  <input type="number" id="foreign" placeholder="Foreign Matter (%)">
+  <input type="number" id="other" placeholder="Other Food Grains (%)">
+  <input type="number" id="damage2" placeholder="Damaged 2%">
+  <input type="number" id="slight4" placeholder="Slight Damaged 4%">
+  <input type="number" id="damage6" placeholder="Damaged 6%">
+  <input type="number" id="moisture" placeholder="Moisture %">
+
+  <select id="status">
+    <option value="FAQ">FAQ</option>
+    <option value="Non FAQ">Non FAQ</option>
+  </select>
+
+  <input type="text" id="remark" placeholder="Remark">
+
+  <button type="submit">Submit</button>
+
+</form>
+
+<script>
+document.getElementById("farmerForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+
+  const url = "https://script.google.com/macros/s/AKfycbze1dASGrpGt8VYXvfCU8AE6S8royeqBHBUTswXbU0Aq3qpOgDEqPC-SySn7FavByQm/exec";
+
+  const data = {
+    sr_no: document.getElementById("sr_no").value,
+    name: document.getElementById("name").value,
+    registration: document.getElementById("registration").value,
+    qty: document.getElementById("qty").value,
+    foreign: document.getElementById("foreign").value,
+    other: document.getElementById("other").value,
+    damage2: document.getElementById("damage2").value,
+    slight4: document.getElementById("slight4").value,
+    damage6: document.getElementById("damage6").value,
+    moisture: document.getElementById("moisture").value,
+    status: document.getElementById("status").value,
+    remark: document.getElementById("remark").value
+  };
+
+  fetch(url, {
+    method: "POST",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(res => res.text())
+  .then(response => {
+    alert("✅ Data Saved Successfully!");
+    document.getElementById("farmerForm").reset();
+  })
+  .catch(err => {
+    alert("❌ Error saving data");
+    console.error(err);
+  });
+
+});
+</script>
+
+</body>
+</html>
