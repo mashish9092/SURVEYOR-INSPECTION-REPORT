@@ -1,64 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Farmer Entry Form</title>
+  <title>Surveyor Inspection Report</title>
+
   <style>
-    body { font-family: Arial; padding: 20px; background:#f5f5f5; }
-    form { background:#fff; padding:20px; border-radius:10px; max-width:500px; margin:auto; }
-    input, select, button {
-      width:100%; margin:8px 0; padding:10px;
-      border-radius:5px; border:1px solid #ccc;
+    body {
+      font-family: Arial;
+      padding: 20px;
     }
-    button { background:#28a745; color:#fff; border:none; cursor:pointer; }
-    button:hover { background:#218838; }
+
+    h2, h3 {
+      text-align: center;
+      margin: 5px;
+    }
+
+    .info {
+      margin: 10px 0;
+    }
+
+    .info input {
+      width: 300px;
+      margin: 5px;
+      padding: 5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    table, th, td {
+      border: 1px solid black;
+    }
+
+    th, td {
+      padding: 5px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+      outline: none;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      background: green;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    @media print {
+      button {
+        display: none;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-<h2 style="text-align:center;">Farmer Inspection Form</h2>
+<h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+<h3>SURVEYOR INSPECTION REPORT</h3>
 
-<form id="farmerForm">
+<div class="info">
+  District: <input id="district">
+  Date: <input id="date" type="date"><br>
 
-  <input type="number" id="sr_no" placeholder="Sr No" required>
-  <input type="text" id="name" placeholder="Farmer Name" required>
-  <input type="text" id="registration" placeholder="Farmer Registration">
+  Commodity: <input value="WHEAT" readonly>
+  Warehouse: <input id="warehouse"><br>
 
-  <input type="number" id="qty" placeholder="Qty (Quintals)">
-  <input type="number" id="foreign" placeholder="Foreign Matter (%)">
-  <input type="number" id="other" placeholder="Other Food Grains (%)">
-  <input type="number" id="damage2" placeholder="Damaged 2%">
-  <input type="number" id="slight4" placeholder="Slight Damaged 4%">
-  <input type="number" id="damage6" placeholder="Damaged 6%">
-  <input type="number" id="moisture" placeholder="Moisture %">
+  Society: <input id="society">
+  Surveyor Name: <input id="surveyor"><br>
+</div>
 
-  <select id="status">
-    <option value="FAQ">FAQ</option>
-    <option value="Non FAQ">Non FAQ</option>
-  </select>
+<table>
+  <tr>
+    <th>Sr No</th>
+    <th>Name</th>
+    <th>Registration</th>
+    <th>Qty</th>
+    <th>Foreign</th>
+    <th>Other</th>
+    <th>Damaged 2%</th>
+    <th>Slight 4%</th>
+    <th>Damaged 6%</th>
+    <th>Moisture</th>
+    <th>Status</th>
+    <th>Remark</th>
+  </tr>
 
-  <input type="text" id="remark" placeholder="Remark">
+  <tr>
+    <td><input id="sr_no"></td>
+    <td><input id="name"></td>
+    <td><input id="reg"></td>
+    <td><input id="qty"></td>
+    <td><input id="foreign"></td>
+    <td><input id="other"></td>
+    <td><input id="d2"></td>
+    <td><input id="d4"></td>
+    <td><input id="d6"></td>
+    <td><input id="moisture"></td>
+    <td><input id="status"></td>
+    <td><input id="remark"></td>
+  </tr>
+</table>
 
-  <button type="submit">Submit</button>
-
-</form>
+<button onclick="saveData()">Save</button>
+<button onclick="window.print()">Print</button>
 
 <script>
-document.getElementById("farmerForm").addEventListener("submit", function(e) {
-  e.preventDefault();
+function saveData() {
 
   const url = "https://script.google.com/macros/s/AKfycbze1dASGrpGt8VYXvfCU8AE6S8royeqBHBUTswXbU0Aq3qpOgDEqPC-SySn7FavByQm/exec";
 
   const data = {
     sr_no: document.getElementById("sr_no").value,
     name: document.getElementById("name").value,
-    registration: document.getElementById("registration").value,
+    registration: document.getElementById("reg").value,
     qty: document.getElementById("qty").value,
     foreign: document.getElementById("foreign").value,
     other: document.getElementById("other").value,
-    damage2: document.getElementById("damage2").value,
-    slight4: document.getElementById("slight4").value,
-    damage6: document.getElementById("damage6").value,
+    damage2: document.getElementById("d2").value,
+    slight4: document.getElementById("d4").value,
+    damage6: document.getElementById("d6").value,
     moisture: document.getElementById("moisture").value,
     status: document.getElementById("status").value,
     remark: document.getElementById("remark").value
@@ -66,22 +137,12 @@ document.getElementById("farmerForm").addEventListener("submit", function(e) {
 
   fetch(url, {
     method: "POST",
-    body: JSON.stringify(data),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    body: JSON.stringify(data)
   })
   .then(res => res.text())
-  .then(response => {
-    alert("✅ Data Saved Successfully!");
-    document.getElementById("farmerForm").reset();
-  })
-  .catch(err => {
-    alert("❌ Error saving data");
-    console.error(err);
-  });
-
-});
+  .then(() => alert("Saved to Sheet"))
+  .catch(() => alert("Error"));
+}
 </script>
 
 </body>
