@@ -34,6 +34,31 @@
       border:none;
       width:100%;
     }
+    table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+th, td {
+  border: 1px solid black;
+  padding: 4px;
+}
+
+input {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+}
+
+button {
+  margin-top: 10px;
+  padding: 8px;
+  background: green;
+  color: white;
+  border: none;
+}
   </style>
 </head>
 
@@ -51,25 +76,27 @@
 
 <!-- TABLE -->
 <table>
-<tr>
-<th>Sr No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damage 2%</th>
-<th>Slight 4%</th>
-<th>Damage 6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
-</tr>
+  <thead>
+    <tr>
+      <th>Sr No</th>
+      <th>Name</th>
+      <th>Registration</th>
+      <th>Qty</th>
+      <th>Foreign</th>
+      <th>Other</th>
+      <th>Damage 2%</th>
+      <th>Slight 4%</th>
+      <th>Damage 6%</th>
+      <th>Moisture</th>
+      <th>Status</th>
+      <th>Remark</th>
+    </tr>
+  </thead>
 
-<!-- 5 Rows Example -->
-<tbody id="tableBody"></tbody>
-
+  <tbody id="tableBody"></tbody>
 </table>
+
+<button onclick="addRow()">+ Add Row</button>
 
 <input id="sign1" placeholder="Signature of Surveyor">
 <input id="sign2" placeholder="Signature of Warehouse Manager">
@@ -79,56 +106,58 @@
 </div>
 
 <script>
+let rowCount = 0;
+// ADD ROW FUNCTION
+function addRow() {
+  rowCount++;
 
-// CREATE 5 ROWS AUTO
-const body = document.getElementById("tableBody");
-
-for(let i=1;i<=5;i++){
-  body.innerHTML += `
-  <tr>
-    <td>${i}</td>
-    <td><input id="name${i}"></td>
-    <td><input id="reg${i}"></td>
-    <td><input type="number" step="any" id="qty${i}"></td>
-    <td><input type="number" step="any" id="f${i}"></td>
-    <td><input type="number" step="any" id="o${i}"></td>
-    <td><input type="number" step="any" id="d2${i}"></td>
-    <td><input type="number" step="any" id="d4${i}"></td>
-    <td><input type="number" step="any" id="d6${i}"></td>
-    <td><input type="number" step="any" id="m${i}"></td>
-    <td><input id="s${i}"></td>
-    <td><input id="r${i}"></td>
-  </tr>
+  const row = `
+    <tr>
+      <td>${rowCount}</td>
+      <td><input id="name${rowCount}"></td>
+      <td><input id="reg${rowCount}"></td>
+      <td><input type="number" step="any" id="qty${rowCount}"></td>
+      <td><input type="number" step="any" id="f${rowCount}"></td>
+      <td><input type="number" step="any" id="o${rowCount}"></td>
+      <td><input type="number" step="any" id="d2${rowCount}"></td>
+      <td><input type="number" step="any" id="d4${rowCount}"></td>
+      <td><input type="number" step="any" id="d6${rowCount}"></td>
+      <td><input type="number" step="any" id="m${rowCount}"></td>
+      <td><input id="s${rowCount}"></td>
+      <td><input id="r${rowCount}"></td>
+    </tr>
   `;
+
+  document.getElementById("tableBody").innerHTML += row;
 }
 
+// DEFAULT 5 ROWS AUTO LOAD
+for (let i = 0; i < 5; i++) {
+  addRow();
+}
+
+// SAVE FUNCTION
 function saveData(){
 
   let rows = [];
 
-  for(let i=1;i<=5;i++){
+  for (let i = 1; i <= rowCount; i++) {
     rows.push({
-      name: document.getElementById("name"+i).value,
-      reg: document.getElementById("reg"+i).value,
-      qty: document.getElementById("qty"+i).value,
-      f: document.getElementById("f"+i).value,
-      o: document.getElementById("o"+i).value,
-      d2: document.getElementById("d2"+i).value,
-      d4: document.getElementById("d4"+i).value,
-      d6: document.getElementById("d6"+i).value,
-      m: document.getElementById("m"+i).value,
-      s: document.getElementById("s"+i).value,
-      r: document.getElementById("r"+i).value
+      name: document.getElementById("name" + i)?.value || "",
+      reg: document.getElementById("reg" + i)?.value || "",
+      qty: document.getElementById("qty" + i)?.value || "",
+      f: document.getElementById("f" + i)?.value || "",
+      o: document.getElementById("o" + i)?.value || "",
+      d2: document.getElementById("d2" + i)?.value || "",
+      d4: document.getElementById("d4" + i)?.value || "",
+      d6: document.getElementById("d6" + i)?.value || "",
+      m: document.getElementById("m" + i)?.value || "",
+      s: document.getElementById("s" + i)?.value || "",
+      r: document.getElementById("r" + i)?.value || ""
     });
   }
 
   const data = {
-    grader: document.getElementById("grader").value,
-    warehouse: document.getElementById("warehouse").value,
-    society: document.getElementById("society").value,
-    date: document.getElementById("date").value,
-    sign1: document.getElementById("sign1").value,
-    sign2: document.getElementById("sign2").value,
     rows: rows
   };
 
