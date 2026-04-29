@@ -12,7 +12,7 @@
     }
 
     .box {
-      max-width: 1100px;
+      max-width: 1200px;
       margin: auto;
       background: #fff;
       padding: 20px;
@@ -26,8 +26,8 @@
 
     input {
       width: 100%;
-      padding: 8px;
-      margin: 5px 0;
+      padding: 6px;
+      margin: 3px 0;
       box-sizing: border-box;
     }
 
@@ -60,7 +60,6 @@
 
     .add-btn {
       background: #007bff;
-      width: auto;
     }
 
     .submit-btn {
@@ -72,9 +71,8 @@
       background: red;
       color: white;
       border: none;
-      padding: 3px 6px;
+      padding: 4px;
       cursor: pointer;
-      font-size: 10px;
     }
 
   </style>
@@ -106,6 +104,7 @@
 <th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
+<th>Action</th>
 </tr>
 </thead>
 
@@ -131,11 +130,7 @@ function addRow() {
 
   const row = `
     <tr id="row${rowCount}">
-      <td>
-        ${rowCount}
-        <br>
-        <button class="delete-btn" onclick="deleteRow(${rowCount})">X</button>
-      </td>
+      <td>${rowCount}</td>
       <td><input id="name${rowCount}"></td>
       <td><input id="reg${rowCount}"></td>
       <td><input type="number" step="any" id="qty${rowCount}"></td>
@@ -147,6 +142,7 @@ function addRow() {
       <td><input type="number" step="any" id="m${rowCount}"></td>
       <td><input id="s${rowCount}"></td>
       <td><input id="r${rowCount}"></td>
+      <td><button class="delete-btn" onclick="deleteRow(${rowCount})">Delete</button></td>
     </tr>
   `;
 
@@ -159,14 +155,12 @@ function deleteRow(id) {
   if (row) row.remove();
 }
 
-// DEFAULT 5 ROWS
+// DEFAULT ROWS
 window.onload = function () {
-  for (let i = 0; i < 5; i++) {
-    addRow();
-  }
-}
+  for (let i = 0; i < 5; i++) addRow();
+};
 
-// SAVE DATA
+// SAVE DATA + API CALL
 function saveData() {
 
   let rows = [];
@@ -177,7 +171,6 @@ function saveData() {
     let reg = document.getElementById("reg" + i)?.value || "";
     let qty = document.getElementById("qty" + i)?.value || "";
 
-    // ONLY FILLED ROWS SAVE
     if (name || reg || qty) {
       rows.push({
         name,
@@ -205,8 +198,16 @@ function saveData() {
     rows: rows
   };
 
+  // SAVE LOCAL (report page ke liye)
   localStorage.setItem("reportData", JSON.stringify(data));
 
+  // API CALL
+  fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec", {
+    method: "POST",
+    body: JSON.stringify(data)
+  });
+
+  // NEXT PAGE
   window.location.href = "report.html";
 }
 
