@@ -106,6 +106,11 @@ button {
 </div>
 
 <script>
+  window.onload = function() {
+  for (let i = 0; i < 5; i++) {
+    addRow();
+  }
+}
 let rowCount = 0;
 // ADD ROW FUNCTION
 function addRow() {
@@ -130,12 +135,6 @@ function addRow() {
 
   document.getElementById("tableBody").innerHTML += row;
 }
-
-// DEFAULT 5 ROWS AUTO LOAD
-for (let i = 0; i < 5; i++) {
-  addRow();
-}
-
 // SAVE FUNCTION
 function saveData(){
 
