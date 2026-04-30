@@ -85,18 +85,18 @@
 <table>
 <thead>
 <tr>
-<th>Sr No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>D2</th>
-<th>D4</th>
-<th>D6</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Sr.no.</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN METTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGEDN GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 </tr>
 </thead>
 
@@ -136,14 +136,14 @@ data.rows.forEach((r, i)=>{
       <td>${r.name}</td>
       <td>${r.reg}</td>
       <td>${r.qty}</td>
-      <td>${r.f}</td>
-      <td>${r.o}</td>
-      <td>${r.d2}</td>
-      <td>${r.d4}</td>
-      <td>${r.d6}</td>
-      <td>${r.m}</td>
-      <td>${r.s}</td>
-      <td>${r.r}</td>
+     <td>${r.foreign}</td>
+<td>${r.other}</td>
+<td>${r.damage2}</td>
+<td>${r.damage4}</td>
+<td>${r.damage6}</td>
+<td>${r.moisture}</td>
+<td>${r.status}</td>
+<td>${r.remark}</td>
     </tr>
     `;
   }
