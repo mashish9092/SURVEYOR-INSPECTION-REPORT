@@ -1,77 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Survey Entry Form</title>
+  <title>Survey Entry</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      font-family: Arial;
-      background: #f4f6f9;
-      padding: 20px;
-    }
+    body { font-family: Arial; background:#f4f6f9; padding:20px; }
+    .box { max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
 
-    .box {
-      max-width: 1200px;
-      margin: auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
+    input, select { width:100%; padding:6px; margin:3px 0; }
 
-    h2 { text-align: center; }
+    .table-container { overflow-x:auto; }
 
-    input, select {
-      width: 100%;
-      padding: 6px;
-      margin: 3px 0;
-      box-sizing: border-box;
-    }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border:1px solid black; font-size:12px; padding:5px; text-align:center; }
+    th { background:#eee; font-size:11px; }
 
-    .table-container {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-
-    th, td {
-      border: 1px solid black;
-      padding: 6px;
-      font-size: 12px;
-      text-align: center;
-    }
-
-    th {
-      background: #eee;
-      font-size: 11px;
-      line-height: 1.2;
-    }
-
-    .btn {
-      margin-top: 10px;
-      padding: 10px;
-      border: none;
-      color: white;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .add-btn { background: #007bff; }
-    .submit-btn { background: green; width: 100%; }
-    .excel-btn { background: #28a745; }
-
-    .delete-btn {
-      background: red;
-      color: white;
-      border: none;
-      padding: 4px;
-      cursor: pointer;
-    }
+    .btn { padding:8px; border:none; color:#fff; cursor:pointer; margin-top:10px; }
+    .add { background:#007bff; }
+    .save { background:green; width:100%; }
+    .del { background:red; }
   </style>
 </head>
 
@@ -90,18 +38,18 @@
 <table>
 <thead>
 <tr>
-<th>Sr.no.</th>
+<th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals</th>
-<th>Foreign (0.75%)</th>
-<th>Other (2%)</th>
-<th>Damage 2%</th>
-<th>Damage 4%</th>
-<th>Damage 6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN METTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -110,13 +58,12 @@
 </table>
 </div>
 
-<button class="btn add-btn" onclick="addRow()">+ Add Row</button>
+<button class="btn add" onclick="addRow()">+ Add Row</button>
 
 <input id="sign1" placeholder="Signature of Surveyor">
 <input id="sign2" placeholder="Signature of Warehouse Manager">
 
-<button class="btn excel-btn" onclick="exportExcel()">Export Excel</button>
-<button class="btn submit-btn" onclick="saveData()">Submit</button>
+<button class="btn save" onclick="saveData()">Save & Next</button>
 
 </div>
 
@@ -124,145 +71,88 @@
 
 let rowCount = 0;
 
-// ADD ROW
 function addRow() {
 
   rowCount++;
-
-  const table = document.getElementById("tableBody");
-  const srNo = table.rows.length + 1;   // ✅ FIX (real count)
+  const sr = document.querySelectorAll("#tableBody tr").length + 1;
 
   const row = `
   <tr id="row${rowCount}">
-    <td class="sr">${srNo}</td>
+    <td class="sr">${sr}</td>
 
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
-    <td><input type="number" step="any" id="qty${rowCount}"></td>
-
-    <td><input type="number" step="any" id="foreign${rowCount}"></td>
-    <td><input type="number" step="any" id="other${rowCount}"></td>
-    <td><input type="number" step="any" id="d2${rowCount}"></td>
-    <td><input type="number" step="any" id="d4${rowCount}"></td>
-    <td><input type="number" step="any" id="d6${rowCount}"></td>
-    <td><input type="number" step="any" id="m${rowCount}"></td>
+    <td><input id="qty${rowCount}"></td>
+    <td><input id="f${rowCount}"></td>
+    <td><input id="o${rowCount}"></td>
+    <td><input id="d2${rowCount}"></td>
+    <td><input id="d4${rowCount}"></td>
+    <td><input id="d6${rowCount}"></td>
+    <td><input id="m${rowCount}"></td>
 
     <td>
-      <select id="status${rowCount}">
+      <select id="s${rowCount}">
         <option>FAQ</option>
         <option>Non-FAQ</option>
       </select>
     </td>
 
-    <td><input id="remark${rowCount}"></td>
+    <td><input id="r${rowCount}"></td>
 
-    <td>
-      <button onclick="deleteRow(${rowCount})" class="delete-btn">X</button>
-    </td>
-  </tr>
-  `;
-
-  table.insertAdjacentHTML("beforeend", row);
-
-  updateSerialNumbers(); // ✅ important
+    <td><button class="del" onclick="deleteRow(${rowCount})">X</button></td>
+  </tr>`;
+  
+  tableBody.insertAdjacentHTML("beforeend", row);
+  updateSr();
 }
 
-// DELETE ROW
-function deleteRow(id) {
-  document.getElementById("row" + id)?.remove();
-  updateSerialNumbers();
-}
-// DEFAULT ROWS
-window.onload = function () {
-  for (let i = 0; i < 5; i++) addRow();
-};
-
-  // Serial No. Fix function
-  function updateSerialNumbers() {
-  const rows = document.querySelectorAll("#tableBody tr");
-
-  rows.forEach((row, index) => {
-    row.querySelector(".sr").innerText = index + 1;
-  });
+function deleteRow(id){
+  document.getElementById("row"+id)?.remove();
+  updateSr();
 }
 
-// SAVE + API
-function saveData() {
+function updateSr(){
+  document.querySelectorAll(".sr").forEach((el,i)=>el.innerText=i+1);
+}
 
-  let rows = [];
+window.onload=()=>{ for(let i=0;i<5;i++) addRow(); }
 
-  for (let i = 1; i <= rowCount; i++) {
+function saveData(){
 
-    let name = document.getElementById("name" + i)?.value || "";
+  let rows=[];
 
-    if (name !== "") {
+  for(let i=1;i<=rowCount;i++){
+    let name=document.getElementById("name"+i)?.value;
+    if(name){
       rows.push({
         name,
-        reg: document.getElementById("reg" + i)?.value || "",
-        qty: document.getElementById("qty" + i)?.value || "",
-        foreign: document.getElementById("foreign" + i)?.value || "",
-        other: document.getElementById("other" + i)?.value || "",
-        d2: document.getElementById("d2" + i)?.value || "",
-        d4: document.getElementById("d4" + i)?.value || "",
-        d6: document.getElementById("d6" + i)?.value || "",
-        m: document.getElementById("m" + i)?.value || "",
-        status: document.getElementById("status" + i)?.value || "",
-        remark: document.getElementById("remark" + i)?.value || ""
+        reg:reg[i]?.value,
+        qty:qty[i]?.value,
+        f:f[i]?.value,
+        o:o[i]?.value,
+        d2:d2[i]?.value,
+        d4:d4[i]?.value,
+        d6:d6[i]?.value,
+        m:m[i]?.value,
+        s:s[i]?.value,
+        r:r[i]?.value
       });
     }
   }
 
-  const data = {
-    grader: grader.value,
-    warehouse: warehouse.value,
-    society: society.value,
-    date: date.value,
-    sign1: sign1.value,
-    sign2: sign2.value,
+  const data={
+    grader:grader.value,
+    warehouse:warehouse.value,
+    society:society.value,
+    date:date.value,
+    sign1:sign1.value,
+    sign2:sign2.value,
     rows
   };
 
-  localStorage.setItem("reportData", JSON.stringify(data));
+  localStorage.setItem("reportData",JSON.stringify(data));
 
-  fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec", {
-    method: "POST",
-    body: JSON.stringify(data)
-  })
-  .then(() => {
-    alert("Saved Successfully ✅");
-  })
-  .catch(() => {
-    alert("Sheet Error ❌");
-  });
-}
-
-// EXPORT EXCEL
-function exportExcel() {
-
-  const data = JSON.parse(localStorage.getItem("reportData"));
-
-  if (!data) return alert("No Data");
-
-  let csv = [];
-
-  csv.push(["Grader","Warehouse","Society","Date","Name","Reg","Qty","Foreign","Other","D2","D4","D6","Moisture","Status","Remark"].join(","));
-
-  data.rows.forEach(r=>{
-    csv.push([
-      data.grader,
-      data.warehouse,
-      data.society,
-      data.date,
-      r.name,r.reg,r.qty,r.foreign,r.other,r.d2,r.d4,r.d6,r.m,r.status,r.remark
-    ].join(","));
-  });
-
-  const blob = new Blob([csv.join("\n")], { type: "text/csv" });
-  const link = document.createElement("a");
-
-  link.href = URL.createObjectURL(blob);
-  link.download = "Survey_Report.csv";
-  link.click();
+  window.location.href="report.html";
 }
 
 </script>
