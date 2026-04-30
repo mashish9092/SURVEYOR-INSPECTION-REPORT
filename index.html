@@ -5,89 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-
-body {
-  font-family: Arial;
-  background:#f4f6f9;
-  padding:20px;
-}
-
-.box {
-  max-width:1200px;
-  margin:auto;
-  background:#fff;
-  padding:20px;
-  border-radius:10px;
-  box-shadow:0 0 10px rgba(0,0,0,0.1);
-}
-
-h2 {
-  text-align:center;
-}
-
-input, select {
-  width:100%;
-  padding:8px;
-  margin:4px 0;
-  box-sizing:border-box;
-  border:1px solid #ccc;
-  border-radius:4px;
-}
-
-/* TABLE FIX */
-.table-container {
-  overflow-x:auto;
-  margin-top:10px;
-}
-
-table {
-  min-width:1400px;
-  border-collapse: collapse;
-}
-
-th {
-  background:#eee;
-  font-size:12px;
-  padding:8px;
-  white-space:normal;
-}
-
-td {
-  padding:5px;
-}
-
-th, td {
-  border:1px solid #444;
-  text-align:center;
-}
-
-td input, td select {
-  height:32px;
-  font-size:13px;
-}
-
-/* BUTTONS */
-.btn {
-  padding:10px;
-  border:none;
-  color:#fff;
-  cursor:pointer;
-  border-radius:5px;
-}
-
-.add { background:#007bff; }
-.save { background:green; width:100%; }
-.del { background:red; }
-
-.btn-group {
-  margin-top:10px;
-}
-
-/* MOBILE */
-@media(max-width:768px){
-  th,td { font-size:11px; }
-}
-
+body {font-family:Arial;background:#f4f6f9;padding:20px;}
+.box {max-width:1200px;margin:auto;background:#fff;padding:20px;border-radius:10px;}
+input,select {width:100%;padding:8px;margin:4px 0;}
+.table-container {overflow-x:auto;}
+table {min-width:1400px;border-collapse:collapse;}
+th,td {border:1px solid #444;padding:5px;text-align:center;}
+th {background:#eee;}
+.btn {padding:10px;color:#fff;border:none;cursor:pointer;}
+.add {background:#007bff;}
+.save {background:green;width:100%;}
+.del {background:red;}
 </style>
 </head>
 
@@ -106,15 +34,15 @@ td input, td select {
 <table>
 <thead>
 <tr>
-<th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals</th>
-<th>Foreign (0.75%)</th>
-<th>Other (2%)</th>
-<th>Damage 2%</th>
-<th>Damage 4%</th>
-<th>Damage 6%</th>
+<th>Sr</th>
+<th>Name</th>
+<th>Reg</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>D2</th>
+<th>D4</th>
+<th>D6</th>
 <th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
@@ -123,162 +51,130 @@ td input, td select {
 </thead>
 
 <tbody id="tableBody"></tbody>
-
 </table>
 </div>
 
-<div class="btn-group">
 <button class="btn add" onclick="addRow()">+ Add Row</button>
-</div>
 
 <input id="sign1" placeholder="Signature of Surveyor">
 <input id="sign2" placeholder="Signature of Warehouse Manager">
 
-<button class="btn save" onclick="saveData()">Save & Next</button>
+<button class="btn save" onclick="saveData()">Save & Send</button>
 
 </div>
 
 <script>
 
-let rowCount = 0;
+let rowCount=0;
 
-/* ADD ROW */
 function addRow(){
   rowCount++;
+  let sr=document.querySelectorAll("#tableBody tr").length+1;
 
-  let sr = document.querySelectorAll("#tableBody tr").length + 1;
-
-  const row = `
+  let row=`
   <tr id="row${rowCount}">
-    <td class="sr">${sr}</td>
+  <td class="sr">${sr}</td>
+  <td><input id="name${rowCount}"></td>
+  <td><input id="reg${rowCount}"></td>
+  <td><input id="qty${rowCount}"></td>
+  <td><input id="f${rowCount}"></td>
+  <td><input id="o${rowCount}"></td>
+  <td><input id="d2${rowCount}"></td>
+  <td><input id="d4${rowCount}"></td>
+  <td><input id="d6${rowCount}"></td>
+  <td><input id="m${rowCount}"></td>
+  <td>
+    <select id="s${rowCount}">
+      <option>FAQ</option>
+      <option>Non-FAQ</option>
+    </select>
+  </td>
+  <td><input id="r${rowCount}"></td>
+  <td><button class="del" onclick="deleteRow(${rowCount})">X</button></td>
+  </tr>`;
 
-    <td><input id="name${rowCount}"></td>
-    <td><input id="reg${rowCount}"></td>
-    <td><input id="qty${rowCount}"></td>
-    <td><input id="f${rowCount}"></td>
-    <td><input id="o${rowCount}"></td>
-    <td><input id="d2${rowCount}"></td>
-    <td><input id="d4${rowCount}"></td>
-    <td><input id="d6${rowCount}"></td>
-    <td><input id="m${rowCount}"></td>
-
-    <td>
-      <select id="s${rowCount}">
-        <option>FAQ</option>
-        <option>Non-FAQ</option>
-      </select>
-    </td>
-
-    <td><input id="r${rowCount}"></td>
-
-    <td>
-      <button class="del" onclick="deleteRow(${rowCount})">X</button>
-    </td>
-  </tr>
-  `;
-
-  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+  tableBody.insertAdjacentHTML("beforeend",row);
   updateSr();
-  // LOAD DATA WHEN EDIT MODE
-window.onload = function () {
-
-  const data = JSON.parse(localStorage.getItem("reportData"));
-
-  if (data) {
-    document.getElementById("grader").value = data.grader || "";
-    document.getElementById("warehouse").value = data.warehouse || "";
-    document.getElementById("society").value = data.society || "";
-    document.getElementById("date").value = data.date || "";
-    document.getElementById("sign1").value = data.sign1 || "";
-    document.getElementById("sign2").value = data.sign2 || "";
-
-    // CLEAR OLD ROWS
-    document.getElementById("tableBody").innerHTML = "";
-    rowCount = 0;
-
-    // ADD ROWS FROM DATA
-    data.rows.forEach(r => {
-      addRow();
-
-      let i = rowCount;
-
-      document.getElementById("name"+i).value = r.name || "";
-      document.getElementById("reg"+i).value = r.reg || "";
-      document.getElementById("qty"+i).value = r.qty || "";
-      document.getElementById("foreign"+i).value = r.f || "";
-      document.getElementById("other"+i).value = r.o || "";
-      document.getElementById("d2"+i).value = r.d2 || "";
-      document.getElementById("d4"+i).value = r.d4 || "";
-      document.getElementById("d6"+i).value = r.d6 || "";
-      document.getElementById("m"+i).value = r.m || "";
-      document.getElementById("status"+i).value = r.s || "FAQ";
-      document.getElementById("remark"+i).value = r.r || "";
-    });
-
-  } else {
-    // DEFAULT 5 ROW
-    for (let i = 0; i < 5; i++) addRow();
-  }
-};
 }
 
-/* DELETE ROW */
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-/* SR FIX */
 function updateSr(){
-  document.querySelectorAll(".sr").forEach((el,i)=>{
-    el.innerText = i+1;
-  });
+  document.querySelectorAll(".sr").forEach((e,i)=>e.innerText=i+1);
 }
 
-/* DEFAULT ROWS */
-window.onload = () => {
-  for(let i=0;i<5;i++) addRow();
-};
+window.onload=()=>{for(let i=0;i<3;i++) addRow();};
 
-/* SAVE DATA */
+/////////////////////////////////////////////////////
+// 🔥 SAVE + SEND TO GOOGLE SHEET
+/////////////////////////////////////////////////////
+
 function saveData(){
 
   let rows=[];
 
   for(let i=1;i<=rowCount;i++){
 
-    let name = document.getElementById("name"+i)?.value;
+    let name=document.getElementById("name"+i)?.value;
 
     if(name){
       rows.push({
         name,
-        reg: document.getElementById("reg"+i)?.value,
-        qty: document.getElementById("qty"+i)?.value,
-        f: document.getElementById("f"+i)?.value,
-        o: document.getElementById("o"+i)?.value,
-        d2: document.getElementById("d2"+i)?.value,
-        d4: document.getElementById("d4"+i)?.value,
-        d6: document.getElementById("d6"+i)?.value,
-        m: document.getElementById("m"+i)?.value,
-        s: document.getElementById("s"+i)?.value,
-        r: document.getElementById("r"+i)?.value
+        reg:reg[i]?.value,
+        qty:qty[i]?.value,
+        f:f[i]?.value,
+        o:o[i]?.value,
+        d2:d2[i]?.value,
+        d4:d4[i]?.value,
+        d6:d6[i]?.value,
+        m:m[i]?.value,
+        s:s[i]?.value,
+        r:r[i]?.value
       });
     }
   }
 
-  const data = {
-    grader: grader.value,
-    warehouse: warehouse.value,
-    society: society.value,
-    date: date.value,
-    sign1: sign1.value,
-    sign2: sign2.value,
-    rows
-  };
+  let payload=[];
 
-  localStorage.setItem("reportData", JSON.stringify(data));
+  rows.forEach(r=>{
+    payload.push([
+      grader.value,
+      warehouse.value,
+      society.value,
+      date.value,
+      r.name,
+      r.reg,
+      r.qty,
+      r.f,
+      r.o,
+      r.d2,
+      r.d4,
+      r.d6,
+      r.m,
+      r.s,
+      r.r,
+      sign1.value,
+      sign2.value
+    ]);
+  });
 
-  window.location.href = "report.html";
+  fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec", {
+    method:"POST",
+    body:JSON.stringify(payload)
+  })
+  .then(res=>res.text())
+  .then(msg=>{
+    alert("✅ Data Saved to Google Sheet");
+    console.log(msg);
+  })
+  .catch(err=>{
+    alert("❌ Error saving data");
+    console.error(err);
+  });
+
 }
 
 </script>
