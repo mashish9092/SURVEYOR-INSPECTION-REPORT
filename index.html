@@ -179,6 +179,47 @@ function addRow(){
 
   document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
   updateSr();
+  // LOAD DATA WHEN EDIT MODE
+window.onload = function () {
+
+  const data = JSON.parse(localStorage.getItem("reportData"));
+
+  if (data) {
+    document.getElementById("grader").value = data.grader || "";
+    document.getElementById("warehouse").value = data.warehouse || "";
+    document.getElementById("society").value = data.society || "";
+    document.getElementById("date").value = data.date || "";
+    document.getElementById("sign1").value = data.sign1 || "";
+    document.getElementById("sign2").value = data.sign2 || "";
+
+    // CLEAR OLD ROWS
+    document.getElementById("tableBody").innerHTML = "";
+    rowCount = 0;
+
+    // ADD ROWS FROM DATA
+    data.rows.forEach(r => {
+      addRow();
+
+      let i = rowCount;
+
+      document.getElementById("name"+i).value = r.name || "";
+      document.getElementById("reg"+i).value = r.reg || "";
+      document.getElementById("qty"+i).value = r.qty || "";
+      document.getElementById("foreign"+i).value = r.f || "";
+      document.getElementById("other"+i).value = r.o || "";
+      document.getElementById("d2"+i).value = r.d2 || "";
+      document.getElementById("d4"+i).value = r.d4 || "";
+      document.getElementById("d6"+i).value = r.d6 || "";
+      document.getElementById("m"+i).value = r.m || "";
+      document.getElementById("status"+i).value = r.s || "FAQ";
+      document.getElementById("remark"+i).value = r.r || "";
+    });
+
+  } else {
+    // DEFAULT 5 ROW
+    for (let i = 0; i < 5; i++) addRow();
+  }
+};
 }
 
 /* DELETE ROW */
