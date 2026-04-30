@@ -168,9 +168,9 @@ function addRow() {
 }
 
 // DELETE ROW
-function deleteRow(btn) {
-  btn.closest("tr").remove();
-  updateSerialNumbers();  // ✅ important
+function deleteRow(id) {
+  document.getElementById("row" + id)?.remove();
+  updateSerialNumbers();
 }
 // DEFAULT ROWS
 window.onload = function () {
