@@ -3,6 +3,7 @@
 <head>
   <title>Survey Entry Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 
 body {
@@ -12,7 +13,6 @@ body {
   margin: 0;
 }
 
-/* MAIN BOX */
 .box {
   max-width: 1200px;
   margin: auto;
@@ -22,12 +22,8 @@ body {
   box-shadow: 0 0 8px rgba(0,0,0,0.1);
 }
 
-h2 {
-  text-align: center;
-  margin-bottom: 10px;
-}
+h2 { text-align: center; }
 
-/* INPUT */
 input, select {
   width: 100%;
   padding: 10px;
@@ -37,48 +33,35 @@ input, select {
   box-sizing: border-box;
 }
 
-/* TABLE SCROLL */
 .table-container {
   overflow-x: auto;
   margin-top: 10px;
 }
 
-/* TABLE */
 table {
-  min-width: 1600px;   /* 🔥 important */
+  min-width: 1600px;
   border-collapse: collapse;
 }
 
-/* HEADER */
 th {
   background: #f1f1f1;
   font-size: 12px;
   padding: 6px;
   border: 1px solid black;
-  text-align: center;
-  white-space: normal;
-  word-break: break-word;
 }
 
-/* CELL */
 td {
   border: 1px solid black;
   padding: 2px;
-  min-width: 100px;
 }
 
-/* 🔥 INPUT PERFECT FIT */
 td input, td select {
   width: 100%;
-  height: 28px;
+  height: 30px;
   padding: 4px;
-  margin: 0;
-  border: 1px solid #ccc;
-  box-sizing: border-box;   /* ⭐ MOST IMPORTANT */
-  font-size: 12px;
+  box-sizing: border-box;
 }
 
-/* BUTTONS */
 .btn {
   padding: 10px;
   border: none;
@@ -86,45 +69,12 @@ td input, td select {
   cursor: pointer;
   margin-top: 10px;
   border-radius: 5px;
-  font-size: 14px;
 }
 
 .add { background: #007bff; }
 .save { background: green; width: 100%; }
 .excel { background: #28a745; }
 .del { background: red; }
-
-/* HOVER EFFECT */
-.btn:hover {
-  opacity: 0.9;
-}
-
-/* MOBILE RESPONSIVE */
-@media (max-width: 768px) {
-
-  .box {
-    padding: 10px;
-  }
-
-  h2 {
-    font-size: 18px;
-  }
-
-  input, select {
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  td input, td select {
-    font-size: 14px;
-    height: 34px;
-  }
-
-  th {
-    font-size: 10px;
-  }
-
-}
 
 </style>
 </head>
@@ -154,8 +104,8 @@ td input, td select {
 <th>SLIGHT DAMAGED GRAINS (4%)</th>
 <th>DAMAGED GRAINS (6%)</th>
 <th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -170,7 +120,7 @@ td input, td select {
 <input id="sign2" placeholder="Signature of Warehouse Manager">
 
 <button class="btn excel" onclick="exportExcel()">Export Excel</button>
-<button class="btn save" onclick="saveData()">Save & Send</button>
+<button class="btn save" onclick="saveData()">Save & Next</button>
 
 </div>
 
@@ -178,7 +128,9 @@ td input, td select {
 
 let rowCount = 0;
 
+// ADD ROW
 function addRow() {
+
   rowCount++;
   const sr = document.querySelectorAll("#tableBody tr").length + 1;
 
@@ -208,26 +160,28 @@ function addRow() {
     <td><button class="del" onclick="deleteRow(${rowCount})">X</button></td>
   </tr>`;
 
-  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+  tableBody.insertAdjacentHTML("beforeend", row);
   updateSr();
 }
 
+// DELETE ROW
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
+// FIX SERIAL NUMBER
 function updateSr(){
   document.querySelectorAll(".sr").forEach((el,i)=>el.innerText=i+1);
 }
 
-// default rows
+// DEFAULT ROWS
 window.onload = () => {
   for(let i=0;i<5;i++) addRow();
 }
 
-// SAVE + API
-function saveData(){
+// SAVE DATA (FINAL FIX)
+async function saveData(){
 
   let rows=[];
 
@@ -261,16 +215,20 @@ function saveData(){
     rows
   };
 
-  // LOCAL SAVE (for edit page)
+  // LOCAL SAVE
   localStorage.setItem("reportData",JSON.stringify(data));
 
-  // 🔴 API CALL (अपना URL डालो)
-  fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec",{
-    method:"POST",
-    body:JSON.stringify(data)
-  });
+  try {
+    await fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec",{
+      method:"POST",
+      body:JSON.stringify(data)
+    });
+  } catch(err){
+    console.log(err);
+  }
 
-  alert("Saved Successfully");
+  // ✅ REDIRECT FIX
+  window.location.href = "report.html";
 }
 
 // EXCEL EXPORT
