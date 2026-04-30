@@ -1,108 +1,172 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Report</title>
+<title>Report Preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Excel Library -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <style>
-body{font-family:Arial;padding:20px;}
-table{width:100%;border-collapse:collapse;}
-th,td{border:1px solid black;padding:6px;font-size:12px;}
-th{background:#eee;}
-button{padding:10px;margin-top:10px;}
+body { font-family: Arial; background:#f4f6f9; padding:20px; }
+.box { max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
+
+h2 { text-align:center; }
+
+table { width:100%; border-collapse: collapse; margin-top:10px; }
+th, td { border:1px solid #333; padding:6px; font-size:12px; text-align:center; }
+th { background:#eee; }
+
+.btn {
+  padding:10px;
+  border:none;
+  color:white;
+  cursor:pointer;
+  margin-top:10px;
+  border-radius:5px;
+}
+
+.excel { background:#28a745; }
+.back { background:#007bff; }
 </style>
 </head>
 
 <body>
 
-<h2>Survey Report</h2>
+<div class="box">
 
-<div id="report"></div>
+<h2>SURVEYOR INSPECTION REPORT</h2>
 
-<button onclick="exportExcel()">Export Excel</button>
-<button onclick="goBack()">Edit</button>
-
-<script>
-
-let data = JSON.parse(localStorage.getItem("reportData"));
-
-render();
-
-function render(){
-
-let html = `
-<p><b>Grader:</b> ${data.grader}</p>
-<p><b>Warehouse:</b> ${data.warehouse}</p>
-<p><b>Society:</b> ${data.society}</p>
-<p><b>Date:</b> ${data.date}</p>
+<p><b>Grader:</b> <span id="grader"></span></p>
+<p><b>Warehouse:</b> <span id="warehouse"></span></p>
+<p><b>Society:</b> <span id="society"></span></p>
+<p><b>Date:</b> <span id="date"></span></p>
 
 <table>
+<thead>
 <tr>
 <th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN METTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>D2</th>
+<th>D4</th>
+<th>D6</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 </tr>
-`;
+</thead>
+
+<tbody id="table"></tbody>
+</table>
+
+<br>
+
+<p><b>Surveyor Sign:</b> <span id="sign1"></span></p>
+<p><b>Manager Sign:</b> <span id="sign2"></span></p>
+
+<button class="btn excel" onclick="exportExcel()">Export Excel</button>
+<button class="btn back" onclick="goBack()">Edit Data</button>
+
+</div>
+
+<script>
+
+const data = JSON.parse(localStorage.getItem("reportData"));
+
+// HEADER
+grader.innerText = data.grader;
+warehouse.innerText = data.warehouse;
+society.innerText = data.society;
+date.innerText = data.date;
+sign1.innerText = data.sign1;
+sign2.innerText = data.sign2;
+
+// TABLE VIEW
+let html = "";
 
 data.rows.forEach((r,i)=>{
-html+=`
-<tr>
-<td>${i+1}</td>
-<td>${r.name}</td>
-<td>${r.reg}</td>
-<td>${r.qty}</td>
-<td>${r.f}</td>
-<td>${r.o}</td>
-<td>${r.d2}</td>
-<td>${r.d4}</td>
-<td>${r.d6}</td>
-<td>${r.m}</td>
-<td>${r.s}</td>
-<td>${r.r}</td>
-</tr>`;
+  html += `
+  <tr>
+    <td>${i+1}</td>
+    <td>${r.name}</td>
+    <td>${r.reg}</td>
+    <td>${r.qty}</td>
+    <td>${r.f}</td>
+    <td>${r.o}</td>
+    <td>${r.d2}</td>
+    <td>${r.d4}</td>
+    <td>${r.d6}</td>
+    <td>${r.m}</td>
+    <td>${r.s}</td>
+    <td>${r.r}</td>
+  </tr>
+  `;
 });
 
-html+=`</table>`;
+document.getElementById("table").innerHTML = html;
 
-document.getElementById("report").innerHTML=html;
-}
 
+// ✅ EXCEL EXPORT (PROPER FORMAT)
 function exportExcel(){
 
-let csv=[];
+  let excelData = [];
 
-csv.push([
-"Grader","Warehouse","Society","Date",
-"Name Of Farmer/Society","Farmer Registration","Qty In Quintals (Approx)",
-"FOREIGN METTER (0.75%)","OTHER FOOD GRAINS (2%)","DAMAGED GRAINS (2%)",
-"SLIGHT DAMAGED GRAINS (4%)","DAMAGED GRAINS (6%)","MOISTURE (12%)",
-"Status FAQ/Non FAQ","Remark If Any"
-].join(","));
+  // Header row (FULL NAME)
+  excelData.push([
+    "Grader",
+    "Warehouse",
+    "Society",
+    "Date",
+    "Name Of Farmer/Society",
+    "Farmer Registration",
+    "Qty In Quintals",
+    "Foreign (0.75%)",
+    "Other (2%)",
+    "Damaged 2%",
+    "Damaged 4%",
+    "Damaged 6%",
+    "Moisture",
+    "Status",
+    "Remark"
+  ]);
 
-data.rows.forEach(r=>{
-csv.push([
-data.grader,data.warehouse,data.society,data.date,
-r.name,r.reg,r.qty,r.f,r.o,r.d2,r.d4,r.d6,r.m,r.s,r.r
-].join(","));
-});
+  // Data rows
+  data.rows.forEach(r=>{
+    excelData.push([
+      data.grader,
+      data.warehouse,
+      data.society,
+      data.date,
+      r.name,
+      r.reg,
+      r.qty,
+      r.f,
+      r.o,
+      r.d2,
+      r.d4,
+      r.d6,
+      r.m,
+      r.s,
+      r.r
+    ]);
+  });
 
-let blob=new Blob([csv.join("\n")],{type:"text/csv"});
-let link=document.createElement("a");
-link.href=URL.createObjectURL(blob);
-link.download="Survey_Report.csv";
-link.click();
+  const ws = XLSX.utils.aoa_to_sheet(excelData);
+  const wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+
+  XLSX.writeFile(wb, "Survey_Report.xlsx");
 }
 
+
+// BACK
 function goBack(){
-window.location.href="index.html";
+  window.location.href = "index.html";
 }
 
 </script>
