@@ -92,18 +92,18 @@
 <table>
 <thead>
 <tr>
-<th>Sr No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damage 2%</th>
-<th>Slight 4%</th>
-<th>Damage 6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Sr.no.</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN METTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGEDN GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -125,30 +125,27 @@
 let rowCount = 0;
 
 // ADD ROW
-function addRow() {
-  rowCount++;
+const row = `
+<tr id="row${rowCount}">
+<td>${rowCount}</td>
 
-  const row = `
-    <tr id="row${rowCount}">
-      <td>${rowCount}</td>
-      <td><input id="name${rowCount}"></td>
-      <td><input id="reg${rowCount}"></td>
-      <td><input type="number" step="any" id="qty${rowCount}"></td>
-      <td><input type="number" step="any" id="f${rowCount}"></td>
-      <td><input type="number" step="any" id="o${rowCount}"></td>
-      <td><input type="number" step="any" id="d2${rowCount}"></td>
-      <td><input type="number" step="any" id="d4${rowCount}"></td>
-      <td><input type="number" step="any" id="d6${rowCount}"></td>
-      <td><input type="number" step="any" id="m${rowCount}"></td>
-      <td><input id="s${rowCount}"></td>
-      <td><input id="r${rowCount}"></td>
-      <td><button class="delete-btn" onclick="deleteRow(${rowCount})">Delete</button></td>
-    </tr>
-  `;
+<td><input id="name${rowCount}"></td>
+<td><input id="reg${rowCount}"></td>
+<td><input type="number" step="any" id="qty${rowCount}"></td>
 
-  document.getElementById("tableBody").innerHTML += row;
-}
+<td><input type="number" step="any" id="foreign${rowCount}"></td>
+<td><input type="number" step="any" id="other${rowCount}"></td>
+<td><input type="number" step="any" id="damage2${rowCount}"></td>
+<td><input type="number" step="any" id="damage4${rowCount}"></td>
+<td><input type="number" step="any" id="damage6${rowCount}"></td>
+<td><input type="number" step="any" id="moisture${rowCount}"></td>
 
+<td><input id="status${rowCount}"></td>
+<td><input id="remark${rowCount}"></td>
+
+<td><button class="delete-btn" onclick="deleteRow(${rowCount})">Delete</button></td>
+</tr>
+`;
 // DELETE ROW
 function deleteRow(id) {
   const row = document.getElementById("row" + id);
@@ -172,19 +169,19 @@ function saveData() {
     let qty = document.getElementById("qty" + i)?.value || "";
 
     if (name || reg || qty) {
-      rows.push({
-        name,
-        reg,
-        qty,
-        f: document.getElementById("f" + i)?.value || "",
-        o: document.getElementById("o" + i)?.value || "",
-        d2: document.getElementById("d2" + i)?.value || "",
-        d4: document.getElementById("d4" + i)?.value || "",
-        d6: document.getElementById("d6" + i)?.value || "",
-        m: document.getElementById("m" + i)?.value || "",
-        s: document.getElementById("s" + i)?.value || "",
-        r: document.getElementById("r" + i)?.value || ""
-      });
+     rows.push({
+  name,
+  reg,
+  qty,
+  foreign: document.getElementById("foreign" + i)?.value || "",
+  other: document.getElementById("other" + i)?.value || "",
+  damage2: document.getElementById("damage2" + i)?.value || "",
+  damage4: document.getElementById("damage4" + i)?.value || "",
+  damage6: document.getElementById("damage6" + i)?.value || "",
+  moisture: document.getElementById("moisture" + i)?.value || "",
+  status: document.getElementById("status" + i)?.value || "",
+  remark: document.getElementById("remark" + i)?.value || ""
+});
     }
   }
 
