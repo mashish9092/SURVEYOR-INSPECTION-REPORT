@@ -200,38 +200,38 @@ function saveData() {
   for (let i = 1; i <= rowCount; i++) {
 
     let name = document.getElementById("name" + i)?.value || "";
-    let reg = document.getElementById("reg" + i)?.value || "";
-    let qty = document.getElementById("qty" + i)?.value || "";
 
-    if (name || reg || qty) {
-     rows.push({
-  name,
-  reg,
-  qty,
-  foreign: document.getElementById("foreign" + i)?.value || "",
-  other: document.getElementById("other" + i)?.value || "",
-  damage2: document.getElementById("damage2" + i)?.value || "",
-  damage4: document.getElementById("damage4" + i)?.value || "",
-  damage6: document.getElementById("damage6" + i)?.value || "",
-  moisture: document.getElementById("moisture" + i)?.value || "",
-  status: document.getElementById("status" + i)?.value || "",
-  remark: document.getElementById("remark" + i)?.value || ""
-});
+    if (name !== "") {  // ✅ only filled rows save
+      rows.push({
+        name,
+        reg: document.getElementById("reg" + i)?.value || "",
+        qty: document.getElementById("qty" + i)?.value || "",
+        foreign: document.getElementById("foreign" + i)?.value || "",
+        other: document.getElementById("other" + i)?.value || "",
+        damage2: document.getElementById("damage2" + i)?.value || "",
+        damage4: document.getElementById("damage4" + i)?.value || "",
+        damage6: document.getElementById("damage6" + i)?.value || "",
+        moisture: document.getElementById("moisture" + i)?.value || "",
+        status: document.getElementById("status" + i)?.value || "",
+        remark: document.getElementById("remark" + i)?.value || ""
+      });
     }
   }
 
   const data = {
-    grader: document.getElementById("grader").value,
-    warehouse: document.getElementById("warehouse").value,
-    society: document.getElementById("society").value,
-    date: document.getElementById("date").value,
-    sign1: document.getElementById("sign1").value,
-    sign2: document.getElementById("sign2").value,
+    grader: grader.value,
+    warehouse: warehouse.value,
+    society: society.value,
+    date: date.value,
+    sign1: sign1.value,
+    sign2: sign2.value,
     rows: rows
   };
 
-  // SAVE LOCAL (report page ke liye)
   localStorage.setItem("reportData", JSON.stringify(data));
+
+  alert("Data Saved Successfully ✅");
+}
 
   // API CALL
   fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec", {
