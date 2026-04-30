@@ -126,43 +126,65 @@ let rowCount = 0;
 
 // ADD ROW
 function addRow() {
+
   rowCount++;
+
+  const table = document.getElementById("tableBody");
+  const srNo = table.rows.length + 1;   // ✅ FIX (real count)
 
   const row = `
   <tr id="row${rowCount}">
-    <td>${rowCount}</td>
+    <td class="sr">${srNo}</td>
+
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
     <td><input type="number" step="any" id="qty${rowCount}"></td>
+
     <td><input type="number" step="any" id="foreign${rowCount}"></td>
     <td><input type="number" step="any" id="other${rowCount}"></td>
     <td><input type="number" step="any" id="d2${rowCount}"></td>
     <td><input type="number" step="any" id="d4${rowCount}"></td>
     <td><input type="number" step="any" id="d6${rowCount}"></td>
     <td><input type="number" step="any" id="m${rowCount}"></td>
+
     <td>
       <select id="status${rowCount}">
         <option>FAQ</option>
         <option>Non-FAQ</option>
       </select>
     </td>
+
     <td><input id="remark${rowCount}"></td>
-    <td><button onclick="deleteRow(${rowCount})" class="delete-btn">X</button></td>
+
+    <td>
+      <button onclick="deleteRow(${rowCount})" class="delete-btn">X</button>
+    </td>
   </tr>
   `;
 
-  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+  table.insertAdjacentHTML("beforeend", row);
+
+  updateSerialNumbers(); // ✅ important
 }
 
 // DELETE ROW
-function deleteRow(id) {
-  document.getElementById("row" + id)?.remove();
+function deleteRow(btn) {
+  btn.closest("tr").remove();
+  updateSerialNumbers();  // ✅ important
 }
-
 // DEFAULT ROWS
 window.onload = function () {
   for (let i = 0; i < 5; i++) addRow();
 };
+
+  // Serial No. Fix function
+  function updateSerialNumbers() {
+  const rows = document.querySelectorAll("#tableBody tr");
+
+  rows.forEach((row, index) => {
+    row.querySelector(".sr").innerText = index + 1;
+  });
+}
 
 // SAVE + API
 function saveData() {
