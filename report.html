@@ -114,30 +114,32 @@ document.getElementById("table").innerHTML = html;
 // ✅ EXCEL EXPORT (PROPER FORMAT)
 function exportExcel(){
 
-  let excelData = [];
+  const data = JSON.parse(localStorage.getItem("reportData"));
 
-  // Header row (FULL NAME)
-  excelData.push([
-    "Grader",
-    "Warehouse",
-    "Society",
+  let rows = [];
+
+  // HEADER ROW
+  rows.push([
+    "Grader/Surveyor Name",
+    "Warehouse Name & Location",
+    "Society / Procurement Centre",
     "Date",
     "Name Of Farmer/Society",
     "Farmer Registration",
-    "Qty In Quintals",
-    "Foreign (0.75%)",
-    "Other (2%)",
-    "Damaged 2%",
-    "Damaged 4%",
-    "Damaged 6%",
-    "Moisture",
-    "Status",
-    "Remark"
+    "Qty In Quintals (Approx)",
+    "FOREIGN METTER (0.75%)",
+    "OTHER FOOD GRAINS (2%)",
+    "DAMAGED GRAINS (2%)",
+    "SLIGHT DAMAGED GRAINS (4%)",
+    "DAMAGED GRAINS (6%)",
+    "MOISTURE (12%)",
+    "Status FAQ/Non FAQ",
+    "Remark If Any"
   ]);
 
-  // Data rows
-  data.rows.forEach(r=>{
-    excelData.push([
+  // DATA ROWS
+  data.rows.forEach(r => {
+    rows.push([
       data.grader,
       data.warehouse,
       data.society,
@@ -156,14 +158,17 @@ function exportExcel(){
     ]);
   });
 
-  const ws = XLSX.utils.aoa_to_sheet(excelData);
-  const wb = XLSX.utils.book_new();
+  // CREATE EXCEL
+  let csvContent = "data:text/csv;charset=utf-8," 
+    + rows.map(e => e.join(",")).join("\n");
 
-  XLSX.utils.book_append_sheet(wb, ws, "Report");
+  let link = document.createElement("a");
+  link.setAttribute("href", encodeURI(csvContent));
+  link.setAttribute("download", "Survey_Report.csv");
+  document.body.appendChild(link);
 
-  XLSX.writeFile(wb, "Survey_Report.xlsx");
+  link.click();
 }
-
 
 // BACK
 function goBack(){
