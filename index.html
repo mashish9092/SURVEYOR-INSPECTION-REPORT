@@ -20,6 +20,38 @@
     .add { background:#007bff; }
     .save { background:green; width:100%; }
     .del { background:red; }
+    .table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+table {
+  min-width: 1200px;   /* IMPORTANT */
+}
+
+th {
+  white-space: normal;
+  word-break: break-word;
+}
+
+td input, td select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px;
+}
+    @media (max-width: 768px) {
+  .box {
+    padding: 10px;
+  }
+
+  th, td {
+    font-size: 10px;
+  }
+}
+    .btn {
+  display: inline-block;
+  margin: 10px 5px 0 0;
+}
   </style>
 </head>
 
