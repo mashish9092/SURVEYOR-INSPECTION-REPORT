@@ -74,6 +74,12 @@
       padding: 4px;
       cursor: pointer;
     }
+    .table-container {
+  overflow-x: auto;
+}
+    th {
+  white-space: nowrap;
+}
 
   </style>
 </head>
@@ -89,7 +95,8 @@
 <input id="society" placeholder="Society / Procurement Centre">
 <input type="date" id="date">
 
-<table>
+  <div  class="table-container">
+<table >
 <thead>
 <tr>
 <th>Sr.no.</th>
@@ -110,7 +117,7 @@
 
 <tbody id="tableBody"></tbody>
 </table>
-
+  </div>
 <button class="btn add-btn" onclick="addRow()">+ Add Row</button>
 
 <input id="sign1" placeholder="Signature of Surveyor">
@@ -125,27 +132,41 @@
 let rowCount = 0;
 
 // ADD ROW
-const row = `
-<tr id="row${rowCount}">
-<td>${rowCount}</td>
+function addRow() {
+  rowCount++;
 
-<td><input id="name${rowCount}"></td>
-<td><input id="reg${rowCount}"></td>
-<td><input type="number" step="any" id="qty${rowCount}"></td>
+  const row = `
+  <tr id="row${rowCount}">
+    <td>${rowCount}</td>
 
-<td><input type="number" step="any" id="foreign${rowCount}"></td>
-<td><input type="number" step="any" id="other${rowCount}"></td>
-<td><input type="number" step="any" id="damage2${rowCount}"></td>
-<td><input type="number" step="any" id="damage4${rowCount}"></td>
-<td><input type="number" step="any" id="damage6${rowCount}"></td>
-<td><input type="number" step="any" id="moisture${rowCount}"></td>
+    <td><input id="name${rowCount}"></td>
+    <td><input id="reg${rowCount}"></td>
+    <td><input type="number" step="any" id="qty${rowCount}"></td>
 
-<td><input id="status${rowCount}"></td>
-<td><input id="remark${rowCount}"></td>
+    <td><input type="number" step="any" id="foreign${rowCount}"></td>
+    <td><input type="number" step="any" id="other${rowCount}"></td>
+    <td><input type="number" step="any" id="damage2${rowCount}"></td>
+    <td><input type="number" step="any" id="damage4${rowCount}"></td>
+    <td><input type="number" step="any" id="damage6${rowCount}"></td>
+    <td><input type="number" step="any" id="moisture${rowCount}"></td>
 
-<td><button class="delete-btn" onclick="deleteRow(${rowCount})">Delete</button></td>
-</tr>
-`;
+    <td>
+      <select id="status${rowCount}">
+        <option value="FAQ">FAQ</option>
+        <option value="Non-FAQ">Non-FAQ</option>
+      </select>
+    </td>
+
+    <td><input id="remark${rowCount}"></td>
+
+    <td>
+      <button onclick="deleteRow(${rowCount})" class="delete-btn">X</button>
+    </td>
+  </tr>
+  `;
+
+  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+}
 // DELETE ROW
 function deleteRow(id) {
   const row = document.getElementById("row" + id);
