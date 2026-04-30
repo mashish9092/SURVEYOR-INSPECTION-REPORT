@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body { font-family: Arial; background:#f4f6f9; padding:20px; }
+.box { max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
+
+h2 { text-align:center; }
+
+.grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap:15px;
+  margin-top:20px;
+}
+
+.card {
+  background:#007bff;
+  color:white;
+  padding:15px;
+  border-radius:8px;
+  text-align:center;
+}
+
+.card h3 { margin:0; font-size:14px; }
+.card p { font-size:22px; margin:5px 0 0; }
+
+canvas {
+  margin-top:30px;
+  background:white;
+}
+
+.btn {
+  margin-top:20px;
+  padding:10px;
+  background:#28a745;
+  color:white;
+  border:none;
+  width:100%;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="box">
+
+<h2>📊 Survey Dashboard</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>Total Entries</h3>
+<p id="total"></p>
+</div>
+
+<div class="card">
+<h3>Total Quantity</h3>
+<p id="qty"></p>
+</div>
+
+<div class="card">
+<h3>Avg Moisture</h3>
+<p id="moisture"></p>
+</div>
+
+<div class="card">
+<h3>FAQ Count</h3>
+<p id="faq"></p>
+</div>
+
+<div class="card">
+<h3>Non-FAQ Count</h3>
+<p id="nonfaq"></p>
+</div>
+
+</div>
+
+<!-- Charts -->
+<canvas id="chart1"></canvas>
+<canvas id="chart2"></canvas>
+
+<button class="btn" onclick="goBack()">⬅ Back to Form</button>
+
+</div>
+
+<script>
+
+// GET DATA
+const data = JSON.parse(localStorage.getItem("reportData"));
+
+let total = data.rows.length;
+let totalQty = 0;
+let totalMoisture = 0;
+let faq = 0;
+let nonfaq = 0;
+
+// CALCULATE
+data.rows.forEach(r => {
+  totalQty += Number(r.qty || 0);
+  totalMoisture += Number(r.m || 0);
+
+  if(r.s === "FAQ") faq++;
+  else nonfaq++;
+});
+
+let avgMoisture = total ? (totalMoisture / total).toFixed(2) : 0;
+
+// SHOW DATA
+document.getElementById("total").innerText = total;
+document.getElementById("qty").innerText = totalQty;
+document.getElementById("moisture").innerText = avgMoisture;
+document.getElementById("faq").innerText = faq;
+document.getElementById("nonfaq").innerText = nonfaq;
+
+
+// 📊 CHART 1: FAQ vs NON-FAQ
+new Chart(document.getElementById("chart1"), {
+  type: 'pie',
+  data: {
+    labels: ["FAQ", "Non-FAQ"],
+    datasets: [{
+      data: [faq, nonfaq]
+    }]
+  }
+});
+
+
+// 📊 CHART 2: Quantity per entry
+let labels = [];
+let qtyData = [];
+
+data.rows.forEach((r,i)=>{
+  labels.push("Row " + (i+1));
+  qtyData.push(Number(r.qty || 0));
+});
+
+new Chart(document.getElementById("chart2"), {
+  type: 'bar',
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "Quantity",
+      data: qtyData
+    }]
+  }
+});
+
+
+// BACK
+function goBack(){
+  window.location.href = "index.html";
+}
+
+</script>
+
+</body>
+</html>
