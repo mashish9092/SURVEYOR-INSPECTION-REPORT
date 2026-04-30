@@ -35,20 +35,32 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 10px;
-      table-layout: fixed;
+      table-layout: auto;
     }
 
-    th, td {
-      border: 1px solid black;
-      padding: 4px;
-      font-size: 12px;
-      text-align: center;
-    }
+   table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto; /* important change */
+}
 
-    th {
-      background: #eee;
-    }
+th, td {
+  border: 1px solid black;
+  padding: 6px;
+  font-size: 12px;
+  text-align: center;
+}
 
+th {
+  background: #f2f2f2;
+  white-space: normal;      /* text wrap */
+  word-wrap: break-word;    /* break long words */
+}
+
+/* Mobile scroll fix */
+.table-container {
+  overflow-x: auto;
+}
     .btn {
       margin-top: 10px;
       padding: 10px;
@@ -99,19 +111,19 @@
 <table >
 <thead>
 <tr>
-<th>Sr.no.</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN METTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGEDN GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
-<th>Action</th>
+<th style="min-width:60px;">Sr.no.</th>
+<th style="min-width:150px;">Name Of Farmer/Society</th>
+<th style="min-width:120px;">Farmer Registration</th>
+<th style="min-width:120px;">Qty In Quintals (Approx)</th>
+<th style="min-width:120px;">FOREIGN METTER (0.75%)</th>
+<th style="min-width:120px;">OTHER FOOD GRAINS (2%)</th>
+<th style="min-width:120px;">DAMAGED GRAINS (2%)</th>
+<th style="min-width:120px;">SLIGHT DAMAGED GRAINS (4%)</th>
+<th style="min-width:120px;">DAMAGED GRAINS (6%)</th>
+<th style="min-width:120px;">MOISTURE (12%)</th>
+<th style="min-width:120px;">Status FAQ/Non FAQ</th>
+<th style="min-width:150px;">Remark If Any</th>
+<th style="min-width:80px;">Action</th>
 </tr>
 </thead>
 
