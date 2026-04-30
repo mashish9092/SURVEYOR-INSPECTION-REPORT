@@ -1,22 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Survey Entry</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Survey Entry Form</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
-body {font-family:Arial;background:#f4f6f9;padding:20px;}
-.box {max-width:1200px;margin:auto;background:#fff;padding:20px;border-radius:10px;}
-input,select {width:100%;padding:8px;margin:4px 0;}
-.table-container {overflow-x:auto;}
-table {min-width:1400px;border-collapse:collapse;}
-th,td {border:1px solid #444;padding:5px;text-align:center;}
-th {background:#eee;}
-.btn {padding:10px;color:#fff;border:none;cursor:pointer;}
-.add {background:#007bff;}
-.save {background:green;width:100%;}
-.del {background:red;}
-</style>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f6f9;
+      padding: 10px;
+      margin: 0;
+    }
+
+    .box {
+      max-width: 1200px;
+      margin: auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    h2 { text-align: center; }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin: 6px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 10px;
+    }
+
+    table {
+      min-width: 1500px;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #eee;
+      font-size: 12px;
+      padding: 6px;
+      border: 1px solid black;
+    }
+
+    td {
+      border: 1px solid black;
+      padding: 4px;
+    }
+
+    td input, td select {
+      width: 100%;
+      padding: 6px;
+      font-size: 12px;
+    }
+
+    .btn {
+      padding: 10px;
+      border: none;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    .add { background: #007bff; }
+    .save { background: green; width: 100%; }
+    .excel { background: #28a745; }
+    .del { background: red; }
+
+    @media (max-width: 768px) {
+      input, select { font-size: 16px; }
+      td input { font-size: 14px; }
+    }
+  </style>
 </head>
 
 <body>
@@ -34,18 +94,18 @@ th {background:#eee;}
 <table>
 <thead>
 <tr>
-<th>Sr</th>
-<th>Name</th>
-<th>Reg</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>D2</th>
-<th>D4</th>
-<th>D6</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Sr.No</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN METTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -59,41 +119,46 @@ th {background:#eee;}
 <input id="sign1" placeholder="Signature of Surveyor">
 <input id="sign2" placeholder="Signature of Warehouse Manager">
 
+<button class="btn excel" onclick="exportExcel()">Export Excel</button>
 <button class="btn save" onclick="saveData()">Save & Send</button>
 
 </div>
 
 <script>
 
-let rowCount=0;
+let rowCount = 0;
 
-function addRow(){
+function addRow() {
   rowCount++;
-  let sr=document.querySelectorAll("#tableBody tr").length+1;
+  const sr = document.querySelectorAll("#tableBody tr").length + 1;
 
-  let row=`
+  const row = `
   <tr id="row${rowCount}">
-  <td class="sr">${sr}</td>
-  <td><input id="name${rowCount}"></td>
-  <td><input id="reg${rowCount}"></td>
-  <td><input id="qty${rowCount}"></td>
-  <td><input id="f${rowCount}"></td>
-  <td><input id="o${rowCount}"></td>
-  <td><input id="d2${rowCount}"></td>
-  <td><input id="d4${rowCount}"></td>
-  <td><input id="d6${rowCount}"></td>
-  <td><input id="m${rowCount}"></td>
-  <td>
-    <select id="s${rowCount}">
-      <option>FAQ</option>
-      <option>Non-FAQ</option>
-    </select>
-  </td>
-  <td><input id="r${rowCount}"></td>
-  <td><button class="del" onclick="deleteRow(${rowCount})">X</button></td>
+    <td class="sr">${sr}</td>
+
+    <td><input id="name${rowCount}"></td>
+    <td><input id="reg${rowCount}"></td>
+    <td><input id="qty${rowCount}"></td>
+    <td><input id="f${rowCount}"></td>
+    <td><input id="o${rowCount}"></td>
+    <td><input id="d2${rowCount}"></td>
+    <td><input id="d4${rowCount}"></td>
+    <td><input id="d6${rowCount}"></td>
+    <td><input id="m${rowCount}"></td>
+
+    <td>
+      <select id="s${rowCount}">
+        <option>FAQ</option>
+        <option>Non-FAQ</option>
+      </select>
+    </td>
+
+    <td><input id="r${rowCount}"></td>
+
+    <td><button class="del" onclick="deleteRow(${rowCount})">X</button></td>
   </tr>`;
 
-  tableBody.insertAdjacentHTML("beforeend",row);
+  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
   updateSr();
 }
 
@@ -103,78 +168,73 @@ function deleteRow(id){
 }
 
 function updateSr(){
-  document.querySelectorAll(".sr").forEach((e,i)=>e.innerText=i+1);
+  document.querySelectorAll(".sr").forEach((el,i)=>el.innerText=i+1);
 }
 
-window.onload=()=>{for(let i=0;i<3;i++) addRow();};
+// default rows
+window.onload = () => {
+  for(let i=0;i<5;i++) addRow();
+}
 
-/////////////////////////////////////////////////////
-// 🔥 SAVE + SEND TO GOOGLE SHEET
-/////////////////////////////////////////////////////
-
+// SAVE + API
 function saveData(){
 
   let rows=[];
 
   for(let i=1;i<=rowCount;i++){
-
     let name=document.getElementById("name"+i)?.value;
 
     if(name){
       rows.push({
         name,
-        reg:reg[i]?.value,
-        qty:qty[i]?.value,
-        f:f[i]?.value,
-        o:o[i]?.value,
-        d2:d2[i]?.value,
-        d4:d4[i]?.value,
-        d6:d6[i]?.value,
-        m:m[i]?.value,
-        s:s[i]?.value,
-        r:r[i]?.value
+        reg:document.getElementById("reg"+i)?.value,
+        qty:document.getElementById("qty"+i)?.value,
+        f:document.getElementById("f"+i)?.value,
+        o:document.getElementById("o"+i)?.value,
+        d2:document.getElementById("d2"+i)?.value,
+        d4:document.getElementById("d4"+i)?.value,
+        d6:document.getElementById("d6"+i)?.value,
+        m:document.getElementById("m"+i)?.value,
+        s:document.getElementById("s"+i)?.value,
+        r:document.getElementById("r"+i)?.value
       });
     }
   }
 
-  let payload=[];
+  const data={
+    grader:grader.value,
+    warehouse:warehouse.value,
+    society:society.value,
+    date:date.value,
+    sign1:sign1.value,
+    sign2:sign2.value,
+    rows
+  };
 
-  rows.forEach(r=>{
-    payload.push([
-      grader.value,
-      warehouse.value,
-      society.value,
-      date.value,
-      r.name,
-      r.reg,
-      r.qty,
-      r.f,
-      r.o,
-      r.d2,
-      r.d4,
-      r.d6,
-      r.m,
-      r.s,
-      r.r,
-      sign1.value,
-      sign2.value
-    ]);
-  });
+  // LOCAL SAVE (for edit page)
+  localStorage.setItem("reportData",JSON.stringify(data));
 
-  fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec", {
+  // 🔴 API CALL (अपना URL डालो)
+  fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec",{
     method:"POST",
-    body:JSON.stringify(payload)
-  })
-  .then(res=>res.text())
-  .then(msg=>{
-    alert("✅ Data Saved to Google Sheet");
-    console.log(msg);
-  })
-  .catch(err=>{
-    alert("❌ Error saving data");
-    console.error(err);
+    body:JSON.stringify(data)
   });
 
+  alert("Saved Successfully");
+}
+
+// EXCEL EXPORT
+function exportExcel(){
+
+  let table = document.querySelector("table").outerHTML;
+
+  let blob = new Blob([table], {type:"application/vnd.ms-excel"});
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "Survey_Report.xls";
+  a.click();
 }
 
 </script>
