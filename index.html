@@ -244,6 +244,46 @@ function exportExcel(){
   a.download = "Survey_Report.xls";
   a.click();
 }
+  // EDIT MODE LOAD
+window.onload = () => {
+
+  let edit = localStorage.getItem("editMode");
+  let data = JSON.parse(localStorage.getItem("reportData"));
+
+  if(edit === "true" && data){
+
+    grader.value = data.grader;
+    warehouse.value = data.warehouse;
+    society.value = data.society;
+    date.value = data.date;
+    sign1.value = data.sign1;
+    sign2.value = data.sign2;
+
+    document.getElementById("tableBody").innerHTML = "";
+    rowCount = 0;
+
+    data.rows.forEach(r=>{
+      addRow();
+
+      document.getElementById("name"+rowCount).value = r.name;
+      document.getElementById("reg"+rowCount).value = r.reg;
+      document.getElementById("qty"+rowCount).value = r.qty;
+      document.getElementById("f"+rowCount).value = r.f;
+      document.getElementById("o"+rowCount).value = r.o;
+      document.getElementById("d2"+rowCount).value = r.d2;
+      document.getElementById("d4"+rowCount).value = r.d4;
+      document.getElementById("d6"+rowCount).value = r.d6;
+      document.getElementById("m"+rowCount).value = r.m;
+      document.getElementById("s"+rowCount).value = r.s;
+      document.getElementById("r"+rowCount).value = r.r;
+    });
+
+    localStorage.removeItem("editMode");
+
+  } else {
+    for(let i=0;i<5;i++) addRow();
+  }
+};
 
 </script>
 
