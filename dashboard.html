@@ -61,8 +61,9 @@
 <button onclick="nextPage()">Next</button>
 
 <!-- TABLE -->
+  
 <h3>📋 Data Summary</h3>
-
+<button class="btn excel" onclick="exportExcel()">Export Excel</button>
 <div class="table-container">
 <table>
 <thead>
@@ -201,6 +202,38 @@ function updateStats(){
     (totalMoisture / allData.length).toFixed(2);
 
   document.getElementById("faq").innerText = faq;
+}
+  function exportExcel(){
+
+  let excel = "";
+
+  // HEADER
+  excel += "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
+
+  // DATA
+  allData.forEach((r,i)=>{
+    excel += `${i+1},
+    ${r["Name Of Farmer/Society"]},
+    ${r["Farmer Registration"]},
+    ${r["Qty In Quintals (Approx)"]},
+    ${r["FOREIGN METTER (0.75%)"]},
+    ${r["OTHER FOOD GRAINS (2%)"]},
+    ${r["DAMAGED GRAINS (2%)"]},
+    ${r["SLIGHT DAMAGED GRAINS (4%)"]},
+    ${r["DAMAGED GRAINS (6%)"]},
+    ${r["MOISTURE (12%)"]},
+    ${r["Status FAQ/Non FAQ"]},
+    ${r["Remark If Any"]}\n`;
+  });
+
+  // DOWNLOAD
+  let blob = new Blob([excel], { type: "application/vnd.ms-excel" });
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "Survey_Report.xls";
+  a.click();
 }
 
 // INIT
