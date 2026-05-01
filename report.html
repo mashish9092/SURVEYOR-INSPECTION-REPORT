@@ -1,149 +1,105 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Survey Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-<title>Survey Report</title>
-<style>
-body { font-family: Arial; background:#f4f6f9; padding:20px; }
-.box { max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
-
-table { width:100%; border-collapse: collapse; margin-top:10px; }
-th, td { border:1px solid black; font-size:12px; padding:5px; text-align:center; }
-
-.btn {
-  padding:10px;
-  border:none;
-  color:#fff;
-  cursor:pointer;
-  margin-top:10px;
-  border-radius:5px;
-}
-
-.excel { background:green; }
-.edit { background:#007bff; }
-</style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+<div class="header">Survey System</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <a href="dashboard.html">📊 Dashboard</a>
+  <a href="index.html">📋 Entry Form</a>
+  <a href="report.html" class="active">📄 Report</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
 <div class="box">
 
-<h2 style="text-align:center;">SURVEYOR INSPECTION REPORT</h2>
+<h2 style="text-align:center;">📄 SURVEYOR INSPECTION REPORT</h2>
 
-<p><b>Grader:</b> <span id="grader"></span></p>
-<p><b>Warehouse:</b> <span id="warehouse"></span></p>
-<p><b>Society:</b> <span id="society"></span></p>
-<p><b>Date:</b> <span id="date"></span></p>
+<br>
+
+<!-- BASIC DETAILS -->
+<p><b>Grader:</b> Aradhya</p>
+<p><b>Warehouse:</b> Mehra</p>
+<p><b>Society:</b> Mumbai</p>
+<p><b>Date:</b> 2026-05-01</p>
+
+<br>
+
+<!-- TABLE -->
+<div class="table-container">
 
 <table>
+
 <thead>
 <tr>
 <th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN METTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Qty In Quintals</th>
+<th>Foreign (0.75%)</th>
+<th>Other (2%)</th>
+<th>Damaged (2%)</th>
+<th>Slight (4%)</th>
+<th>Damaged (6%)</th>
+<th>Moisture (12%)</th>
+<th>Status</th>
+<th>Remark</th>
 </tr>
 </thead>
 
-<tbody id="table"></tbody>
+<tbody>
+
+<tr>
+<td>1</td>
+<td>Hritu_Aradhya</td>
+<td>112233445566778899</td>
+<td>100</td>
+<td>1.2</td>
+<td>4.2</td>
+<td>1.2</td>
+<td>4.2</td>
+<td>12</td>
+<td>10.1</td>
+<td>FAQ</td>
+<td>-</td>
+</tr>
+
+</tbody>
+
 </table>
-
-<br>
-
-<p><b>Surveyor Sign:</b> <span id="sign1"></span></p>
-<p><b>Manager Sign:</b> <span id="sign2"></span></p>
-
-<button class="btn excel" onclick="exportExcel()">Export Excel</button>
-<button class="btn edit" onclick="editData()">Edit Data</button>
 
 </div>
 
-<script>
+<br><br>
 
-// LOAD DATA
-let data = JSON.parse(localStorage.getItem("reportData"));
+<!-- SIGNATURE -->
+<p><b>Surveyor Sign:</b> ____________________</p>
+<p><b>Manager Sign:</b> ____________________</p>
 
-if(!data){
-  alert("No Data Found ❌");
-} else {
+<br>
 
-  document.getElementById("grader").innerText = data.grader;
-  document.getElementById("warehouse").innerText = data.warehouse;
-  document.getElementById("society").innerText = data.society;
-  document.getElementById("date").innerText = data.date;
-  document.getElementById("sign1").innerText = data.sign1;
-  document.getElementById("sign2").innerText = data.sign2;
+<!-- BUTTONS -->
+<button class="btn-excel">⬇ Export Excel</button>
+<button class="btn" onclick="window.location.href='index.html'">✏ Edit Data</button>
 
-  let html = "";
+</div>
 
-  data.rows.forEach((r,i)=>{
-    html += `
-    <tr>
-      <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.f}</td>
-      <td>${r.o}</td>
-      <td>${r.d2}</td>
-      <td>${r.d4}</td>
-      <td>${r.d6}</td>
-      <td>${r.m}</td>
-      <td>${r.s}</td>
-      <td>${r.r}</td>
-    </tr>`;
-  });
+</div>
 
-  document.getElementById("table").innerHTML = html;
-}
-
-
-// EDIT BUTTON
-function editData(){
-  localStorage.setItem("editMode","true");
-  window.location.href = "index.html";
-}
-
-
-// EXCEL EXPORT
-function exportExcel(){
-
-  let data = JSON.parse(localStorage.getItem("reportData"));
-
-  let excel = "";
-
-  excel += "Grader," + data.grader + "\n";
-  excel += "Warehouse," + data.warehouse + "\n";
-  excel += "Society," + data.society + "\n";
-  excel += "Date," + data.date + "\n\n";
-
-  excel += "Sr.No,Name Of Farmer/Society,Farmer Registration,Qty In Quintals (Approx),FOREIGN METTER (0.75%),OTHER FOOD GRAINS (2%),DAMAGED GRAINS (2%),SLIGHT DAMAGED GRAINS (4%),DAMAGED GRAINS (6%),MOISTURE (12%),Status FAQ/Non FAQ,Remark If Any\n";
-
-  data.rows.forEach((r,i)=>{
-    excel += `${i+1},${r.name},${r.reg},${r.qty},${r.f},${r.o},${r.d2},${r.d4},${r.d6},${r.m},${r.s},${r.r}\n`;
-  });
-
-  excel += "\nSurveyor Sign," + data.sign1;
-  excel += "\nManager Sign," + data.sign2;
-
-  let blob = new Blob([excel], { type: "application/vnd.ms-excel" });
-  let url = URL.createObjectURL(blob);
-
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = "Survey_Report.xls";
-  a.click();
-}
-
-</script>
+<!-- FOOTER -->
+<div class="footer">
+© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
+</div>
 
 </body>
 </html>
