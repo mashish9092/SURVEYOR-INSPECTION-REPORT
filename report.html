@@ -80,21 +80,43 @@
 <!-- POPUP -->
 <div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
   <div style="background:#fff; padding:20px; margin:100px auto; width:300px;">
-    <h3>Edit Row</h3>
+   <h3>Edit Row</h3>
 
-    <input id="eName" placeholder="Name">
-    <input id="eReg" placeholder="Registration">
-    <input id="eQty" placeholder="Qty">
-    <input id="eForeign" placeholder="Foreign">
-    <input id="eOther" placeholder="Other">
-    <input id="eDamaged" placeholder="Damaged">
-    <input id="eSlight" placeholder="Slight">
-    <input id="eSix" placeholder="6%">
-    <input id="eMoisture" placeholder="Moisture">
-    
-    <select id="eStatus">
-      <option>FAQ</option>
-      <option>Non-FAQ</option>
+<label>Name</label>
+<input id="eName">
+
+<label>Registration</label>
+<input id="eReg">
+
+<label>Qty</label>
+<input id="eQty">
+
+<label>Foreign (0.75%)</label>
+<input id="eForeign">
+
+<label>Other (2%)</label>
+<input id="eOther">
+
+<label>Damaged (2%)</label>
+<input id="eDamaged">
+
+<label>Slight (4%)</label>
+<input id="eSlight">
+
+<label>Damaged (6%)</label>
+<input id="eSix">
+
+<label>Moisture (12%)</label>
+<input id="eMoisture">
+
+<label>Status</label>
+<select id="eStatus">
+  <option>FAQ</option>
+  <option>Non-FAQ</option>
+</select>
+
+<label>Remark</label>
+<input id="eRemark">
     </select>
 
     <input id="eRemark" placeholder="Remark">
@@ -128,24 +150,24 @@ window.onload = function(){
 
   let html = "";
 
-  data.rows.forEach((r,i)=>{
-    html += `
-    <tr>
-      <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.foreign}</td>
-      <td>${r.other}</td>
-      <td>${r.damaged}</td>
-      <td>${r.slight}</td>
-      <td>${r.six}</td>
-      <td>${r.moisture}</td>
-      <td>${r.status}</td>
-      <td>${r.remark}</td>
-      <td><button onclick="editRow(this)">Edit</button></td>
-    </tr>`;
-  });
+ data.rows.forEach((r,i)=>{
+  html += `
+  <tr>
+    <td>${i+1}</td>
+    <td>${r.name || ""}</td>
+    <td>${r.reg || ""}</td>
+    <td>${r.qty || ""}</td>
+    <td>${r.foreign || ""}</td>
+    <td>${r.other || ""}</td>
+    <td>${r.damaged || ""}</td>
+    <td>${r.slight || ""}</td>
+    <td>${r.six || ""}</td>
+    <td>${r.moisture || ""}</td>
+    <td>${r.status || ""}</td>
+    <td>${r.remark || ""}</td>
+    <td><button onclick="editRow(this)">Edit</button></td>
+  </tr>`;
+});
 
   tableBody.innerHTML = html;
 }
@@ -155,17 +177,17 @@ function editRow(btn){
 
   currentRow = btn.parentElement.parentElement;
 
-  eName.value = currentRow.children[1].innerText;
-  eReg.value = currentRow.children[2].innerText;
-  eQty.value = currentRow.children[3].innerText;
-  eForeign.value = currentRow.children[4].innerText;
-  eOther.value = currentRow.children[5].innerText;
-  eDamaged.value = currentRow.children[6].innerText;
-  eSlight.value = currentRow.children[7].innerText;
-  eSix.value = currentRow.children[8].innerText;
-  eMoisture.value = currentRow.children[9].innerText;
-  eStatus.value = currentRow.children[10].innerText;
-  eRemark.value = currentRow.children[11].innerText;
+  eName.value = currentRow.children[1].innerText || "";
+  eReg.value = currentRow.children[2].innerText || "";
+  eQty.value = currentRow.children[3].innerText || "";
+  eForeign.value = currentRow.children[4].innerText || "";
+  eOther.value = currentRow.children[5].innerText || "";
+  eDamaged.value = currentRow.children[6].innerText || "";
+  eSlight.value = currentRow.children[7].innerText || "";
+  eSix.value = currentRow.children[8].innerText || "";
+  eMoisture.value = currentRow.children[9].innerText || "";
+  eStatus.value = currentRow.children[10].innerText || "FAQ";
+  eRemark.value = currentRow.children[11].innerText || "";
 
   popup.style.display = "block";
 }
@@ -191,14 +213,23 @@ async function updateRow(){
   currentRow.children[11].innerText = eRemark.value;
 
   // API UPDATE
-  await fetch(API,{
-    method:"POST",
-    body: JSON.stringify({
-      action:"update",
-      reg:eReg.value,
-      name:eName.value
-    })
-  });
+ await fetch(API,{
+  method:"POST",
+  body: JSON.stringify({
+    action:"update",
+    reg:eReg.value,
+    name:eName.value,
+    qty:eQty.value,
+    foreign:eForeign.value,
+    other:eOther.value,
+    damaged:eDamaged.value,
+    slight:eSlight.value,
+    six:eSix.value,
+    moisture:eMoisture.value,
+    status:eStatus.value,
+    remark:eRemark.value
+  })
+});
 
   showToast("Updated Successfully ✅");
   closePopup();
