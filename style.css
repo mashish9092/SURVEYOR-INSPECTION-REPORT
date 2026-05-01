@@ -14,11 +14,17 @@ body {
   padding-left: 20px;
   font-size: 18px;
   font-weight: bold;
+
+  position: fixed;   /* 🔥 IMPORTANT */
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 180px;   /* 👈 कम कर दिया */
+  width: 150px;   
   background: #1e1e2f;
   color: white;
   position: fixed;
@@ -28,10 +34,9 @@ body {
 }
 
 .sidebar a {
-  display: block;
-  padding: 10px;
-  color: #ccc;
-  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .sidebar a:hover {
@@ -41,8 +46,9 @@ body {
 
 /* MAIN */
 .main {
-  margin-left: 180px; /* sidebar के हिसाब से */
+  margin-left: 150px;
   padding: 20px;
+  margin-top: 70px;   /* 🔥 NEW */
 }
 
 /* BOX */
@@ -88,6 +94,14 @@ td {
 td input, td select {
   width: 100%;
   height: 30px;
+  padding: 4px;
+  box-sizing: border-box;   /* 🔥 VERY IMPORTANT */
+}
+th, td {
+  border: 1px solid black;
+  padding: 4px;
+  text-align: center;
+  white-space: nowrap;   /* 🔥 लाइन टूटेगी नहीं */
 }
 
 /* BUTTON */
