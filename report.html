@@ -121,6 +121,26 @@
 <script>
 
 function goToEdit(){
+
+  let row = document.querySelector("#reportTable tbody tr");
+
+  if(!row){
+    alert("No data to edit");
+    return;
+  }
+
+  let data = {
+    name: row.children[1].innerText,
+    reg: row.children[2].innerText,
+    qty: row.children[3].innerText,
+    moisture: row.children[9].innerText,
+    status: row.children[10].innerText
+  };
+
+  // SAVE IN LOCAL STORAGE
+  localStorage.setItem("editData", JSON.stringify(data));
+
+  // REDIRECT
   window.location.href = "index.html";
 }
 
