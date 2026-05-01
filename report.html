@@ -20,96 +20,56 @@
 
 <!-- MAIN -->
 <div class="main">
-  <div class="box">
+<div class="box">
 
-    <h2 class="report-title">📄 SURVEYOR INSPECTION REPORT</h2>
+<h2 class="report-title">📄 SURVEYOR INSPECTION REPORT</h2>
 
-    <!-- INFO GRID -->
-    <div class="report-grid">
+<!-- INFO -->
+<div class="report-grid">
+  <div class="report-item"><span>👤 Grader</span><strong id="grader"></strong></div>
+  <div class="report-item"><span>🏢 Warehouse</span><strong id="warehouse"></strong></div>
+  <div class="report-item"><span>📍 Society</span><strong id="society"></strong></div>
+  <div class="report-item"><span>📅 Date</span><strong id="date"></strong></div>
+</div>
 
-      <div class="report-item">
-        <span>👤 Grader</span>
-        <strong>Aradhya</strong>
-      </div>
+<!-- TABLE -->
+<div class="table-container">
+<table id="reportTable">
+<thead>
+<tr>
+<th>Sr.No</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
+<th>Action</th>
+</tr>
+</thead>
 
-      <div class="report-item">
-        <span>🏢 Warehouse</span>
-        <strong>Mehra</strong>
-      </div>
+<tbody id="tableBody"></tbody>
 
-      <div class="report-item">
-        <span>📍 Society</span>
-        <strong>Mumbai</strong>
-      </div>
+</table>
+</div>
 
-      <div class="report-item">
-        <span>📅 Date</span>
-        <strong>2026-05-01</strong>
-      </div>
+<!-- SIGN -->
+<div style="margin-top:20px;">
+<p><b>Surveyor Sign:</b> _____________</p>
+<p><b>Manager Sign:</b> _____________</p>
+</div>
 
-    </div>
+<!-- BUTTONS -->
+<div class="btn-group">
+<button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
+</div>
 
-    <!-- TABLE -->
-    <div class="table-container">
-      <table id="reportTable">
-
-        <thead>
-          <tr>
-            <th>Sr.No</th>
-            <th>Name Of Farmer/Society</th>
-            <th>Farmer Registration</th>
-            <th>Qty</th>
-            <th>Foreign</th>
-            <th>Other</th>
-            <th>Damaged</th>
-            <th>Slight</th>
-            <th>6%</th>
-            <th>Moisture</th>
-            <th>Status</th>
-            <th>Remark</th>
-          </tr>
-        </thead>
-
-        <tbody id="tableBody">
-          <tr>
-            <td>1</td>
-            <td>Hritu_Aradhya</td>
-            <td>112233445566778899</td>
-            <td>100</td>
-            <td>1.2</td>
-            <td>4.2</td>
-            <td>1.2</td>
-            <td>4.2</td>
-            <td>12</td>
-            <td>10.1</td>
-            <td>FAQ</td>
-            <td>-</td>
-          </tr>
-        </tbody>
-
-      </table>
-    </div>
-
-    <!-- SIGNATURE -->
-    <div class="sign-section" style="margin-top:20px;">
-      <p><b>Surveyor Sign:</b> ____________________</p>
-      <p><b>Manager Sign:</b> ____________________</p>
-    </div>
-
-    <!-- BUTTONS -->
-    <div class="btn-group">
-
-      <button class="btn excel" onclick="exportExcel()">
-        ⬇ Export Excel
-      </button>
-
-      <button class="btn edit" onclick="goToEdit()">
-        ✏ Edit Data
-      </button>
-
-    </div>
-
-  </div>
+</div>
 </div>
 
 <!-- FOOTER -->
@@ -117,75 +77,163 @@
 © 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
 
-<!-- SCRIPT -->
+<!-- POPUP -->
+<div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+  <div style="background:#fff; padding:20px; margin:100px auto; width:300px;">
+    <h3>Edit Row</h3>
+
+    <input id="eName" placeholder="Name">
+    <input id="eReg" placeholder="Registration">
+    <input id="eQty" placeholder="Qty">
+    <input id="eForeign" placeholder="Foreign">
+    <input id="eOther" placeholder="Other">
+    <input id="eDamaged" placeholder="Damaged">
+    <input id="eSlight" placeholder="Slight">
+    <input id="eSix" placeholder="6%">
+    <input id="eMoisture" placeholder="Moisture">
+    
+    <select id="eStatus">
+      <option>FAQ</option>
+      <option>Non-FAQ</option>
+    </select>
+
+    <input id="eRemark" placeholder="Remark">
+
+    <br><br>
+    <button class="btn save" onclick="updateRow()">Update</button>
+    <button class="btn edit" onclick="closePopup()">Cancel</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
 <script>
 
-function goToEdit(){
+const API = "PASTE_YOUR_API_URL_HERE";
 
-  let row = document.querySelector("#reportTable tbody tr");
+let currentRow = null;
 
-  if(!row){
-    alert("No data to edit");
-    return;
-  }
+// LOAD DATA FROM LOCAL STORAGE
+window.onload = function(){
 
-  let data = {
-    name: row.children[1].innerText,
-    reg: row.children[2].innerText,
-    qty: row.children[3].innerText,
-    moisture: row.children[9].innerText,
-    status: row.children[10].innerText
-  };
+  let data = JSON.parse(localStorage.getItem("reportData"));
 
-  // SAVE IN LOCAL STORAGE
-  localStorage.setItem("editData", JSON.stringify(data));
+  if(!data) return;
 
-  // REDIRECT
-  window.location.href = "index.html";
+  document.getElementById("grader").innerText = data.grader;
+  document.getElementById("warehouse").innerText = data.warehouse;
+  document.getElementById("society").innerText = data.society;
+  document.getElementById("date").innerText = data.date;
+
+  let html = "";
+
+  data.rows.forEach((r,i)=>{
+    html += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.foreign}</td>
+      <td>${r.other}</td>
+      <td>${r.damaged}</td>
+      <td>${r.slight}</td>
+      <td>${r.six}</td>
+      <td>${r.moisture}</td>
+      <td>${r.status}</td>
+      <td>${r.remark}</td>
+      <td><button onclick="editRow(this)">Edit</button></td>
+    </tr>`;
+  });
+
+  tableBody.innerHTML = html;
 }
 
-// EXPORT FUNCTION (SAFE VERSION)
+// OPEN POPUP
+function editRow(btn){
+
+  currentRow = btn.parentElement.parentElement;
+
+  eName.value = currentRow.children[1].innerText;
+  eReg.value = currentRow.children[2].innerText;
+  eQty.value = currentRow.children[3].innerText;
+  eForeign.value = currentRow.children[4].innerText;
+  eOther.value = currentRow.children[5].innerText;
+  eDamaged.value = currentRow.children[6].innerText;
+  eSlight.value = currentRow.children[7].innerText;
+  eSix.value = currentRow.children[8].innerText;
+  eMoisture.value = currentRow.children[9].innerText;
+  eStatus.value = currentRow.children[10].innerText;
+  eRemark.value = currentRow.children[11].innerText;
+
+  popup.style.display = "block";
+}
+
+// CLOSE POPUP
+function closePopup(){
+  popup.style.display = "none";
+}
+
+// UPDATE
+async function updateRow(){
+
+  currentRow.children[1].innerText = eName.value;
+  currentRow.children[2].innerText = eReg.value;
+  currentRow.children[3].innerText = eQty.value;
+  currentRow.children[4].innerText = eForeign.value;
+  currentRow.children[5].innerText = eOther.value;
+  currentRow.children[6].innerText = eDamaged.value;
+  currentRow.children[7].innerText = eSlight.value;
+  currentRow.children[8].innerText = eSix.value;
+  currentRow.children[9].innerText = eMoisture.value;
+  currentRow.children[10].innerText = eStatus.value;
+  currentRow.children[11].innerText = eRemark.value;
+
+  // API UPDATE
+  await fetch(API,{
+    method:"POST",
+    body: JSON.stringify({
+      action:"update",
+      reg:eReg.value,
+      name:eName.value
+    })
+  });
+
+  showToast("Updated Successfully ✅");
+  closePopup();
+}
+
+// EXPORT
 function exportExcel(){
 
-  const rows = document.querySelectorAll("#reportTable tbody tr");
-
-  if(rows.length === 0){
-    alert("No data available to export");
-    return;
-  }
-
+  let rows = document.querySelectorAll("#reportTable tr");
   let csv = [];
 
-  // HEADER
-  let headers = [];
-  document.querySelectorAll("#reportTable thead th").forEach(th=>{
-    headers.push(th.innerText);
-  });
-  csv.push(headers);
-
-  // DATA
   rows.forEach(row=>{
-    let cols = row.querySelectorAll("td");
+    let cols = row.querySelectorAll("td,th");
     let data = [];
 
-    cols.forEach(td=>{
-      data.push(td.innerText.replace(/,/g, ""));
+    cols.forEach(col=>{
+      data.push(col.innerText);
     });
 
-    csv.push(data);
+    csv.push(data.join(","));
   });
 
-  let csvContent = csv.map(e => e.join(",")).join("\n");
+  let blob = new Blob([csv.join("\n")], {type:"text/csv"});
+  let link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "Survey_Report.csv";
+  link.click();
+}
 
-  let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  let url = URL.createObjectURL(blob);
-
-  let a = document.createElement("a");
-  a.href = url;
-  a.download = "Survey_Report.csv";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+// TOAST
+function showToast(msg){
+  let t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
+  setTimeout(()=> t.style.display="none",3000);
 }
 
 </script>
