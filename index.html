@@ -22,8 +22,8 @@
 <h2>Survey Entry Form</h2>
 
 <input id="grader" placeholder="Grader Name">
-<input id="warehouse" placeholder="Warehouse">
-<input id="society" placeholder="Society">
+<input id="warehouse" placeholder="Warehouse Name & Location">
+<input id="society" placeholder="Society / Procurement Centre">
 <input type="date" id="date">
 
 <div class="table-container">
@@ -31,11 +31,17 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Reg</th>
-<th>Qty</th>
-<th>Moisture</th>
-<th>Status</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals</th>
+<th>FOREIGN METTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -48,26 +54,39 @@
 
 <br><br>
 
-<button onclick="saveData()">Save</button>
+<button onclick="saveData()">Save & Generate Report</button>
 
 </div>
 </div>
 
 <!-- POPUP -->
-<div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
-  <div style="background:#fff; padding:20px; margin:100px auto; width:300px;">
-    <h3>Edit</h3>
-    <input id="eName">
-    <input id="eReg">
-    <input id="eQty">
+<div id="popup" class="popup">
+  <div class="popup-box">
+
+    <h3>Edit Record</h3>
+
+    <input id="eName" placeholder="Name">
+    <input id="eReg" placeholder="Registration">
+    <input id="eQty" placeholder="Qty">
+    <input id="eF">
+    <input id="eO">
+    <input id="eD2">
+    <input id="eD4">
+    <input id="eD6">
     <input id="eM">
-    <select id="eStatus">
+
+    <select id="eS">
       <option>FAQ</option>
       <option>Non-FAQ</option>
     </select>
+
+    <input id="eR" placeholder="Remark">
+
     <br><br>
+
     <button onclick="updateRow()">Update</button>
     <button onclick="closePopup()">Cancel</button>
+
   </div>
 </div>
 
@@ -81,13 +100,20 @@ const API = "PASTE_YOUR_API_URL_HERE";
 
 // ADD ROW
 function addRow(){
+
   rowCount++;
+
   let row = `
   <tr id="row${rowCount}">
     <td>${rowCount}</td>
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
     <td><input id="qty${rowCount}"></td>
+    <td><input id="f${rowCount}"></td>
+    <td><input id="o${rowCount}"></td>
+    <td><input id="d2${rowCount}"></td>
+    <td><input id="d4${rowCount}"></td>
+    <td><input id="d6${rowCount}"></td>
     <td><input id="m${rowCount}"></td>
     <td>
       <select id="s${rowCount}">
@@ -95,28 +121,37 @@ function addRow(){
         <option>Non-FAQ</option>
       </select>
     </td>
+    <td><input id="r${rowCount}"></td>
     <td>
       <button onclick="openPopup(${rowCount})">Edit</button>
       <button onclick="deleteRow(${rowCount})">X</button>
     </td>
   </tr>`;
+
   tableBody.insertAdjacentHTML("beforeend", row);
 }
 
 // OPEN POPUP
 function openPopup(id){
+
   currentId = id;
 
-  eName.value = document.getElementById("name"+id).value;
-  eReg.value = document.getElementById("reg"+id).value;
-  eQty.value = document.getElementById("qty"+id).value;
-  eM.value = document.getElementById("m"+id).value;
-  eStatus.value = document.getElementById("s"+id).value;
+  eName.value = name[id].value;
+  eReg.value = reg[id].value;
+  eQty.value = qty[id].value;
+  eF.value = f[id].value;
+  eO.value = o[id].value;
+  eD2.value = d2[id].value;
+  eD4.value = d4[id].value;
+  eD6.value = d6[id].value;
+  eM.value = m[id].value;
+  eS.value = s[id].value;
+  eR.value = r[id].value;
 
-  popup.style.display = "block";
+  popup.style.display = "flex";
 }
 
-// CLOSE POPUP
+// CLOSE
 function closePopup(){
   popup.style.display = "none";
 }
@@ -124,25 +159,17 @@ function closePopup(){
 // UPDATE
 async function updateRow(){
 
-  let data = {
-    action:"update",
-    name:eName.value,
-    reg:eReg.value,
-    qty:eQty.value,
-    m:eM.value,
-    s:eStatus.value
-  };
-
-  await fetch(API,{
-    method:"POST",
-    body:JSON.stringify(data)
-  });
-
-  document.getElementById("name"+currentId).value = eName.value;
-  document.getElementById("reg"+currentId).value = eReg.value;
-  document.getElementById("qty"+currentId).value = eQty.value;
-  document.getElementById("m"+currentId).value = eM.value;
-  document.getElementById("s"+currentId).value = eStatus.value;
+  name[currentId].value = eName.value;
+  reg[currentId].value = eReg.value;
+  qty[currentId].value = eQty.value;
+  f[currentId].value = eF.value;
+  o[currentId].value = eO.value;
+  d2[currentId].value = eD2.value;
+  d4[currentId].value = eD4.value;
+  d6[currentId].value = eD6.value;
+  m[currentId].value = eM.value;
+  s[currentId].value = eS.value;
+  r[currentId].value = eR.value;
 
   showToast("Updated ✅");
   closePopup();
@@ -151,48 +178,73 @@ async function updateRow(){
 // DELETE
 async function deleteRow(id){
 
-  let reg = document.getElementById("reg"+id).value;
+  let regNo = document.getElementById("reg"+id).value;
 
   await fetch(API,{
     method:"POST",
-    body:JSON.stringify({action:"delete", reg})
+    body:JSON.stringify({action:"delete", reg:regNo})
   });
 
   document.getElementById("row"+id).remove();
+
   showToast("Deleted ❌");
 }
 
 // SAVE
 async function saveData(){
 
+  let rows=[];
+
   for(let i=1;i<=rowCount;i++){
 
-    let name = document.getElementById("name"+i)?.value;
+    let nameVal = document.getElementById("name"+i)?.value;
 
-    if(name){
-      let data = {
-        action:"add",
-        name,
-        reg:document.getElementById("reg"+i).value,
-        qty:document.getElementById("qty"+i).value,
-        m:document.getElementById("m"+i).value,
-        s:document.getElementById("s"+i).value
+    if(nameVal){
+
+      let rowData = {
+        name:nameVal,
+        reg:reg[i].value,
+        qty:qty[i].value,
+        f:f[i].value,
+        o:o[i].value,
+        d2:d2[i].value,
+        d4:d4[i].value,
+        d6:d6[i].value,
+        m:m[i].value,
+        s:s[i].value,
+        r:r[i].value
       };
+
+      rows.push(rowData);
 
       await fetch(API,{
         method:"POST",
-        body:JSON.stringify(data)
+        body:JSON.stringify({action:"add",...rowData})
       });
     }
   }
 
-  showToast("Saved Successfully ✅");
+  // LOCAL SAVE FOR REPORT
+  localStorage.setItem("reportData",JSON.stringify({
+    grader:grader.value,
+    warehouse:warehouse.value,
+    society:society.value,
+    date:date.value,
+    rows
+  }));
+
+  showToast("Saved & Report Generated ✅");
+
+  setTimeout(()=>{
+    window.location.href="report.html";
+  },1000);
 }
 
 // TOAST
 function showToast(msg){
 
   let t = document.getElementById("toast");
+
   t.innerText = msg;
   t.style.display = "block";
 
@@ -202,7 +254,7 @@ function showToast(msg){
 }
 
 // INIT
-window.onload = ()=>{ for(let i=0;i<3;i++) addRow(); }
+window.onload = ()=>{ for(let i=0;i<5;i++) addRow(); }
 
 </script>
 
