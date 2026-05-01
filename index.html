@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
 <div class="header">Survey System</div>
@@ -61,10 +62,14 @@
 
 <div class="footer">© 2026 Survey System</div>
 
+<!-- ✅ API CONFIG -->
+<script src="config.js"></script>
+
 <script>
 
 let rowCount = 0;
 
+// ADD ROW
 function addRow(){
   rowCount++;
 
@@ -90,61 +95,85 @@ function addRow(){
     <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
-  tableBody.insertAdjacentHTML("beforeend", row);
+  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
   updateSr();
 }
 
+// DELETE
 function deleteRow(id){
   document.getElementById("row"+id).remove();
   updateSr();
 }
 
+// SR NO FIX
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
     row.cells[0].innerText = i+1;
   });
 }
 
-function saveData(){
+// SAVE DATA
+async function saveData(){
 
   let rows = [];
 
   document.querySelectorAll("#tableBody tr").forEach(row=>{
+
     let i = row.id.replace("row","");
 
-    rows.push({
-      name: name0(i),
-      reg: val("reg"+i),
-      qty: val("qty"+i),
-      foreign: val("f"+i),
-      other: val("o"+i),
-      damaged2: val("d2"+i),
-      slight: val("d4"+i),
-      damaged6: val("d6"+i),
-      moisture: val("m"+i),
-      status: val("s"+i),
-      remark: val("r"+i)
-    });
+    let name = getVal("name"+i);
+
+    if(name){   // ✅ EMPTY ROW SKIP
+      let data = {
+        name,
+        reg: getVal("reg"+i),
+        qty: getVal("qty"+i),
+        f: getVal("f"+i),
+        o: getVal("o"+i),
+        d2: getVal("d2"+i),
+        d4: getVal("d4"+i),
+        d6: getVal("d6"+i),
+        m: getVal("m"+i),
+        s: getVal("s"+i),
+        r: getVal("r"+i)
+      };
+
+      rows.push(data);
+
+      // 🔥 GOOGLE SHEET SAVE
+      if(typeof API !== "undefined"){
+        await fetch(API,{
+          method:"POST",
+          body: JSON.stringify({
+            action:"add",
+            ...data
+          })
+        });
+      }
+    }
+
   });
 
+  // SAVE FOR REPORT PAGE
   localStorage.setItem("reportData", JSON.stringify({
-    grader: grader.value,
-    warehouse: warehouse.value,
-    society: society.value,
-    date: date.value,
+    grader: getVal("grader"),
+    warehouse: getVal("warehouse"),
+    society: getVal("society"),
+    date: getVal("date"),
     rows
   }));
+
+  alert("Saved Successfully ✅");
 
   window.location.href="report.html";
 }
 
-function val(id){
+// HELPER
+function getVal(id){
   return document.getElementById(id)?.value || "";
 }
-function name0(i){
-  return document.getElementById("name"+i)?.value || "";
-}
 
+// INIT
 window.onload = ()=> addRow();
 
 </script>
