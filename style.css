@@ -136,6 +136,24 @@ td:nth-child(11) {
   color: white;
   cursor: pointer;
 }
+html, body {
+  height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* MAIN CONTENT FULL HEIGHT */
+.main {
+  flex: 1;
+}
+
+/* FOOTER FIX */
+.footer {
+  margin-top: auto;
+}
 
 /* EXCEL BUTTON */
 .btn-excel {
