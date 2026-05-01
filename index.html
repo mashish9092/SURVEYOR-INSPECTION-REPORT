@@ -21,10 +21,12 @@
 
 <h2>Survey Entry Form</h2>
 
-<input id="grader" placeholder="Grader / Surveyor Name">
+<input id="grader" placeholder="Grader Name">
 <input id="warehouse" placeholder="Warehouse Name & Location">
 <input id="society" placeholder="Society / Procurement Centre">
 <input type="date" id="date">
+
+<br><br>
 
 <div class="table-container">
 <table>
@@ -33,7 +35,7 @@
 <th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals(Approx)</th>
+<th>Qty In Quintals (Approx)</th>
 <th>FOREIGN METTER (0.75%)</th>
 <th>OTHER FOOD GRAINS (2%)</th>
 <th>DAMAGED GRAINS (2%)</th>
@@ -50,6 +52,8 @@
 </table>
 </div>
 
+<br>
+
 <button onclick="addRow()">+ Add Row</button>
 
 <br><br>
@@ -59,35 +63,8 @@
 </div>
 </div>
 
-<!-- POPUP -->
-<div id="popup" class="popup">
-  <div class="popup-box">
-
-    <h3>Edit Record</h3>
-
-    <input id="eName" placeholder="Name">
-    <input id="eReg" placeholder="Registration">
-    <input id="eQty" placeholder="Qty">
-    <input id="eF">
-    <input id="eO">
-    <input id="eD2">
-    <input id="eD4">
-    <input id="eD6">
-    <input id="eM">
-
-    <select id="eS">
-      <option>FAQ</option>
-      <option>Non-FAQ</option>
-    </select>
-
-    <input id="eR" placeholder="Remark">
-
-    <br><br>
-
-    <button onclick="updateRow()">Update</button>
-    <button onclick="closePopup()">Cancel</button>
-
-  </div>
+<div class="footer">
+© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
 
 <div id="toast"></div>
@@ -95,7 +72,6 @@
 <script>
 
 let rowCount = 0;
-let currentId = 0;
 const API = "PASTE_YOUR_API_URL_HERE";
 
 // ADD ROW
@@ -123,117 +99,64 @@ function addRow(){
     </td>
     <td><input id="r${rowCount}"></td>
     <td>
-      <button onclick="openPopup(${rowCount})">Edit</button>
-      <button onclick="deleteRow(${rowCount})">X</button>
+      <button onclick="deleteRow(${rowCount})">❌</button>
     </td>
   </tr>`;
 
-  tableBody.insertAdjacentHTML("beforeend", row);
+  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
 }
 
-// OPEN POPUP
-function openPopup(id){
-
-  currentId = id;
-
-  eName.value = name[id].value;
-  eReg.value = reg[id].value;
-  eQty.value = qty[id].value;
-  eF.value = f[id].value;
-  eO.value = o[id].value;
-  eD2.value = d2[id].value;
-  eD4.value = d4[id].value;
-  eD6.value = d6[id].value;
-  eM.value = m[id].value;
-  eS.value = s[id].value;
-  eR.value = r[id].value;
-
-  popup.style.display = "flex";
-}
-
-// CLOSE
-function closePopup(){
-  popup.style.display = "none";
-}
-
-// UPDATE
-async function updateRow(){
-
-  name[currentId].value = eName.value;
-  reg[currentId].value = eReg.value;
-  qty[currentId].value = eQty.value;
-  f[currentId].value = eF.value;
-  o[currentId].value = eO.value;
-  d2[currentId].value = eD2.value;
-  d4[currentId].value = eD4.value;
-  d6[currentId].value = eD6.value;
-  m[currentId].value = eM.value;
-  s[currentId].value = eS.value;
-  r[currentId].value = eR.value;
-
-  showToast("Updated ✅");
-  closePopup();
-}
-
-// DELETE
-async function deleteRow(id){
-
-  let regNo = document.getElementById("reg"+id).value;
-
-  await fetch(API,{
-    method:"POST",
-    body:JSON.stringify({action:"delete", reg:regNo})
-  });
-
+// DELETE ROW
+function deleteRow(id){
   document.getElementById("row"+id).remove();
-
-  showToast("Deleted ❌");
+  showToast("Row Deleted ❌");
 }
 
-// SAVE
+// SAVE DATA
 async function saveData(){
 
   let rows=[];
 
   for(let i=1;i<=rowCount;i++){
 
-    let nameVal = document.getElementById("name"+i)?.value;
+    let name = document.getElementById("name"+i)?.value;
 
-    if(nameVal){
+    if(name){
 
-      let rowData = {
-        name:nameVal,
-        reg:reg[i].value,
-        qty:qty[i].value,
-        f:f[i].value,
-        o:o[i].value,
-        d2:d2[i].value,
-        d4:d4[i].value,
-        d6:d6[i].value,
-        m:m[i].value,
-        s:s[i].value,
-        r:r[i].value
+      let data = {
+        name,
+        reg:document.getElementById("reg"+i).value,
+        qty:document.getElementById("qty"+i).value,
+        f:document.getElementById("f"+i).value,
+        o:document.getElementById("o"+i).value,
+        d2:document.getElementById("d2"+i).value,
+        d4:document.getElementById("d4"+i).value,
+        d6:document.getElementById("d6"+i).value,
+        m:document.getElementById("m"+i).value,
+        s:document.getElementById("s"+i).value,
+        r:document.getElementById("r"+i).value
       };
 
-      rows.push(rowData);
+      rows.push(data);
 
+      // GOOGLE SHEET SAVE
       await fetch(API,{
         method:"POST",
-        body:JSON.stringify({action:"add",...rowData})
+        body:JSON.stringify({action:"add",...data})
       });
     }
   }
 
-  // LOCAL SAVE FOR REPORT
-  localStorage.setItem("reportData",JSON.stringify({
-    grader:grader.value,
-    warehouse:warehouse.value,
-    society:society.value,
-    date:date.value,
+  // SAVE FOR REPORT PAGE
+  localStorage.setItem("reportData", JSON.stringify({
+    grader:document.getElementById("grader").value,
+    warehouse:document.getElementById("warehouse").value,
+    society:document.getElementById("society").value,
+    date:document.getElementById("date").value,
     rows
   }));
 
-  showToast("Saved & Report Generated ✅");
+  showToast("Saved Successfully ✅");
 
   setTimeout(()=>{
     window.location.href="report.html";
@@ -246,6 +169,13 @@ function showToast(msg){
   let t = document.getElementById("toast");
 
   t.innerText = msg;
+  t.style.position = "fixed";
+  t.style.bottom = "20px";
+  t.style.right = "20px";
+  t.style.background = "#28a745";
+  t.style.color = "white";
+  t.style.padding = "10px 15px";
+  t.style.borderRadius = "6px";
   t.style.display = "block";
 
   setTimeout(()=>{
@@ -253,8 +183,8 @@ function showToast(msg){
   },3000);
 }
 
-// INIT
-window.onload = ()=>{ for(let i=0;i<5;i++) addRow(); }
+// INIT (ONLY 1 ROW)
+window.onload = ()=> addRow();
 
 </script>
 
