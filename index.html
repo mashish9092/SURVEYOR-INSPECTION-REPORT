@@ -10,202 +10,164 @@
 
 <div class="header">Survey System</div>
 
-<div class="sidebar">
-  <a href="dashboard.html">📊 Dashboard</a>
-  <a href="index.html" class="active">📋 Entry Form</a>
-  <a href="report.html">📄 Report</a>
-</div>
-
 <div class="main">
 <div class="box">
 
 <h2>Survey Entry Form</h2>
 
-<input id="grader" placeholder="Grader Name">
-<input id="warehouse" placeholder="Warehouse">
-<input id="society" placeholder="Society">
+<input id="grader" placeholder="Grader/Surveyor Name">
+<input id="warehouse" placeholder="Warehouse Name & Location">
+<input id="society" placeholder="Society/Procurement Centre">
 <input type="date" id="date">
 
 <br><br>
 
-<div class="table-container">
 <table>
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Reg</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>D2</th>
-<th>D4</th>
-<th>D6</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN MATTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
 
 <tbody id="tableBody"></tbody>
 </table>
-</div>
 
 <br>
 
-<div style="display:flex; gap:10px;">
-  <button onclick="addRow()" class="btn add">➕ Add Row</button>
-  <button onclick="saveData()" class="btn save">💾 Save & Generate Report</button>
-</div>
+<button onclick="addRow()">➕ Add Row</button>
+<button onclick="saveData()">💾 Save & Generate Report</button>
 
 </div>
 </div>
 
-<div class="footer">© 2026 Survey System</div>
-
-<!-- API CONFIG -->
 <script src="config.js"></script>
 
 <script>
 
 let rowCount = 0;
 
-// =====================
 // ADD ROW
-// =====================
 function addRow(){
-
   rowCount++;
 
   let row = `
   <tr id="row${rowCount}">
     <td></td>
-    <td><input id="name${rowCount}" placeholder="Name"></td>
-    <td><input id="reg${rowCount}" placeholder="Reg No"></td>
+    <td><input id="name${rowCount}"></td>
+    <td><input id="reg${rowCount}"></td>
     <td><input id="qty${rowCount}" type="number"></td>
-    <td><input id="f${rowCount}" type="number"></td>
-    <td><input id="o${rowCount}" type="number"></td>
-    <td><input id="d2${rowCount}" type="number"></td>
-    <td><input id="d4${rowCount}" type="number"></td>
-    <td><input id="d6${rowCount}" type="number"></td>
-    <td><input id="m${rowCount}" type="number"></td>
+    <td><input id="foreign${rowCount}" type="number"></td>
+    <td><input id="other${rowCount}" type="number"></td>
+    <td><input id="damaged2${rowCount}" type="number"></td>
+    <td><input id="slight${rowCount}" type="number"></td>
+    <td><input id="damaged6${rowCount}" type="number"></td>
+    <td><input id="moisture${rowCount}" type="number"></td>
     <td>
-      <select id="s${rowCount}">
+      <select id="status${rowCount}">
         <option>FAQ</option>
         <option>Non-FAQ</option>
       </select>
     </td>
-    <td><input id="r${rowCount}" placeholder="Remark"></td>
+    <td><input id="remark${rowCount}"></td>
     <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
-  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
-
+  tableBody.insertAdjacentHTML("beforeend", row);
   updateSr();
 }
 
-// =====================
-// DELETE ROW
-// =====================
+// DELETE
 function deleteRow(id){
   document.getElementById("row"+id).remove();
   updateSr();
 }
 
-// =====================
-// FIX SERIAL NUMBER
-// =====================
+// SR NO FIX
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
     row.cells[0].innerText = i + 1;
   });
 }
 
-// =====================
-// SAVE DATA
-// =====================
+// SAVE
 async function saveData(){
 
-  let rows = [];
+  let rows=[];
+  let allRows=document.querySelectorAll("#tableBody tr");
 
-  let allRows = document.querySelectorAll("#tableBody tr");
-
-  if(allRows.length === 0){
-    alert("Please add at least one row ❗");
+  if(allRows.length===0){
+    alert("Add at least 1 row");
     return;
   }
 
   for(let row of allRows){
 
-    let i = row.id.replace("row","");
+    let i=row.id.replace("row","");
 
-    let name = getVal("name"+i);
-
-    if(!name) continue; // skip empty
-
-    let data = {
-      name,
-      reg: getVal("reg"+i),
-      qty: getVal("qty"+i),
-      f: getVal("f"+i),
-      o: getVal("o"+i),
-      d2: getVal("d2"+i),
-      d4: getVal("d4"+i),
-      d6: getVal("d6"+i),
-      m: getVal("m"+i),
-      s: getVal("s"+i),
-      r: getVal("r"+i)
+    let data={
+      name:getVal("name"+i),
+      reg:getVal("reg"+i),
+      qty:getVal("qty"+i),
+      foreign:getVal("foreign"+i),
+      other:getVal("other"+i),
+      damaged2:getVal("damaged2"+i),
+      slight:getVal("slight"+i),
+      damaged6:getVal("damaged6"+i),
+      moisture:getVal("moisture"+i),
+      status:getVal("status"+i),
+      remark:getVal("remark"+i)
     };
+
+    if(!data.name) continue;
 
     rows.push(data);
 
-    // GOOGLE SHEET SAVE
+    // API SAVE
     if(typeof API !== "undefined"){
-      try{
-        await fetch(API,{
-          method:"POST",
-          body: JSON.stringify({
-            action:"add",
-            ...data
-          })
-        });
-      }catch(err){
-        console.log("API Error:", err);
-      }
+      await fetch(API,{
+        method:"POST",
+        body:JSON.stringify({
+          action:"add",
+          ...data
+        })
+      });
     }
   }
 
-  if(rows.length === 0){
-    alert("Please fill at least one row ❗");
+  if(rows.length===0){
+    alert("Fill at least one row");
     return;
   }
 
-  // SAVE FOR REPORT PAGE
-  localStorage.setItem("reportData", JSON.stringify({
-    grader: getVal("grader"),
-    warehouse: getVal("warehouse"),
-    society: getVal("society"),
-    date: getVal("date"),
+  localStorage.setItem("reportData",JSON.stringify({
+    grader:getVal("grader"),
+    warehouse:getVal("warehouse"),
+    society:getVal("society"),
+    date:getVal("date"),
     rows
   }));
 
   alert("Saved Successfully ✅");
-
-  window.location.href = "report.html";
+  window.location.href="report.html";
 }
 
-// =====================
-// HELPER
-// =====================
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
-// =====================
-// INIT
-// =====================
-window.onload = () => addRow();
+window.onload=()=>addRow();
 
 </script>
 
