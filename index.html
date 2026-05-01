@@ -192,7 +192,7 @@ async function saveData(){
   localStorage.setItem("reportData",JSON.stringify(data));
 
   try {
-    await fetch("https://script.google.com/macros/s/AKfycbxJpf3bJ6LVdgnC4omAk3bBmUp0Ns4BQcEFc60Pggy1m53cCqMt-ZMMY2DJT7gt5FKE/exec",{
+    await fetch("https://script.google.com/macros/s/AKfycbyIX4TF2-PfxoY725Yj4diHysjXbGO0wVXamCGC1dVyWQO8CSk2DjJhnayCIwHLPDsP/exec",{
       method:"POST",
       body:JSON.stringify(data)
     });
