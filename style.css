@@ -227,6 +227,44 @@ body {
 table {
   min-width: 1600px;   /* 🔥 बड़ा करो */
 }
+/* PREMIUM TABLE */
+table {
+  min-width: 1400px;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+  background: white;
+}
+
+th {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+  color: white;
+  font-weight: 600;
+  padding: 10px;
+}
+
+td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+  background: #f9f9f9;
+}
+
+tr:hover {
+  background: #e6f0ff;
+  transition: 0.3s;
+}
+
+/* SCROLL BAR STYLE */
+.table-container::-webkit-scrollbar {
+  height: 8px;
+}
+.table-container::-webkit-scrollbar-thumb {
+  background: #007bff;
+  border-radius: 10px;
+}
 /* MOBILE RESPONSIVE */
 @media(max-width:768px){
 
