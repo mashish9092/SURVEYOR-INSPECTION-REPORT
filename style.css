@@ -161,6 +161,37 @@ td:nth-child(13) {
   margin-top: 20px;
 }
 
+/* Dashboard design */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.card {
+  background: #007bff;
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.card:nth-child(2) { background: #28a745; }
+.card:nth-child(3) { background: #ff9800; }
+.card:nth-child(4) { background: #6f42c1; }
+
+.card h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.card p {
+  font-size: 22px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
 /* MOBILE RESPONSIVE */
 @media(max-width:768px){
 
