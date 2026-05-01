@@ -130,28 +130,30 @@ function deleteRow(id){
 // SAVE DATA
 async function saveData(){
 
-  let rows=[];
+ let rows = [];
 
-  for(let i=1;i<=rowCount;i++){
+for(let i=1;i<=rowCount;i++){
 
-    let name = document.getElementById("name"+i)?.value;
+  let name = document.getElementById("name"+i)?.value;
 
-    if(name){
+  if(name){
 
-      let data = {
-        name,
-        reg:document.getElementById("reg"+i).value,
-        qty:document.getElementById("qty"+i).value,
-        f:document.getElementById("f"+i).value,
-        o:document.getElementById("o"+i).value,
-        d2:document.getElementById("d2"+i).value,
-        d4:document.getElementById("d4"+i).value,
-        d6:document.getElementById("d6"+i).value,
-        m:document.getElementById("m"+i).value,
-        s:document.getElementById("s"+i).value,
-        r:document.getElementById("r"+i).value
-      };
+    rows.push({
+      name: document.getElementById("name"+i).value,
+      reg: document.getElementById("reg"+i).value,
+      qty: document.getElementById("qty"+i).value,
+      foreign: document.getElementById("f"+i).value,
+      other: document.getElementById("o"+i).value,
+      damaged: document.getElementById("d"+i).value,
+      slight: document.getElementById("slt"+i).value,
+      six: document.getElementById("six"+i).value,
+      moisture: document.getElementById("m"+i).value,
+      status: document.getElementById("s"+i).value,
+      remark: document.getElementById("r"+i).value
+    });
 
+  }
+}
       rows.push(data);
 
       // GOOGLE SHEET SAVE
