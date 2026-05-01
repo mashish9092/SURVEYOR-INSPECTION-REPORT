@@ -13,9 +13,10 @@
 
 <!-- SIDEBAR -->
 <div class="sidebar">
+  <a href="dashboard.html" class="active">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
   <a href="report.html">📄 Report</a>
-  <a href="dashboard.html" class="active">📊 Dashboard</a>
+  
 </div>
 
 <!-- MAIN -->
@@ -51,7 +52,10 @@
 </div>
 
 <br>
+<input type="text" placeholder="Search..." onkeyup="searchData()">
 
+<button onclick="prevPage()">Prev</button>
+<button onclick="nextPage()">Next</button>
 <!-- TABLE VIEW -->
 <h3>📋 Data Summary</h3>
 
@@ -80,57 +84,72 @@
 <div class="footer">
   © 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
-
 <script>
 
-const data = JSON.parse(localStorage.getItem("reportData"));
+const API_URL = "PASTE_YOUR_SCRIPT_URL_HERE"; // 👈 यहाँ URL डालो
 
-if(!data){
-  alert("No Data Found");
+let fullData = [];
+let currentPage = 1;
+let rowsPerPage = 10;
+
+// LOAD DATA
+async function loadData(){
+  const res = await fetch(API_URL);
+  fullData = await res.json();
+
+  renderTable();
+  updateStats();
 }
 
-// CALCULATIONS
-let total = data.rows.length;
-let totalQty = 0;
-let totalMoisture = 0;
-let faq = 0;
+// TABLE SHOW
+function renderTable(){
 
-data.rows.forEach(r=>{
-  totalQty += Number(r.qty || 0);
-  totalMoisture += Number(r.m || 0);
-  if(r.s === "FAQ") faq++;
-});
+  let start = (currentPage - 1) * rowsPerPage;
+  let end = start + rowsPerPage;
 
-// DISPLAY
-document.getElementById("total").innerText = total;
-document.getElementById("qty").innerText = totalQty;
-document.getElementById("moisture").innerText = (totalMoisture / total).toFixed(2);
-document.getElementById("faq").innerText = faq;
+  let data = fullData.slice(start, end);
 
-// TABLE
-let html = "";
+  let html = "";
 
-data.rows.forEach((r,i)=>{
-  html += `
-  <tr>
-    <td>${i+1}</td>
-    <td>${r.name}</td>
-    <td>${r.reg}</td>
-    <td>${r.qty}</td>
-    <td>${r.f}</td>
-    <td>${r.o}</td>
-    <td>${r.d2}</td>
-    <td>${r.d4}</td>
-    <td>${r.d6}</td>
-    <td>${r.m}</td>
-    <td>${r.s}</td>
-    <td>${r.r}</td>
-  </tr>`;
-});
+  data.forEach((r,i)=>{
+    html += `
+    <tr>
+      <td>${start+i+1}</td>
+      <td>${r["Name Of Farmer/Society"]}</td>
+      <td>${r["Farmer Registration"]}</td>
+      <td>${r["Qty In Quintals (Approx)"]}</td>
+      <td>${r["MOISTURE (12%)"]}</td>
+      <td>${r["Status FAQ/Non FAQ"]}</td>
+    </tr>`;
+  });
 
-document.getElementById("table").innerHTML = html;
+  document.getElementById("table").innerHTML = html;
+}
+
+// STATS
+function updateStats(){
+
+  document.getElementById("total").innerText = fullData.length;
+
+  let totalQty = 0;
+  let moisture = 0;
+  let faq = 0;
+
+  fullData.forEach(r=>{
+    totalQty += Number(r["Qty In Quintals (Approx)"] || 0);
+    moisture += Number(r["MOISTURE (12%)"] || 0);
+
+    if(r["Status FAQ/Non FAQ"] === "FAQ") faq++;
+  });
+
+  document.getElementById("qty").innerText = totalQty;
+  document.getElementById("moisture").innerText = (moisture/fullData.length).toFixed(2);
+  document.getElementById("faq").innerText = faq;
+}
+
+// LOAD
+loadData();
 
 </script>
-
 </body>
 </html>
