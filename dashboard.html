@@ -1,164 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-<title>Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<style>
-body { font-family: Arial; background:#f4f6f9; padding:20px; }
-.box { max-width:1200px; margin:auto; background:#fff; padding:20px; border-radius:10px; }
-
-h2 { text-align:center; }
-
-.grid {
-  display:grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-  gap:15px;
-  margin-top:20px;
-}
-
-.card {
-  background:#007bff;
-  color:white;
-  padding:15px;
-  border-radius:8px;
-  text-align:center;
-}
-
-.card h3 { margin:0; font-size:14px; }
-.card p { font-size:22px; margin:5px 0 0; }
-
-canvas {
-  margin-top:30px;
-  background:white;
-}
-
-.btn {
-  margin-top:20px;
-  padding:10px;
-  background:#28a745;
-  color:white;
-  border:none;
-  width:100%;
-  cursor:pointer;
-}
-</style>
 </head>
 
 <body>
 
+<!-- HEADER -->
+<div class="header">Survey System Dashboard</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <a href="index.html">📋 Entry Form</a>
+  <a href="report.html">📄 Report</a>
+  <a href="dashboard.html" class="active">📊 Dashboard</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
 <div class="box">
 
-<h2>📊 Survey Dashboard</h2>
+<h2>📊 Dashboard Overview</h2>
 
-<div class="grid">
+<!-- CARDS -->
+<div class="cards">
 
-<div class="card">
-<h3>Total Entries</h3>
-<p id="total"></p>
-</div>
+  <div class="card">
+    <h3>Total Entries</h3>
+    <p id="total"></p>
+  </div>
 
-<div class="card">
-<h3>Total Quantity</h3>
-<p id="qty"></p>
-</div>
+  <div class="card">
+    <h3>Total Quantity</h3>
+    <p id="qty"></p>
+  </div>
 
-<div class="card">
-<h3>Avg Moisture</h3>
-<p id="moisture"></p>
-</div>
+  <div class="card">
+    <h3>Avg Moisture</h3>
+    <p id="moisture"></p>
+  </div>
 
-<div class="card">
-<h3>FAQ Count</h3>
-<p id="faq"></p>
-</div>
-
-<div class="card">
-<h3>Non-FAQ Count</h3>
-<p id="nonfaq"></p>
-</div>
+  <div class="card">
+    <h3>FAQ Count</h3>
+    <p id="faq"></p>
+  </div>
 
 </div>
 
-<!-- Charts -->
-<canvas id="chart1"></canvas>
-<canvas id="chart2"></canvas>
+<br>
 
-<button class="btn" onclick="goBack()">⬅ Back to Form</button>
+<!-- TABLE VIEW -->
+<h3>📋 Data Summary</h3>
 
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>Sr.No</th>
+<th>Name Of Farmer/Society</th>
+<th>Qty</th>
+<th>Moisture</th>
+<th>Status</th>
+</tr>
+</thead>
+
+<tbody id="table"></tbody>
+
+</table>
+</div>
+
+</div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  © 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
 
 <script>
 
-// GET DATA
 const data = JSON.parse(localStorage.getItem("reportData"));
 
+if(!data){
+  alert("No Data Found");
+}
+
+// CALCULATIONS
 let total = data.rows.length;
 let totalQty = 0;
 let totalMoisture = 0;
 let faq = 0;
-let nonfaq = 0;
 
-// CALCULATE
-data.rows.forEach(r => {
+data.rows.forEach(r=>{
   totalQty += Number(r.qty || 0);
   totalMoisture += Number(r.m || 0);
-
   if(r.s === "FAQ") faq++;
-  else nonfaq++;
 });
 
-let avgMoisture = total ? (totalMoisture / total).toFixed(2) : 0;
-
-// SHOW DATA
+// DISPLAY
 document.getElementById("total").innerText = total;
 document.getElementById("qty").innerText = totalQty;
-document.getElementById("moisture").innerText = avgMoisture;
+document.getElementById("moisture").innerText = (totalMoisture / total).toFixed(2);
 document.getElementById("faq").innerText = faq;
-document.getElementById("nonfaq").innerText = nonfaq;
 
-
-// 📊 CHART 1: FAQ vs NON-FAQ
-new Chart(document.getElementById("chart1"), {
-  type: 'pie',
-  data: {
-    labels: ["FAQ", "Non-FAQ"],
-    datasets: [{
-      data: [faq, nonfaq]
-    }]
-  }
-});
-
-
-// 📊 CHART 2: Quantity per entry
-let labels = [];
-let qtyData = [];
+// TABLE
+let html = "";
 
 data.rows.forEach((r,i)=>{
-  labels.push("Row " + (i+1));
-  qtyData.push(Number(r.qty || 0));
+  html += `
+  <tr>
+    <td>${i+1}</td>
+    <td>${r.name}</td>
+    <td>${r.qty}</td>
+    <td>${r.m}</td>
+    <td>${r.s}</td>
+  </tr>`;
 });
 
-new Chart(document.getElementById("chart2"), {
-  type: 'bar',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: "Quantity",
-      data: qtyData
-    }]
-  }
-});
-
-
-// BACK
-function goBack(){
-  window.location.href = "index.html";
-}
+document.getElementById("table").innerHTML = html;
 
 </script>
 
