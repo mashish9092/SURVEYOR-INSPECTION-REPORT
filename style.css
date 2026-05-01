@@ -135,6 +135,10 @@ tr:nth-child(even) {
 .btn.excel {
   background: linear-gradient(135deg, #28a745, #218838);
 }
+.btn.excel{
+  margin-top:20px;
+  display:inline-block;
+}
 
 /* EDIT BUTTON */
 .btn.edit {
