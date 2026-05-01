@@ -11,59 +11,120 @@ body {
   color: white;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding-left: 20px;
   font-size: 18px;
   font-weight: bold;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 220px;
-  background: #222;
+  width: 180px;   /* 👈 कम कर दिया */
+  background: #1e1e2f;
   color: white;
   position: fixed;
   top: 60px;
   bottom: 0;
   left: 0;
-  padding-top: 20px;
 }
 
 .sidebar a {
   display: block;
-  padding: 12px;
-  color: white;
+  padding: 10px;
+  color: #ccc;
   text-decoration: none;
 }
 
 .sidebar a:hover {
   background: #007bff;
+  color: white;
 }
 
 /* MAIN */
 .main {
-  margin-left: 220px;
+  margin-left: 180px; /* sidebar के हिसाब से */
   padding: 20px;
-  margin-top: 60px;
 }
 
-/* FOOTER */
-.footer {
-  background: #222;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  position: fixed;
-  bottom: 0;
+/* BOX */
+.box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* INPUT */
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* TABLE SCROLL FIX */
+.table-container {
+  overflow-x: auto;
   width: 100%;
 }
 
+/* TABLE */
+table {
+  min-width: 1400px;   /* 👈 IMPORTANT */
+  border-collapse: collapse;
+}
+
+th {
+  background: #eee;
+  font-size: 12px;
+  padding: 6px;
+  border: 1px solid black;
+}
+
+td {
+  border: 1px solid black;
+  padding: 4px;
+}
+
+td input, td select {
+  width: 100%;
+  height: 30px;
+}
+
+/* BUTTON */
+.btn {
+  padding: 8px 12px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.add { background: #007bff; }
+.save { background: green; }
+.excel { background: #28a745; }
+.del { background: red; }
+
+/* FOOTER */
+.footer {
+  background: #1e1e2f;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  margin-top: 20px;
+}
+
 /* MOBILE */
-@media (max-width: 768px) {
+@media(max-width:768px){
   .sidebar {
-    width: 100%;
     position: relative;
+    width: 100%;
   }
+
   .main {
     margin-left: 0;
+  }
+
+  table {
+    min-width: 1000px;
   }
 }
