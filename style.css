@@ -157,14 +157,16 @@ tr:nth-child(even) {
 /* REPORT GRID */
 .report-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
+  gap: 20px;   /* spacing fix */
+  margin: 20px 0;
 }
 
 .report-item {
   background: #f1f5ff;
-  padding: 10px;
-  border-left: 4px solid #007bff;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 5px solid #007bff;
 }
 
 /* FOOTER */
@@ -187,7 +189,14 @@ tr:nth-child(even) {
   border-radius: 6px;
   display: none;
 }
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
 
+th, td {
+  border: 1px solid #ccc;   /* 🔥 BORDER FIX */
+}
 /* MOBILE */
 @media(max-width:768px){
   .sidebar {
