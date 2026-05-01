@@ -57,8 +57,11 @@
 <br><br>
 
 <!-- PAGINATION -->
-<button onclick="prevPage()">Prev</button>
-<button onclick="nextPage()">Next</button>
+<div class="pagination">
+  <button onclick="prevPage()">⬅ Prev</button>
+  <span id="pageInfo"></span>
+  <button onclick="nextPage()">Next ➡</button>
+</div>
 
 <!-- TABLE -->
   
@@ -143,11 +146,15 @@ function renderTable(){
       <td>${r["MOISTURE (12%)"] || ""}</td>
       <td>${r["Status FAQ/Non FAQ"] || ""}</td>
       <td>${r["Remark If Any"] || ""}</td>
-    </tr>
-    `;
+    </tr>`;
   });
 
   document.getElementById("table").innerHTML = html;
+
+  // PAGE INFO 🔥
+  let totalPages = Math.ceil(filteredData.length / perPage);
+  document.getElementById("pageInfo").innerText =
+    `Page ${currentPage} of ${totalPages}`;
 }
 
 // SEARCH
@@ -165,7 +172,9 @@ function searchData(){
 
 // PAGINATION
 function nextPage(){
-  if(currentPage * perPage < filteredData.length){
+  let totalPages = Math.ceil(filteredData.length / perPage);
+
+  if(currentPage < totalPages){
     currentPage++;
     renderTable();
   }
@@ -203,30 +212,31 @@ function updateStats(){
 
   document.getElementById("faq").innerText = faq;
 }
-  function exportExcel(){
+function exportExcel(){
 
   let excel = "";
 
   // HEADER
   excel += "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
 
-  // DATA
+  // DATA (🔥 IMPORTANT FIX)
   allData.forEach((r,i)=>{
-    excel += `${i+1},
-    ${r["Name Of Farmer/Society"]},
-    ${r["Farmer Registration"]},
-    ${r["Qty In Quintals (Approx)"]},
-    ${r["FOREIGN METTER (0.75%)"]},
-    ${r["OTHER FOOD GRAINS (2%)"]},
-    ${r["DAMAGED GRAINS (2%)"]},
-    ${r["SLIGHT DAMAGED GRAINS (4%)"]},
-    ${r["DAMAGED GRAINS (6%)"]},
-    ${r["MOISTURE (12%)"]},
-    ${r["Status FAQ/Non FAQ"]},
-    ${r["Remark If Any"]}\n`;
+    excel += [
+      i+1,
+      r["Name Of Farmer/Society"] || "",
+      r["Farmer Registration"] || "",
+      r["Qty In Quintals (Approx)"] || "",
+      r["FOREIGN METTER (0.75%)"] || "",
+      r["OTHER FOOD GRAINS (2%)"] || "",
+      r["DAMAGED GRAINS (2%)"] || "",
+      r["SLIGHT DAMAGED GRAINS (4%)"] || "",
+      r["DAMAGED GRAINS (6%)"] || "",
+      r["MOISTURE (12%)"] || "",
+      r["Status FAQ/Non FAQ"] || "",
+      r["Remark If Any"] || ""
+    ].join(",") + "\n";
   });
 
-  // DOWNLOAD
   let blob = new Blob([excel], { type: "application/vnd.ms-excel" });
   let url = URL.createObjectURL(blob);
 
