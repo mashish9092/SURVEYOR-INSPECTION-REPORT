@@ -32,17 +32,17 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN METTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged (2%)</th>
+<th>Slight (4%)</th>
+<th>Damaged (6%)</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -54,15 +54,8 @@
 <br>
 
 <div class="form-actions">
-
-  <button class="btn add" onclick="addRow()">
-    ➕ Add Row
-  </button>
-
-  <button class="btn save" onclick="saveData()">
-    💾 Save & Generate Report
-  </button>
-
+  <button class="btn add" onclick="addRow()">➕ Add Row</button>
+  <button class="btn save" onclick="saveData()">💾 Save & Generate Report</button>
 </div>
 
 </div>
@@ -77,7 +70,7 @@
 <script>
 
 let rowCount = 0;
-const API = "PASTE_YOUR_API_URL_HERE";
+const API = "PASTE_YOUR_API_URL_HERE"; // optional
 
 // ADD ROW
 function addRow(){
@@ -86,7 +79,7 @@ function addRow(){
 
   let row = `
   <tr id="row${rowCount}">
-    <td>${rowCount}</td>
+    <td></td>
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
     <td><input id="qty${rowCount}"></td>
@@ -103,74 +96,65 @@ function addRow(){
       </select>
     </td>
     <td><input id="r${rowCount}"></td>
-    <td>
-      <button onclick="deleteRow(${rowCount})">❌</button>
-    </td>
+    <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
   document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+
   updateSerialNumbers();
 }
 
-// DELETE ROW
+// DELETE
 function deleteRow(id){
   document.getElementById("row"+id).remove();
-   updateSerialNumbers();
+  updateSerialNumbers();
   showToast("Row Deleted ❌");
 }
-  function updateSerialNumbers(){
 
+// FIX SR.NO
+function updateSerialNumbers(){
   let rows = document.querySelectorAll("#tableBody tr");
-
   rows.forEach((row, index)=>{
     row.cells[0].innerText = index + 1;
   });
 }
 
-// SAVE DATA
-async function saveData(){
+// SAVE
+function saveData(){
 
- let rows = [];
+  let rowsData = [];
 
-for(let i=1;i<=rowCount;i++){
+  document.querySelectorAll("#tableBody tr").forEach((row, index)=>{
 
-  let name = document.getElementById("name"+i)?.value;
+    let i = row.id.replace("row","");
 
-  if(name){
+    let name = document.getElementById("name"+i).value;
 
-    rows.push({
-      name: document.getElementById("name"+i).value,
-      reg: document.getElementById("reg"+i).value,
-      qty: document.getElementById("qty"+i).value,
-      foreign: document.getElementById("f"+i).value,
-      other: document.getElementById("o"+i).value,
-      damaged: document.getElementById("d"+i).value,
-      slight: document.getElementById("slt"+i).value,
-      six: document.getElementById("six"+i).value,
-      moisture: document.getElementById("m"+i).value,
-      status: document.getElementById("s"+i).value,
-      remark: document.getElementById("r"+i).value
-    });
-
-  }
-}
-      rows.push(data);
-
-      // GOOGLE SHEET SAVE
-      await fetch(API,{
-        method:"POST",
-        body:JSON.stringify({action:"add",...data})
+    if(name){
+      rowsData.push({
+        name,
+        reg: document.getElementById("reg"+i).value,
+        qty: document.getElementById("qty"+i).value,
+        foreign: document.getElementById("f"+i).value,
+        other: document.getElementById("o"+i).value,
+        damaged2: document.getElementById("d2"+i).value,
+        slight: document.getElementById("d4"+i).value,
+        damaged6: document.getElementById("d6"+i).value,
+        moisture: document.getElementById("m"+i).value,
+        status: document.getElementById("s"+i).value,
+        remark: document.getElementById("r"+i).value
       });
     }
-  }
 
-  // SAVE FOR REPORT PAGE
+  });
+
+  // SAVE TO LOCAL STORAGE
   localStorage.setItem("reportData", JSON.stringify({
-    grader:document.getElementById("grader").value,
-    warehouse:document.getElementById("warehouse").value,
-    society:document.getElementById("society").value,
-    date:document.getElementById("date").value,
-    rows
+    grader: grader.value,
+    warehouse: warehouse.value,
+    society: society.value,
+    date: date.value,
+    rows: rowsData
   }));
 
   showToast("Saved Successfully ✅");
@@ -182,7 +166,6 @@ for(let i=1;i<=rowCount;i++){
 
 // TOAST
 function showToast(msg){
-
   let t = document.getElementById("toast");
 
   t.innerText = msg;
@@ -200,7 +183,7 @@ function showToast(msg){
   },3000);
 }
 
-// INIT (ONLY 1 ROW)
+// INIT
 window.onload = ()=> addRow();
 
 </script>
