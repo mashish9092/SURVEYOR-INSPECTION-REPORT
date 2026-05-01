@@ -54,94 +54,115 @@
 
 <br>
 
-<button onclick="addRow()">➕ Add Row</button>
-<button onclick="saveData()">💾 Save & Generate Report</button>
+<div style="display:flex; gap:10px;">
+  <button onclick="addRow()" class="btn add">➕ Add Row</button>
+  <button onclick="saveData()" class="btn save">💾 Save & Generate Report</button>
+</div>
 
 </div>
 </div>
 
 <div class="footer">© 2026 Survey System</div>
 
-<!-- ✅ API CONFIG -->
+<!-- API CONFIG -->
 <script src="config.js"></script>
 
 <script>
 
 let rowCount = 0;
 
+// =====================
 // ADD ROW
+// =====================
 function addRow(){
+
   rowCount++;
 
   let row = `
   <tr id="row${rowCount}">
     <td></td>
-    <td><input id="name${rowCount}"></td>
-    <td><input id="reg${rowCount}"></td>
-    <td><input id="qty${rowCount}"></td>
-    <td><input id="f${rowCount}"></td>
-    <td><input id="o${rowCount}"></td>
-    <td><input id="d2${rowCount}"></td>
-    <td><input id="d4${rowCount}"></td>
-    <td><input id="d6${rowCount}"></td>
-    <td><input id="m${rowCount}"></td>
+    <td><input id="name${rowCount}" placeholder="Name"></td>
+    <td><input id="reg${rowCount}" placeholder="Reg No"></td>
+    <td><input id="qty${rowCount}" type="number"></td>
+    <td><input id="f${rowCount}" type="number"></td>
+    <td><input id="o${rowCount}" type="number"></td>
+    <td><input id="d2${rowCount}" type="number"></td>
+    <td><input id="d4${rowCount}" type="number"></td>
+    <td><input id="d6${rowCount}" type="number"></td>
+    <td><input id="m${rowCount}" type="number"></td>
     <td>
       <select id="s${rowCount}">
         <option>FAQ</option>
         <option>Non-FAQ</option>
       </select>
     </td>
-    <td><input id="r${rowCount}"></td>
+    <td><input id="r${rowCount}" placeholder="Remark"></td>
     <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
   document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+
   updateSr();
 }
 
-// DELETE
+// =====================
+// DELETE ROW
+// =====================
 function deleteRow(id){
   document.getElementById("row"+id).remove();
   updateSr();
 }
 
-// SR NO FIX
+// =====================
+// FIX SERIAL NUMBER
+// =====================
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
-    row.cells[0].innerText = i+1;
+    row.cells[0].innerText = i + 1;
   });
 }
 
+// =====================
 // SAVE DATA
+// =====================
 async function saveData(){
 
   let rows = [];
 
-  document.querySelectorAll("#tableBody tr").forEach(row=>{
+  let allRows = document.querySelectorAll("#tableBody tr");
+
+  if(allRows.length === 0){
+    alert("Please add at least one row ❗");
+    return;
+  }
+
+  for(let row of allRows){
 
     let i = row.id.replace("row","");
 
     let name = getVal("name"+i);
 
-    if(name){   // ✅ EMPTY ROW SKIP
-      let data = {
-        name,
-        reg: getVal("reg"+i),
-        qty: getVal("qty"+i),
-        f: getVal("f"+i),
-        o: getVal("o"+i),
-        d2: getVal("d2"+i),
-        d4: getVal("d4"+i),
-        d6: getVal("d6"+i),
-        m: getVal("m"+i),
-        s: getVal("s"+i),
-        r: getVal("r"+i)
-      };
+    if(!name) continue; // skip empty
 
-      rows.push(data);
+    let data = {
+      name,
+      reg: getVal("reg"+i),
+      qty: getVal("qty"+i),
+      f: getVal("f"+i),
+      o: getVal("o"+i),
+      d2: getVal("d2"+i),
+      d4: getVal("d4"+i),
+      d6: getVal("d6"+i),
+      m: getVal("m"+i),
+      s: getVal("s"+i),
+      r: getVal("r"+i)
+    };
 
-      // 🔥 GOOGLE SHEET SAVE
-      if(typeof API !== "undefined"){
+    rows.push(data);
+
+    // GOOGLE SHEET SAVE
+    if(typeof API !== "undefined"){
+      try{
         await fetch(API,{
           method:"POST",
           body: JSON.stringify({
@@ -149,10 +170,16 @@ async function saveData(){
             ...data
           })
         });
+      }catch(err){
+        console.log("API Error:", err);
       }
     }
+  }
 
-  });
+  if(rows.length === 0){
+    alert("Please fill at least one row ❗");
+    return;
+  }
 
   // SAVE FOR REPORT PAGE
   localStorage.setItem("reportData", JSON.stringify({
@@ -165,16 +192,20 @@ async function saveData(){
 
   alert("Saved Successfully ✅");
 
-  window.location.href="report.html";
+  window.location.href = "report.html";
 }
 
+// =====================
 // HELPER
+// =====================
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
+// =====================
 // INIT
-window.onload = ()=> addRow();
+// =====================
+window.onload = () => addRow();
 
 </script>
 
