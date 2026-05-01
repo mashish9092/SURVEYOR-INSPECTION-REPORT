@@ -4,7 +4,26 @@ body {
   font-family: Arial, sans-serif;
   background: #f4f6f9;
 }
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  color: #ddd;
+  text-decoration: none;
+  transition: 0.3s;
+}
 
+.sidebar a:hover {
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
+}
+
+.sidebar a.active {
+  background: #28a745;   /* same green */
+  color: white;
+}
 /* HEADER */
 .header {
   height: 60px;
@@ -191,7 +210,23 @@ td:nth-child(13) {
   margin-top: 10px;
   font-weight: bold;
 }
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 
+.main {
+  flex: 1;
+}
+.table-container {
+  overflow-x: auto;
+  width: 100%;
+}
+
+table {
+  min-width: 1600px;   /* 🔥 बड़ा करो */
+}
 /* MOBILE RESPONSIVE */
 @media(max-width:768px){
 
