@@ -20,108 +20,96 @@
 
 <!-- MAIN -->
 <div class="main">
+  <div class="box">
 
-<div class="box">
+    <h2 class="report-title">📄 SURVEYOR INSPECTION REPORT</h2>
 
-<h2 class="report-title">📄 SURVEYOR INSPECTION REPORT</h2>
+    <!-- INFO GRID -->
+    <div class="report-grid">
 
-<!-- INFO GRID -->
-<div class="report-grid">
+      <div class="report-item">
+        <span>👤 Grader</span>
+        <strong>Aradhya</strong>
+      </div>
 
-  <div class="report-item">
-    <span>👤 Grader</span>
-    <strong>Aradhya</strong>
+      <div class="report-item">
+        <span>🏢 Warehouse</span>
+        <strong>Mehra</strong>
+      </div>
+
+      <div class="report-item">
+        <span>📍 Society</span>
+        <strong>Mumbai</strong>
+      </div>
+
+      <div class="report-item">
+        <span>📅 Date</span>
+        <strong>2026-05-01</strong>
+      </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-container">
+      <table id="reportTable">
+
+        <thead>
+          <tr>
+            <th>Sr.No</th>
+            <th>Name Of Farmer/Society</th>
+            <th>Farmer Registration</th>
+            <th>Qty</th>
+            <th>Foreign</th>
+            <th>Other</th>
+            <th>Damaged</th>
+            <th>Slight</th>
+            <th>6%</th>
+            <th>Moisture</th>
+            <th>Status</th>
+            <th>Remark</th>
+          </tr>
+        </thead>
+
+        <tbody id="tableBody">
+          <tr>
+            <td>1</td>
+            <td>Hritu_Aradhya</td>
+            <td>112233445566778899</td>
+            <td>100</td>
+            <td>1.2</td>
+            <td>4.2</td>
+            <td>1.2</td>
+            <td>4.2</td>
+            <td>12</td>
+            <td>10.1</td>
+            <td>FAQ</td>
+            <td>-</td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+    <!-- SIGNATURE -->
+    <div class="sign-section" style="margin-top:20px;">
+      <p><b>Surveyor Sign:</b> ____________________</p>
+      <p><b>Manager Sign:</b> ____________________</p>
+    </div>
+
+    <!-- BUTTONS -->
+    <div class="btn-group">
+
+      <button class="btn excel" onclick="exportExcel()">
+        ⬇ Export Excel
+      </button>
+
+      <button class="btn edit" onclick="goToEdit()">
+        ✏ Edit Data
+      </button>
+
+    </div>
+
   </div>
-
-  <div class="report-item">
-    <span>🏢 Warehouse</span>
-    <strong>Mehra</strong>
-  </div>
-
-  <div class="report-item">
-    <span>📍 Society</span>
-    <strong>Mumbai</strong>
-  </div>
-
-  <div class="report-item">
-    <span>📅 Date</span>
-    <strong>2026-05-01</strong>
-  </div>
-
-</div>
-
-<br>
-
-<!-- TABLE -->
-<div class="table-container">
-
-<table id="reportTable">
-
-<thead>
-<tr>
-<th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
-</tr>
-</thead>
-
-<tbody id="tableBody">
-
-<tr>
-<td>1</td>
-<td>Hritu_Aradhya</td>
-<td>112233445566778899</td>
-<td>100</td>
-<td>1.2</td>
-<td>4.2</td>
-<td>1.2</td>
-<td>4.2</td>
-<td>12</td>
-<td>10.1</td>
-<td>FAQ</td>
-<td>-</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
-<br><br>
-
-<!-- SIGNATURE -->
-<div class="sign-section">
-<p><b>Surveyor Sign:</b> ____________________</p>
-<p><b>Manager Sign:</b> ____________________</p>
-</div>
-
-<br>
-
-<!-- BUTTONS -->
-<div class="btn-group">
-
-<button class="btn excel" onclick="exportExcel()">
-⬇ Export Excel
-</button>
-
-<button class="btn edit" onclick="goToEdit()">
-✏ Edit Data
-</button>
-
-</div>
-</div>
-
-</div>
 </div>
 
 <!-- FOOTER -->
@@ -136,8 +124,15 @@ function goToEdit(){
   window.location.href = "index.html";
 }
 
-// ✅ FIXED EXPORT (NO ERROR IN EXCEL)
+// EXPORT FUNCTION (SAFE VERSION)
 function exportExcel(){
+
+  const rows = document.querySelectorAll("#reportTable tbody tr");
+
+  if(rows.length === 0){
+    alert("No data available to export");
+    return;
+  }
 
   let csv = [];
 
@@ -148,28 +143,29 @@ function exportExcel(){
   });
   csv.push(headers);
 
-  // ROWS
-  document.querySelectorAll("#reportTable tbody tr").forEach(row=>{
+  // DATA
+  rows.forEach(row=>{
     let cols = row.querySelectorAll("td");
     let data = [];
 
     cols.forEach(td=>{
-      data.push(td.innerText.replace(/,/g, "")); // comma remove
+      data.push(td.innerText.replace(/,/g, ""));
     });
 
     csv.push(data);
   });
 
-  // CONVERT
   let csvContent = csv.map(e => e.join(",")).join("\n");
 
-  let blob = new Blob([csvContent], { type: "text/csv" });
+  let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   let url = URL.createObjectURL(blob);
 
   let a = document.createElement("a");
   a.href = url;
   a.download = "Survey_Report.csv";
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
 }
 
 </script>
