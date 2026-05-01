@@ -4,68 +4,7 @@
   <title>Survey Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
-
-  <style>
-
-    table, th, td{
-      border:1px solid #ccc;
-    }
-
-    .btn{
-      padding:8px 14px;
-      border:none;
-      border-radius:6px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .btn.excel{
-      background:#28a745;
-      color:white;
-      margin-top:20px;
-    }
-
-    .btn.edit{
-      background:#007bff;
-      color:white;
-    }
-
-    .btn.update{
-      background:#28a745;
-      color:white;
-    }
-
-    .popup-box{
-      max-height:80vh;
-      overflow-y:auto;
-      border-radius:10px;
-    }
-
-    .report-grid{
-      display:flex;
-      gap:15px;
-      flex-wrap:wrap;
-      margin-bottom:20px;
-    }
-
-    .report-item{
-      flex:1;
-      min-width:200px;
-      background:#eef2ff;
-      padding:12px;
-      border-left:5px solid #007bff;
-      border-radius:10px;
-    }
-
-    label{
-      font-size:13px;
-      margin-top:6px;
-      display:block;
-    }
-
-  </style>
 </head>
-
 <body>
 
 <div class="header">Survey System</div>
@@ -79,261 +18,181 @@
 <div class="main">
 <div class="box">
 
-<h2>📄 SURVEYOR INSPECTION REPORT</h2>
+<h2>📄 Survey Report</h2>
 
-<!-- INFO -->
-<div class="report-grid">
-  <div class="report-item"><b>👤 Grader:</b> <span id="grader"></span></div>
-  <div class="report-item"><b>🏢 Warehouse:</b> <span id="warehouse"></span></div>
-  <div class="report-item"><b>📍 Society:</b> <span id="society"></span></div>
-  <div class="report-item"><b>📅 Date:</b> <span id="date"></span></div>
-</div>
+<div id="info"></div>
 
-<!-- TABLE -->
 <div class="table-container">
 <table id="reportTable">
-
 <thead>
 <tr>
 <th>Sr.No</th>
 <th>Name</th>
-<th>Registration</th>
+<th>Reg</th>
 <th>Qty</th>
 <th>Foreign</th>
 <th>Other</th>
-<th>Damaged (2%)</th>
-<th>Slight (4%)</th>
-<th>Damaged (6%)</th>
+<th>D2</th>
+<th>D4</th>
+<th>D6</th>
 <th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
-
-<tbody id="tableBody"></tbody>
-
+<tbody></tbody>
 </table>
 </div>
 
-<!-- SIGN -->
-<div style="margin-top:20px;">
-  <p><b>Surveyor Sign:</b> _____________</p>
-  <p style="margin-top:15px;"><b>Manager Sign:</b> _____________</p>
-</div>
+<br>
 
-<button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
+<button onclick="exportExcel()">⬇ Export Excel</button>
 
 </div>
-</div>
-
-<div class="footer">
-© 2026 Survey System | Developed by Ashish Mehra
 </div>
 
 <!-- POPUP -->
-<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);">
+<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0005;">
+<div style="background:#fff;padding:20px;margin:80px auto;width:300px;max-height:80vh;overflow:auto;">
 
-<div class="popup-box" style="background:#fff;padding:20px;margin:80px auto;width:350px;">
+<h3>Edit</h3>
 
-<h3>Edit Row</h3>
-
-<label>Name</label>
-<input id="eName">
-
-<label>Registration</label>
-<input id="eReg">
-
-<label>Qty</label>
-<input id="eQty">
-
-<label>Foreign</label>
-<input id="eForeign">
-
-<label>Other</label>
-<input id="eOther">
-
-<label>Damaged (2%)</label>
-<input id="eDamaged">
-
-<label>Slight (4%)</label>
-<input id="eSlight">
-
-<label>Damaged (6%)</label>
-<input id="eSix">
-
-<label>Moisture</label>
-<input id="eMoisture">
-
-<label>Status</label>
-<select id="eStatus">
-<option>FAQ</option>
-<option>Non-FAQ</option>
-</select>
-
-<label>Remark</label>
+<input id="eName"><input id="eReg"><input id="eQty">
+<input id="eForeign"><input id="eOther">
+<input id="eD2"><input id="eD4"><input id="eD6">
+<input id="eM">
+<select id="eStatus"><option>FAQ</option><option>Non-FAQ</option></select>
 <input id="eRemark">
 
 <br><br>
-
-<button class="btn update" onclick="updateRow()">Update</button>
-<button class="btn edit" onclick="closePopup()">Cancel</button>
+<button onclick="updateRow()">Update</button>
+<button onclick="closePopup()">Cancel</button>
 
 </div>
 </div>
-
-<div id="toast"></div>
 
 <script>
 
-let currentRow = null;
-const API = "https://script.google.com/macros/s/AKfycbzi1e4WmmtNwYWuQPc6WAAXZ753ZlRvFldRRX-lSWx_4ltH4yDkX10SLnW3F2XJVVID/exec";
+const API = "PASTE_YOUR_GOOGLE_SCRIPT_URL";
 
-// LOAD DATA
-window.onload = function(){
+let data = JSON.parse(localStorage.getItem("reportData"));
+let currentIndex = 0;
 
-  let data = JSON.parse(localStorage.getItem("reportData"));
-  if(!data) return;
+function load(){
 
-  grader.innerText = data.grader;
-  warehouse.innerText = data.warehouse;
-  society.innerText = data.society;
-  date.innerText = data.date;
+  info.innerHTML = `
+  <p><b>Grader:</b> ${data.grader}</p>
+  <p><b>Warehouse:</b> ${data.warehouse}</p>
+  <p><b>Society:</b> ${data.society}</p>
+  <p><b>Date:</b> ${data.date}</p>`;
 
-  let html = "";
+  render();
+}
+
+function render(){
+
+  let html="";
 
   data.rows.forEach((r,i)=>{
 
-    html += `
+    html+=`
     <tr>
-      <td>${i+1}</td>
-      <td>${r.name || ""}</td>
-      <td>${r.reg || ""}</td>
-      <td>${r.qty || ""}</td>
-      <td>${r.foreign || ""}</td>
-      <td>${r.other || ""}</td>
-      <td>${r.damaged2 || ""}</td>
-      <td>${r.slight || ""}</td>
-      <td>${r.damaged6 || ""}</td>
-      <td>${r.moisture || ""}</td>
-      <td>${r.status || ""}</td>
-      <td>${r.remark || ""}</td>
-      <td><button class="btn edit" onclick="editRow(this)">Edit</button></td>
+    <td>${i+1}</td>
+    <td>${r.name}</td>
+    <td>${r.reg}</td>
+    <td>${r.qty}</td>
+    <td>${r.foreign}</td>
+    <td>${r.other}</td>
+    <td>${r.damaged2}</td>
+    <td>${r.slight}</td>
+    <td>${r.damaged6}</td>
+    <td>${r.moisture}</td>
+    <td>${r.status}</td>
+    <td>${r.remark}</td>
+    <td><button onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
-  tableBody.innerHTML = html;
+  document.querySelector("#reportTable tbody").innerHTML = html;
 }
 
-// EDIT
-function editRow(btn){
+function editRow(i){
 
-  currentRow = btn.closest("tr");
+  currentIndex = i;
+  let r = data.rows[i];
 
-  eName.value = currentRow.children[1].innerText;
-  eReg.value = currentRow.children[2].innerText;
-  eQty.value = currentRow.children[3].innerText;
-  eForeign.value = currentRow.children[4].innerText;
-  eOther.value = currentRow.children[5].innerText;
-  eDamaged.value = currentRow.children[6].innerText;
-  eSlight.value = currentRow.children[7].innerText;
-  eSix.value = currentRow.children[8].innerText;
-  eMoisture.value = currentRow.children[9].innerText;
-  eStatus.value = currentRow.children[10].innerText;
-  eRemark.value = currentRow.children[11].innerText;
+  eName.value=r.name;
+  eReg.value=r.reg;
+  eQty.value=r.qty;
+  eForeign.value=r.foreign;
+  eOther.value=r.other;
+  eD2.value=r.damaged2;
+  eD4.value=r.slight;
+  eD6.value=r.damaged6;
+  eM.value=r.moisture;
+  eStatus.value=r.status;
+  eRemark.value=r.remark;
 
-  popup.style.display = "block";
-}
-
-// UPDATE + GOOGLE SHEET
-async function updateRow(){
-
-  // UI UPDATE
-  currentRow.children[1].innerText = eName.value;
-  currentRow.children[2].innerText = eReg.value;
-  currentRow.children[3].innerText = eQty.value;
-  currentRow.children[4].innerText = eForeign.value;
-  currentRow.children[5].innerText = eOther.value;
-  currentRow.children[6].innerText = eDamaged.value;
-  currentRow.children[7].innerText = eSlight.value;
-  currentRow.children[8].innerText = eSix.value;
-  currentRow.children[9].innerText = eMoisture.value;
-  currentRow.children[10].innerText = eStatus.value;
-  currentRow.children[11].innerText = eRemark.value;
-
-  // 🔥 LOCAL STORAGE UPDATE (IMPORTANT)
-  let data = JSON.parse(localStorage.getItem("reportData"));
-
-  let rowIndex = currentRow.rowIndex - 1;
-
-  data.rows[rowIndex] = {
-    name: eName.value,
-    reg: eReg.value,
-    qty: eQty.value,
-    foreign: eForeign.value,
-    other: eOther.value,
-    damaged2: eDamaged.value,
-    slight: eSlight.value,
-    damaged6: eSix.value,
-    moisture: eMoisture.value,
-    status: eStatus.value,
-    remark: eRemark.value
-  };
-
-  localStorage.setItem("reportData", JSON.stringify(data));
-
-  // 🔥 GOOGLE SHEET (ONLY IF API सही है)
-  if(API !== "PASTE_YOUR_GOOGLE_SCRIPT_URL"){
-    await fetch(API,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"update",
-        ...data.rows[rowIndex]
-      })
-    });
-  }
-
-  showToast("Updated ✅");
-  closePopup();
+  popup.style.display="block";
 }
 
 function closePopup(){
-  popup.style.display = "none";
+  popup.style.display="none";
 }
 
-// EXPORT
+async function updateRow(){
+
+  let r = data.rows[currentIndex];
+
+  r.name=eName.value;
+  r.reg=eReg.value;
+  r.qty=eQty.value;
+  r.foreign=eForeign.value;
+  r.other=eOther.value;
+  r.damaged2=eD2.value;
+  r.slight=eD4.value;
+  r.damaged6=eD6.value;
+  r.moisture=eM.value;
+  r.status=eStatus.value;
+  r.remark=eRemark.value;
+
+  localStorage.setItem("reportData",JSON.stringify(data));
+
+  render();
+  closePopup();
+
+  // GOOGLE SHEET
+  if(API !== "PASTE_YOUR_GOOGLE_SCRIPT_URL"){
+    await fetch(API,{
+      method:"POST",
+      mode:"no-cors",
+      body:JSON.stringify({
+        action:"update",
+        ...r
+      })
+    });
+  }
+}
+
 function exportExcel(){
 
-  let rows = document.querySelectorAll("#reportTable tr");
-  let csv = [];
-
-  rows.forEach((row)=>{
-    let cols = row.querySelectorAll("th, td");
-    let data = [];
-
-    cols.forEach((col, index)=>{
-      // ❌ skip last column (Action)
-      if(index !== cols.length - 1){
-        data.push(col.innerText);
-      }
-    });
-
-    csv.push(data.join(","));
+  let csv=[];
+  document.querySelectorAll("#reportTable tr").forEach(row=>{
+    let cols=row.querySelectorAll("th,td");
+    let arr=[];
+    cols.forEach(c=>arr.push(c.innerText));
+    csv.push(arr.join(","));
   });
 
-  let blob = new Blob([csv.join("\n")], {type:"text/csv"});
-  let link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "Survey_Report.csv";
-  link.click();
+  let blob=new Blob([csv.join("\n")]);
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="report.csv";
+  a.click();
 }
 
-// TOAST
-function showToast(msg){
-  toast.innerText = msg;
-  toast.style.display = "block";
-  setTimeout(()=>toast.style.display="none",3000);
-}
+window.onload=load;
 
 </script>
 
