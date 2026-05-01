@@ -5,16 +5,10 @@
   box-sizing: border-box;
 }
 
-/* FULL HEIGHT */
-html, body {
-  height: 100%;
-}
-
+/* BODY */
 body {
   font-family: Arial, sans-serif;
   background: #f4f6f9;
-  display: flex;
-  flex-direction: column;
 }
 
 /* HEADER */
@@ -31,11 +25,12 @@ body {
   top: 0;
   left: 0;
   right: 0;
+  z-index: 1000;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 180px;
+  width: 200px;
   background: #1e1e2f;
   position: fixed;
   top: 60px;
@@ -45,8 +40,8 @@ body {
 }
 
 .sidebar a {
-  display: flex;
-  padding: 12px 15px;
+  display: block;
+  padding: 12px;
   color: #ccc;
   text-decoration: none;
 }
@@ -63,10 +58,9 @@ body {
 
 /* MAIN */
 .main {
-  margin-left: 180px;
+  margin-left: 200px;
   margin-top: 70px;
   padding: 20px;
-  flex: 1;
 }
 
 /* BOX */
@@ -74,6 +68,7 @@ body {
   background: white;
   padding: 20px;
   border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
 }
 
 /* INPUT */
@@ -85,134 +80,127 @@ input, select {
   border: 1px solid #ccc;
 }
 
-/* TABLE */
+/* TABLE WRAPPER */
 .table-container {
+  width: 100%;
   overflow-x: auto;
+  margin-top: 10px;
 }
 
+/* TABLE */
 table {
-  min-width: 1500px;
+  min-width: 1400px;
   border-collapse: collapse;
 }
 
+/* HEADER */
 th {
   background: linear-gradient(45deg, #007bff, #0056b3);
   color: white;
   padding: 10px;
+  text-align: center;
 }
 
+/* CELLS */
 td {
   padding: 8px;
   text-align: center;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ddd;
 }
 
+/* ROW COLOR */
 tr:nth-child(even) {
   background: #f9f9f9;
 }
 
-/* BUTTON BASE */
+/* BUTTON */
 .btn {
-  padding: 10px 18px;
+  padding: 8px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   color: white;
   cursor: pointer;
   font-weight: bold;
 }
 
-/* ADD BUTTON */
+/* BUTTON COLORS */
 .btn.add {
-  background: linear-gradient(135deg, #17a2b8, #138496);
+  background: #17a2b8;
 }
 
-/* SAVE BUTTON */
 .btn.save {
-  background: linear-gradient(135deg, #28a745, #218838);
+  background: #28a745;
 }
 
-/* EXCEL BUTTON */
-.btn.excel {
-  background: linear-gradient(135deg, #28a745, #218838);
-}
-.btn.excel{
-  margin-top:20px;
-  display:inline-block;
-}
-
-/* EDIT BUTTON */
 .btn.edit {
-  background: linear-gradient(135deg, #007bff, #0056b3);
+  background: #007bff;
+}
+
+.btn.excel {
+  background: #28a745;
+  margin-top: 15px;
 }
 
 /* HOVER */
 .btn:hover {
-  transform: translateY(-2px);
+  opacity: 0.9;
 }
 
-/* BUTTON GROUP */
-.form-actions,
-.btn-group {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
+/* INFO BOX */
+#info {
+  background: #eef2ff;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
 }
 
-/* REPORT GRID */
-.report-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
+/* ========================= */
+/* 🔥 POPUP FIXED VERSION */
+/* ========================= */
+
+#popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
 }
-/* POPUP FIX */
+
+/* POPUP BOX */
 .popup-box {
+  width: 400px;
   max-height: 80vh;
   overflow-y: auto;
-}
-
-.report-item {
-  flex: 1 1 220px;
-  background: #eef2ff;
-  padding: 12px;
+  background: white;
+  padding: 20px;
   border-radius: 10px;
 }
 
 /* FOOTER */
 .footer {
-  background: #1e1e2f;
-  color: white;
   text-align: center;
-  padding: 12px;
-  margin-top: auto;
-}
-
-/* TOAST */
-#toast {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: #28a745;
-  color: white;
   padding: 10px;
-  border-radius: 6px;
-  display: none;
-}
-table {
-  border-collapse: collapse;
-  width: 100%;
 }
 
-th, td {
-  border: 1px solid #ccc;   /* 🔥 BORDER FIX */
-}
 /* MOBILE */
 @media(max-width:768px){
+
   .sidebar {
     position: relative;
     width: 100%;
+    height: auto;
   }
 
   .main {
     margin-left: 0;
+  }
+
+  table {
+    min-width: 1000px;
   }
 }
