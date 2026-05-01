@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="style.css">
   <title>Survey Entry Form</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
+<!-- HEADER -->
 <div class="header">Survey System</div>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
-<a href="dashboard.html" class="active">📊 Dashboard</a>
-<a href="index.html" class="active">📋 Entry Form</a>
-<a href="report.html" class="active">📄 Report</a>
+  <a href="dashboard.html">📊 Dashboard</a>
+  <a href="index.html" class="active">📋 Entry Form</a>
+  <a href="report.html">📄 Report</a>
 </div>
 
-
+<!-- MAIN -->
 <div class="main">
 <div class="box">
 
@@ -31,15 +34,15 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN METTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
 <th>Action</th>
@@ -55,24 +58,54 @@
 <input id="sign1" placeholder="Signature of Surveyor">
 <input id="sign2" placeholder="Signature of Warehouse Manager">
 
-<button class="btn excel" onclick="exportExcel()">Export Excel</button>
-<button class="btn save" onclick="saveData()">Save & Next</button>
+<br><br>
 
+<button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
+<button class="btn save" onclick="saveData()">💾 Save & Next</button>
+
+</div>
+</div>
+
+<!-- POPUP EDIT -->
+<div id="editPopup" class="popup">
+  <div class="popup-box">
+    <h3>Edit Record</h3>
+
+    <input id="editName" placeholder="Name">
+    <input id="editReg" placeholder="Registration">
+    <input id="editQty" placeholder="Qty">
+    <input id="editMoisture" placeholder="Moisture">
+
+    <select id="editStatus">
+      <option>FAQ</option>
+      <option>Non-FAQ</option>
+    </select>
+
+    <br><br>
+
+    <button class="btn save" onclick="updateRow()">Update</button>
+    <button class="btn" onclick="closePopup()">Cancel</button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
 
 <script>
 
 let rowCount = 0;
+let currentEditRow = 0;
 
 // ADD ROW
-function addRow() {
+function addRow(){
 
   rowCount++;
 
-  const row = `
+  let row = `
   <tr id="row${rowCount}">
     <td class="sr"></td>
-
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
     <td><input id="qty${rowCount}"></td>
@@ -82,18 +115,19 @@ function addRow() {
     <td><input id="d4${rowCount}"></td>
     <td><input id="d6${rowCount}"></td>
     <td><input id="m${rowCount}"></td>
-
     <td>
       <select id="s${rowCount}">
         <option>FAQ</option>
         <option>Non-FAQ</option>
       </select>
     </td>
-
     <td><input id="r${rowCount}"></td>
-
-    <td><button class="del" onclick="deleteRow(${rowCount})">X</button></td>
-  </tr>`;
+    <td>
+      <button onclick="openEditPopup(${rowCount})">✏</button>
+      <button onclick="deleteRow(${rowCount})">❌</button>
+    </td>
+  </tr>
+  `;
 
   tableBody.insertAdjacentHTML("beforeend", row);
   updateSr();
@@ -105,80 +139,68 @@ function deleteRow(id){
   updateSr();
 }
 
-// SERIAL FIX
+// SR FIX
 function updateSr(){
   document.querySelectorAll(".sr").forEach((el,i)=>el.innerText=i+1);
 }
 
+// POPUP OPEN
+function openEditPopup(id){
 
-// ✅ SINGLE ONLOAD (FINAL FIX)
+  currentEditRow = id;
+
+  editName.value = document.getElementById("name"+id).value;
+  editReg.value = document.getElementById("reg"+id).value;
+  editQty.value = document.getElementById("qty"+id).value;
+  editMoisture.value = document.getElementById("m"+id).value;
+  editStatus.value = document.getElementById("s"+id).value;
+
+  document.getElementById("editPopup").style.display = "flex";
+}
+
+// CLOSE POPUP
+function closePopup(){
+  document.getElementById("editPopup").style.display = "none";
+}
+
+// UPDATE ROW
+function updateRow(){
+
+  document.getElementById("name"+currentEditRow).value = editName.value;
+  document.getElementById("reg"+currentEditRow).value = editReg.value;
+  document.getElementById("qty"+currentEditRow).value = editQty.value;
+  document.getElementById("m"+currentEditRow).value = editMoisture.value;
+  document.getElementById("s"+currentEditRow).value = editStatus.value;
+
+  closePopup();
+}
+
+// LOAD DEFAULT ROWS
 window.onload = () => {
-
-  let edit = localStorage.getItem("editMode");
-  let data = JSON.parse(localStorage.getItem("reportData"));
-
-  if(edit === "true" && data){
-
-    grader.value = data.grader;
-    warehouse.value = data.warehouse;
-    society.value = data.society;
-    date.value = data.date;
-    sign1.value = data.sign1;
-    sign2.value = data.sign2;
-
-    tableBody.innerHTML = "";
-    rowCount = 0;
-
-    data.rows.forEach(r=>{
-      addRow();
-
-      document.getElementById("name"+rowCount).value = r.name;
-      document.getElementById("reg"+rowCount).value = r.reg;
-      document.getElementById("qty"+rowCount).value = r.qty;
-      document.getElementById("f"+rowCount).value = r.f;
-      document.getElementById("o"+rowCount).value = r.o;
-      document.getElementById("d2"+rowCount).value = r.d2;
-      document.getElementById("d4"+rowCount).value = r.d4;
-      document.getElementById("d6"+rowCount).value = r.d6;
-      document.getElementById("m"+rowCount).value = r.m;
-      document.getElementById("s"+rowCount).value = r.s;
-      document.getElementById("r"+rowCount).value = r.r;
-    });
-
-    localStorage.removeItem("editMode");
-
-  } else {
-    for(let i=0;i<5;i++) addRow();
-  }
+  for(let i=0;i<5;i++) addRow();
 };
 
-
-// SAVE DATA
+// SAVE
 async function saveData(){
 
   let rows=[];
 
   for(let i=1;i<=rowCount;i++){
-    let name=document.getElementById("name"+i)?.value;
+
+    let name = document.getElementById("name"+i)?.value;
 
     if(name){
       rows.push({
         name,
         reg:document.getElementById("reg"+i)?.value,
         qty:document.getElementById("qty"+i)?.value,
-        f:document.getElementById("f"+i)?.value,
-        o:document.getElementById("o"+i)?.value,
-        d2:document.getElementById("d2"+i)?.value,
-        d4:document.getElementById("d4"+i)?.value,
-        d6:document.getElementById("d6"+i)?.value,
         m:document.getElementById("m"+i)?.value,
-        s:document.getElementById("s"+i)?.value,
-        r:document.getElementById("r"+i)?.value
+        s:document.getElementById("s"+i)?.value
       });
     }
   }
 
-  const data={
+  let data = {
     grader:grader.value,
     warehouse:warehouse.value,
     society:society.value,
@@ -188,23 +210,23 @@ async function saveData(){
     rows
   };
 
-  localStorage.setItem("reportData",JSON.stringify(data));
+  localStorage.setItem("reportData", JSON.stringify(data));
 
-  try {
-    await fetch("https://script.google.com/macros/s/AKfycbyIX4TF2-PfxoY725Yj4diHysjXbGO0wVXamCGC1dVyWQO8CSk2DjJhnayCIwHLPDsP/exec",{
-      method:"POST",
-      body:JSON.stringify(data)
-    });
-  } catch(e){}
+  await fetch("YOUR_GOOGLE_API_URL",{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
 
-  window.location.href = "report.html";
+  window.location.href="report.html";
 }
 
-
-// EXCEL EXPORT
+// EXPORT
 function exportExcel(){
+
   let table = document.querySelector("table").outerHTML;
+
   let blob = new Blob([table], {type:"application/vnd.ms-excel"});
+
   let a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = "Survey_Report.xls";
@@ -212,10 +234,6 @@ function exportExcel(){
 }
 
 </script>
-</div>
 
-<div class="footer">
-  © Ashish Mehra
-</div>
 </body>
 </html>
