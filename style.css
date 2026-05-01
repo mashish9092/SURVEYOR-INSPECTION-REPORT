@@ -156,17 +156,21 @@ tr:nth-child(even) {
 
 /* REPORT GRID */
 .report-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px,1fr));
-  gap: 20px;   /* spacing fix */
-  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+/* POPUP FIX */
+.popup-box {
+  max-height: 80vh;
+  overflow-y: auto;
 }
 
 .report-item {
-  background: #f1f5ff;
-  padding: 15px;
+  flex: 1 1 220px;
+  background: #eef2ff;
+  padding: 12px;
   border-radius: 10px;
-  border-left: 5px solid #007bff;
 }
 
 /* FOOTER */
