@@ -104,12 +104,22 @@ function addRow(){
   </tr>`;
 
   document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+  updateSerialNumbers();
 }
 
 // DELETE ROW
 function deleteRow(id){
   document.getElementById("row"+id).remove();
+   updateSerialNumbers();
   showToast("Row Deleted ❌");
+}
+  function updateSerialNumbers(){
+
+  let rows = document.querySelectorAll("#tableBody tr");
+
+  rows.forEach((row, index)=>{
+    row.cells[0].innerText = index + 1;
+  });
 }
 
 // SAVE DATA
