@@ -8,25 +8,22 @@
 
 <body>
 
-<!-- HEADER -->
 <div class="header">Survey System</div>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html">📊 Dashboard</a>
   <a href="index.html" class="active">📋 Entry Form</a>
   <a href="report.html">📄 Report</a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 <div class="box">
 
 <h2>Survey Entry Form</h2>
 
-<input id="grader" placeholder="Grader/Surveyor Name">
-<input id="warehouse" placeholder="Warehouse Name & Location">
-<input id="society" placeholder="Society / Procurement Centre">
+<input id="grader" placeholder="Grader Name">
+<input id="warehouse" placeholder="Warehouse">
+<input id="society" placeholder="Society">
 <input type="date" id="date">
 
 <div class="table-container">
@@ -35,16 +32,10 @@
 <tr>
 <th>Sr.No</th>
 <th>Name</th>
-<th>Registration</th>
+<th>Reg</th>
 <th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
 <th>Moisture</th>
 <th>Status</th>
-<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -53,67 +44,50 @@
 </table>
 </div>
 
-<button class="btn add" onclick="addRow()">+ Add Row</button>
-
-<input id="sign1" placeholder="Signature of Surveyor">
-<input id="sign2" placeholder="Signature of Warehouse Manager">
+<button onclick="addRow()">+ Add Row</button>
 
 <br><br>
 
-<button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
-<button class="btn save" onclick="saveData()">💾 Save & Next</button>
+<button onclick="saveData()">Save</button>
 
 </div>
 </div>
 
-<!-- POPUP EDIT -->
-<div id="editPopup" class="popup">
-  <div class="popup-box">
-    <h3>Edit Record</h3>
-
-    <input id="editName" placeholder="Name">
-    <input id="editReg" placeholder="Registration">
-    <input id="editQty" placeholder="Qty">
-    <input id="editMoisture" placeholder="Moisture">
-
-    <select id="editStatus">
+<!-- POPUP -->
+<div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
+  <div style="background:#fff; padding:20px; margin:100px auto; width:300px;">
+    <h3>Edit</h3>
+    <input id="eName">
+    <input id="eReg">
+    <input id="eQty">
+    <input id="eM">
+    <select id="eStatus">
       <option>FAQ</option>
       <option>Non-FAQ</option>
     </select>
-
     <br><br>
-
-    <button class="btn save" onclick="updateRow()">Update</button>
-    <button class="btn" onclick="closePopup()">Cancel</button>
+    <button onclick="updateRow()">Update</button>
+    <button onclick="closePopup()">Cancel</button>
   </div>
 </div>
 
-<!-- FOOTER -->
-<div class="footer">
-© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
-</div>
+<div id="toast"></div>
 
 <script>
 
 let rowCount = 0;
-let currentEditRow = 0;
+let currentId = 0;
+const API = "PASTE_YOUR_API_URL_HERE";
 
 // ADD ROW
 function addRow(){
-
   rowCount++;
-
   let row = `
   <tr id="row${rowCount}">
-    <td class="sr"></td>
+    <td>${rowCount}</td>
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
     <td><input id="qty${rowCount}"></td>
-    <td><input id="f${rowCount}"></td>
-    <td><input id="o${rowCount}"></td>
-    <td><input id="d2${rowCount}"></td>
-    <td><input id="d4${rowCount}"></td>
-    <td><input id="d6${rowCount}"></td>
     <td><input id="m${rowCount}"></td>
     <td>
       <select id="s${rowCount}">
@@ -121,79 +95,72 @@ function addRow(){
         <option>Non-FAQ</option>
       </select>
     </td>
-    <td><input id="r${rowCount}"></td>
     <td>
-      <button onclick="openEditPopup(${rowCount})">✏</button>
-      <button onclick="deleteRow(${rowCount})">❌</button>
+      <button onclick="openPopup(${rowCount})">Edit</button>
+      <button onclick="deleteRow(${rowCount})">X</button>
     </td>
-  </tr>
-  `;
-
+  </tr>`;
   tableBody.insertAdjacentHTML("beforeend", row);
-  updateSr();
 }
 
-// DELETE
-function deleteRow(id){
-  document.getElementById("row"+id)?.remove();
-  updateSr();
-}
+// OPEN POPUP
+function openPopup(id){
+  currentId = id;
 
-// SR FIX
-function updateSr(){
-  document.querySelectorAll(".sr").forEach((el,i)=>el.innerText=i+1);
-}
+  eName.value = document.getElementById("name"+id).value;
+  eReg.value = document.getElementById("reg"+id).value;
+  eQty.value = document.getElementById("qty"+id).value;
+  eM.value = document.getElementById("m"+id).value;
+  eStatus.value = document.getElementById("s"+id).value;
 
-// POPUP OPEN
-function openEditPopup(id){
-
-  currentEditRow = id;
-
-  editName.value = document.getElementById("name"+id).value;
-  editReg.value = document.getElementById("reg"+id).value;
-  editQty.value = document.getElementById("qty"+id).value;
-  editMoisture.value = document.getElementById("m"+id).value;
-  editStatus.value = document.getElementById("s"+id).value;
-
-  document.getElementById("editPopup").style.display = "flex";
+  popup.style.display = "block";
 }
 
 // CLOSE POPUP
 function closePopup(){
-  document.getElementById("editPopup").style.display = "none";
+  popup.style.display = "none";
 }
 
-// UPDATE ROW
-function updateRow(){
-   let data = {
+// UPDATE
+async function updateRow(){
+
+  let data = {
     action:"update",
-    name:editName.value,
-    reg:editReg.value,
-    qty:editQty.value,
-    m:editMoisture.value,
-    s:editStatus.value
+    name:eName.value,
+    reg:eReg.value,
+    qty:eQty.value,
+    m:eM.value,
+    s:eStatus.value
   };
 
-  await fetch("YOUR_API_URL",{
+  await fetch(API,{
     method:"POST",
     body:JSON.stringify(data)
   });
 
-  showToast("Updated Successfully 🔄");
+  document.getElementById("name"+currentId).value = eName.value;
+  document.getElementById("reg"+currentId).value = eReg.value;
+  document.getElementById("qty"+currentId).value = eQty.value;
+  document.getElementById("m"+currentId).value = eM.value;
+  document.getElementById("s"+currentId).value = eStatus.value;
 
-  document.getElementById("name"+currentEditRow).value = editName.value;
-  document.getElementById("reg"+currentEditRow).value = editReg.value;
-  document.getElementById("qty"+currentEditRow).value = editQty.value;
-  document.getElementById("m"+currentEditRow).value = editMoisture.value;
-  document.getElementById("s"+currentEditRow).value = editStatus.value;
-
+  showToast("Updated ✅");
   closePopup();
 }
 
-// LOAD DEFAULT ROWS
-window.onload = () => {
-  for(let i=0;i<5;i++) addRow();
-};
+// DELETE
+async function deleteRow(id){
+
+  let reg = document.getElementById("reg"+id).value;
+
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({action:"delete", reg})
+  });
+
+  document.getElementById("row"+id).remove();
+  showToast("Deleted ❌");
+}
 
 // SAVE
 async function saveData(){
@@ -203,23 +170,16 @@ async function saveData(){
     let name = document.getElementById("name"+i)?.value;
 
     if(name){
-
       let data = {
         action:"add",
         name,
         reg:document.getElementById("reg"+i).value,
         qty:document.getElementById("qty"+i).value,
-        f:document.getElementById("f"+i).value,
-        o:document.getElementById("o"+i).value,
-        d2:document.getElementById("d2"+i).value,
-        d4:document.getElementById("d4"+i).value,
-        d6:document.getElementById("d6"+i).value,
         m:document.getElementById("m"+i).value,
-        s:document.getElementById("s"+i).value,
-        r:document.getElementById("r"+i).value
+        s:document.getElementById("s"+i).value
       };
 
-      await fetch("YOUR_API_URL",{
+      await fetch(API,{
         method:"POST",
         body:JSON.stringify(data)
       });
@@ -228,35 +188,21 @@ async function saveData(){
 
   showToast("Saved Successfully ✅");
 }
-  async function deleteRow(id){
 
-  let reg = document.getElementById("reg"+id).value;
+// TOAST
+function showToast(msg){
 
-  await fetch("YOUR_API_URL",{
-    method:"POST",
-    body:JSON.stringify({
-      action:"delete",
-      reg:reg
-    })
-  });
+  let t = document.getElementById("toast");
+  t.innerText = msg;
+  t.style.display = "block";
 
-  document.getElementById("row"+id).remove();
-
-  showToast("Deleted Successfully ❌");
+  setTimeout(()=>{
+    t.style.display = "none";
+  },3000);
 }
 
-// EXPORT
-function exportExcel(){
-
-  let table = document.querySelector("table").outerHTML;
-
-  let blob = new Blob([table], {type:"application/vnd.ms-excel"});
-
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "Survey_Report.xls";
-  a.click();
-}
+// INIT
+window.onload = ()=>{ for(let i=0;i<3;i++) addRow(); }
 
 </script>
 
