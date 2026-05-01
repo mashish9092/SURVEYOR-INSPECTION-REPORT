@@ -5,7 +5,7 @@
   box-sizing: border-box;
 }
 
-/* FULL HEIGHT FIX */
+/* FULL HEIGHT */
 html, body {
   height: 100%;
 }
@@ -31,7 +31,6 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
 }
 
 /* SIDEBAR */
@@ -45,16 +44,11 @@ body {
   padding-top: 15px;
 }
 
-/* SIDEBAR LINKS */
 .sidebar a {
   display: flex;
-  align-items: center;
-  gap: 8px;
   padding: 12px 15px;
   color: #ccc;
   text-decoration: none;
-  font-size: 14px;
-  transition: 0.3s;
 }
 
 .sidebar a:hover {
@@ -65,7 +59,6 @@ body {
 .sidebar a.active {
   background: #28a745;
   color: white;
-  border-radius: 5px;
 }
 
 /* MAIN */
@@ -80,8 +73,7 @@ body {
 .box {
   background: white;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  border-radius: 10px;
 }
 
 /* INPUT */
@@ -93,206 +85,86 @@ input, select {
   border: 1px solid #ccc;
 }
 
-/* TABLE CONTAINER */
+/* TABLE */
 .table-container {
   overflow-x: auto;
-  margin-top: 10px;
 }
 
-/* TABLE */
 table {
   min-width: 1500px;
-  width: 100%;
   border-collapse: collapse;
-  border-radius: 10px;
-  overflow: hidden;
 }
 
-/* TABLE HEADER */
 th {
   background: linear-gradient(45deg, #007bff, #0056b3);
   color: white;
   padding: 10px;
-  font-size: 13px;
-  white-space: nowrap;
 }
 
-/* TABLE DATA */
 td {
   padding: 8px;
   text-align: center;
   border-bottom: 1px solid #ddd;
-  white-space: nowrap;
 }
 
-/* ROW DESIGN */
 tr:nth-child(even) {
   background: #f9f9f9;
 }
 
-tr:hover {
-  background: #e6f0ff;
-}
-
-/* STATUS COLUMN WIDTH */
-th:nth-child(11),
-td:nth-child(11) {
-  min-width: 120px;
-}
-
 /* BUTTON BASE */
 .btn {
-  padding: 10px 16px;
+  padding: 10px 18px;
   border: none;
   border-radius: 8px;
   color: white;
   cursor: pointer;
   font-weight: bold;
-  transition: 0.3s;
-}
-/* REPORT TITLE */
-.report-title {
-  text-align: center;
-  font-size: 22px;
-  margin-bottom: 20px;
 }
 
-/* REPORT GRID */
-.report-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-  gap: 15px;
-  margin-bottom: 20px;
+/* ADD BUTTON */
+.btn.add {
+  background: linear-gradient(135deg, #17a2b8, #138496);
 }
 
-.report-item {
-  background: #f1f5ff;
-  padding: 12px;
-  border-radius: 8px;
-  border-left: 4px solid #007bff;
+/* SAVE BUTTON */
+.btn.save {
+  background: linear-gradient(135deg, #28a745, #218838);
 }
 
-.report-item span {
-  font-size: 12px;
-  color: #555;
+/* EXCEL BUTTON */
+.btn.excel {
+  background: linear-gradient(135deg, #28a745, #218838);
 }
 
-.report-item strong {
-  display: block;
-  margin-top: 4px;
-  font-size: 15px;
+/* EDIT BUTTON */
+.btn.edit {
+  background: linear-gradient(135deg, #007bff, #0056b3);
 }
 
-/* BUTTON FIX */
+/* HOVER */
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+/* BUTTON GROUP */
+.form-actions,
 .btn-group {
   display: flex;
   gap: 12px;
   margin-top: 20px;
 }
 
-.btn {
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  color: white;
-  opacity: 1 !important;   /* 🔥 FORCE SHOW */
-}
-
-/* EXCEL */
-.excel {
-  background: linear-gradient(45deg, #28a745, #218838);
-}
-
-/* EDIT */
-.edit {
-  background: linear-gradient(45deg, #007bff, #0056b3);
-}
-
-/* HOVER */
-.btn:hover {
-  transform: scale(1.05);
-}
-
-/* EXCEL BUTTON */
-.excel {
-  background: linear-gradient(135deg, #28a745, #218838);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-}
-
-.excel:hover {
-  transform: translateY(-2px);
-}
-
-/* EDIT BUTTON */
-.edit {
-  background: linear-gradient(135deg, #007bff, #0056b3);
-}
-
-.edit:hover {
-  transform: translateY(-2px);
-}
-
-/* BUTTON GROUP */
-.btn-group {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* TABLE HEADER FLEX (OPTIONAL USE) */
-.table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* PAGINATION */
-.pagination {
-  display: flex;
-  gap: 10px;
-  margin: 10px 0;
-}
-
-.pagination button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.pagination button:hover {
-  background: #0056b3;
-}
-
-/* DASHBOARD CARDS */
-.cards {
+/* REPORT GRID */
+.report-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
-  gap: 15px;
-  margin-top: 15px;
+  gap: 10px;
 }
 
-.card {
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-.card:nth-child(1){ background:#007bff; }
-.card:nth-child(2){ background:#28a745; }
-.card:nth-child(3){ background:#ff9800; }
-.card:nth-child(4){ background:#6f42c1; }
-
-.card p {
-  font-size: 22px;
-  margin-top: 10px;
-  font-weight: bold;
+.report-item {
+  background: #f1f5ff;
+  padding: 10px;
+  border-left: 4px solid #007bff;
 }
 
 /* FOOTER */
@@ -303,75 +175,27 @@ td:nth-child(11) {
   padding: 12px;
   margin-top: auto;
 }
+
+/* TOAST */
 #toast {
   position: fixed;
   bottom: 20px;
   right: 20px;
   background: #28a745;
   color: white;
-  padding: 12px 20px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 6px;
   display: none;
-  z-index: 9999;
 }
 
 /* MOBILE */
 @media(max-width:768px){
-
   .sidebar {
     position: relative;
     width: 100%;
-    height: auto;
   }
 
   .main {
     margin-left: 0;
   }
-
-  table {
-    min-width: 1000px;
-  }
-
-  .btn-group {
-    flex-direction: column;
-  }
-  .form-actions{
-  display:flex;
-  gap:15px;
-  margin-top:20px;
-}
-
-/* ADD BUTTON */
-.btn.add{
-  background: linear-gradient(135deg, #17a2b8, #138496);
-  color:white;
-  padding:10px 18px;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer;
-  transition:0.3s;
-}
-
-.btn.add:hover{
-  transform: translateY(-2px);
-}
-
-/* SAVE BUTTON */
-.btn.save{
-  background: linear-gradient(135deg, #28a745, #218838);
-  color:white;
-  padding:10px 20px;
-  border:none;
-  border-radius:8px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 4px 10px rgba(0,0,0,0.2);
-  transition:0.3s;
-}
-
-.btn.save:hover{
-  transform: translateY(-2px);
-  background:#1e7e34;
-}
 }
