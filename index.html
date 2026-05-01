@@ -124,7 +124,7 @@ function saveData(){
 
   let rowsData = [];
 
-  document.querySelectorAll("#tableBody tr").forEach((row, index)=>{
+  document.querySelectorAll("#tableBody tr").forEach((row)=>{
 
     let i = row.id.replace("row","");
 
@@ -148,20 +148,22 @@ function saveData(){
 
   });
 
-  // SAVE TO LOCAL STORAGE
-  localStorage.setItem("reportData", JSON.stringify({
+  let finalData = {
     grader: grader.value,
     warehouse: warehouse.value,
     society: society.value,
     date: date.value,
     rows: rowsData
-  }));
+  };
+
+  // 🔥 LOCAL STORAGE SAVE
+  localStorage.setItem("reportData", JSON.stringify(finalData));
 
   showToast("Saved Successfully ✅");
 
   setTimeout(()=>{
     window.location.href="report.html";
-  },1000);
+  },800);
 }
 
 // TOAST
