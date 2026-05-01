@@ -3,15 +3,26 @@
 <head>
   <title>Survey Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
 <body>
+
+<div class="header">Survey Report</div>
+
+<div class="sidebar">
+  <a href="index.html">📋 Entry Form</a>
+  <a href="report.html" class="active">📄 Report</a>
+</div>
+
+<div class="main">
+<div class="box">
 
 <h2>📄 Survey Report</h2>
 
 <div id="info"></div>
 
-<table border="1" id="reportTable">
+<table id="reportTable">
 <thead>
 <tr>
 <th>Sr.No</th>
@@ -34,7 +45,40 @@
 </table>
 
 <br>
-<button onclick="exportExcel()">⬇ Export Excel</button>
+<button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
+
+</div>
+</div>
+
+<!-- POPUP -->
+<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0005;">
+<div class="box popup-box">
+
+<h3>Edit Row</h3>
+
+<input id="eName">
+<input id="eReg">
+<input id="eQty">
+<input id="eForeign">
+<input id="eOther">
+<input id="eDamaged2">
+<input id="eSlight">
+<input id="eDamaged6">
+<input id="eMoisture">
+
+<select id="eStatus">
+<option>FAQ</option>
+<option>Non-FAQ</option>
+</select>
+
+<input id="eRemark">
+
+<br><br>
+<button class="btn save" onclick="updateRow()">Update</button>
+<button class="btn" onclick="closePopup()">Cancel</button>
+
+</div>
+</div>
 
 <script src="config.js"></script>
 
@@ -53,9 +97,7 @@ function load(){
 }
 
 function render(){
-
   let html="";
-
   data.rows.forEach((r,i)=>{
     html+=`
     <tr>
@@ -71,11 +113,63 @@ function render(){
     <td>${r.moisture}</td>
     <td>${r.status}</td>
     <td>${r.remark}</td>
-    <td><button onclick="editRow(${i})">Edit</button></td>
+    <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
   document.querySelector("#reportTable tbody").innerHTML=html;
+}
+
+function editRow(i){
+  currentIndex=i;
+  let r=data.rows[i];
+
+  eName.value=r.name;
+  eReg.value=r.reg;
+  eQty.value=r.qty;
+  eForeign.value=r.foreign;
+  eOther.value=r.other;
+  eDamaged2.value=r.damaged2;
+  eSlight.value=r.slight;
+  eDamaged6.value=r.damaged6;
+  eMoisture.value=r.moisture;
+  eStatus.value=r.status;
+  eRemark.value=r.remark;
+
+  popup.style.display="block";
+}
+
+function closePopup(){
+  popup.style.display="none";
+}
+
+async function updateRow(){
+
+  let r=data.rows[currentIndex];
+
+  r.name=eName.value;
+  r.reg=eReg.value;
+  r.qty=eQty.value;
+  r.foreign=eForeign.value;
+  r.other=eOther.value;
+  r.damaged2=eDamaged2.value;
+  r.slight=eSlight.value;
+  r.damaged6=eDamaged6.value;
+  r.moisture=eMoisture.value;
+  r.status=eStatus.value;
+  r.remark=eRemark.value;
+
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"update",
+      ...r
+    })
+  });
+
+  localStorage.setItem("reportData",JSON.stringify(data));
+  render();
+  closePopup();
 }
 
 function exportExcel(){
