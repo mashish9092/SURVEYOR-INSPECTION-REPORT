@@ -187,7 +187,7 @@
 <script>
 
 let currentRow = null;
-const API = "PASTE_YOUR_GOOGLE_SCRIPT_URL";
+const API = "https://script.google.com/macros/s/AKfycbyIX4TF2-PfxoY725Yj4diHysjXbGO0wVXamCGC1dVyWQO8CSk2DjJhnayCIwHLPDsP/exec";
 
 // LOAD DATA
 window.onload = function(){
@@ -248,6 +248,7 @@ function editRow(btn){
 // UPDATE + GOOGLE SHEET
 async function updateRow(){
 
+  // UI UPDATE
   currentRow.children[1].innerText = eName.value;
   currentRow.children[2].innerText = eReg.value;
   currentRow.children[3].innerText = eQty.value;
@@ -260,26 +261,39 @@ async function updateRow(){
   currentRow.children[10].innerText = eStatus.value;
   currentRow.children[11].innerText = eRemark.value;
 
-  // 🔥 GOOGLE SHEET UPDATE
-  await fetch(API,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"update",
-      name:eName.value,
-      reg:eReg.value,
-      qty:eQty.value,
-      foreign:eForeign.value,
-      other:eOther.value,
-      damaged:eDamaged.value,
-      slight:eSlight.value,
-      six:eSix.value,
-      moisture:eMoisture.value,
-      status:eStatus.value,
-      remark:eRemark.value
-    })
-  });
+  // 🔥 LOCAL STORAGE UPDATE (IMPORTANT)
+  let data = JSON.parse(localStorage.getItem("reportData"));
 
-  showToast("Updated + Synced to Sheet ✅");
+  let rowIndex = currentRow.rowIndex - 1;
+
+  data.rows[rowIndex] = {
+    name: eName.value,
+    reg: eReg.value,
+    qty: eQty.value,
+    foreign: eForeign.value,
+    other: eOther.value,
+    damaged2: eDamaged.value,
+    slight: eSlight.value,
+    damaged6: eSix.value,
+    moisture: eMoisture.value,
+    status: eStatus.value,
+    remark: eRemark.value
+  };
+
+  localStorage.setItem("reportData", JSON.stringify(data));
+
+  // 🔥 GOOGLE SHEET (ONLY IF API सही है)
+  if(API !== "PASTE_YOUR_GOOGLE_SCRIPT_URL"){
+    await fetch(API,{
+      method:"POST",
+      body:JSON.stringify({
+        action:"update",
+        ...data.rows[rowIndex]
+      })
+    });
+  }
+
+  showToast("Updated ✅");
   closePopup();
 }
 
@@ -293,12 +307,15 @@ function exportExcel(){
   let rows = document.querySelectorAll("#reportTable tr");
   let csv = [];
 
-  rows.forEach(row=>{
-    let cols = row.querySelectorAll("td,th");
+  rows.forEach((row)=>{
+    let cols = row.querySelectorAll("th, td");
     let data = [];
 
-    cols.forEach(col=>{
-      data.push(col.innerText);
+    cols.forEach((col, index)=>{
+      // ❌ skip last column (Action)
+      if(index !== cols.length - 1){
+        data.push(col.innerText);
+      }
     });
 
     csv.push(data.join(","));
