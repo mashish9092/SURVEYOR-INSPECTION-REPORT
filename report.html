@@ -6,24 +6,63 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+
+    table, th, td{
+      border:1px solid #ccc;
+    }
+
+    .btn{
+      padding:8px 14px;
+      border:none;
+      border-radius:6px;
+      cursor:pointer;
+      font-weight:bold;
+    }
+
+    .btn.excel{
+      background:#28a745;
+      color:white;
+      margin-top:20px;
+    }
+
+    .btn.edit{
+      background:#007bff;
+      color:white;
+    }
+
+    .btn.update{
+      background:#28a745;
+      color:white;
+    }
+
     .popup-box{
       max-height:80vh;
       overflow-y:auto;
+      border-radius:10px;
     }
 
     .report-grid{
       display:flex;
-      flex-wrap:wrap;
       gap:15px;
-      margin-bottom:15px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
     }
 
     .report-item{
-      flex:1 1 220px;
+      flex:1;
+      min-width:200px;
       background:#eef2ff;
       padding:12px;
+      border-left:5px solid #007bff;
       border-radius:10px;
     }
+
+    label{
+      font-size:13px;
+      margin-top:6px;
+      display:block;
+    }
+
   </style>
 </head>
 
@@ -57,17 +96,17 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN METTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged (2%)</th>
+<th>Slight (4%)</th>
+<th>Damaged (6%)</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -79,18 +118,17 @@
 
 <!-- SIGN -->
 <div style="margin-top:20px;">
-  <p><b>Surveyor Sign:</b> _____________</p> <br>
+  <p><b>Surveyor Sign:</b> _____________</p>
   <p style="margin-top:15px;"><b>Manager Sign:</b> _____________</p>
 </div>
 
-<!-- BUTTON -->
 <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
 
 </div>
 </div>
 
 <div class="footer">
-© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
+© 2026 Survey System | Developed by Ashish Mehra
 </div>
 
 <!-- POPUP -->
@@ -115,13 +153,13 @@
 <label>Other</label>
 <input id="eOther">
 
-<label>Damaged</label>
+<label>Damaged (2%)</label>
 <input id="eDamaged">
 
-<label>Slight</label>
+<label>Slight (4%)</label>
 <input id="eSlight">
 
-<label>6%</label>
+<label>Damaged (6%)</label>
 <input id="eSix">
 
 <label>Moisture</label>
@@ -138,7 +176,7 @@
 
 <br><br>
 
-<button class="btn" onclick="updateRow()">Update</button>
+<button class="btn update" onclick="updateRow()">Update</button>
 <button class="btn edit" onclick="closePopup()">Cancel</button>
 
 </div>
@@ -149,12 +187,12 @@
 <script>
 
 let currentRow = null;
+const API = "PASTE_YOUR_GOOGLE_SCRIPT_URL";
 
 // LOAD DATA
 window.onload = function(){
 
   let data = JSON.parse(localStorage.getItem("reportData"));
-
   if(!data) return;
 
   grader.innerText = data.grader;
@@ -174,15 +212,14 @@ window.onload = function(){
       <td>${r.qty || ""}</td>
       <td>${r.foreign || ""}</td>
       <td>${r.other || ""}</td>
-      <td>${r.damaged || ""}</td>
+      <td>${r.damaged2 || ""}</td>
       <td>${r.slight || ""}</td>
-      <td>${r.six || ""}</td>
+      <td>${r.damaged6 || ""}</td>
       <td>${r.moisture || ""}</td>
       <td>${r.status || ""}</td>
       <td>${r.remark || ""}</td>
-      <td><button onclick="editRow(this)">Edit</button></td>
-    </tr>
-    `;
+      <td><button class="btn edit" onclick="editRow(this)">Edit</button></td>
+    </tr>`;
   });
 
   tableBody.innerHTML = html;
@@ -191,7 +228,7 @@ window.onload = function(){
 // EDIT
 function editRow(btn){
 
-  currentRow = btn.parentElement.parentElement;
+  currentRow = btn.closest("tr");
 
   eName.value = currentRow.children[1].innerText;
   eReg.value = currentRow.children[2].innerText;
@@ -208,8 +245,8 @@ function editRow(btn){
   popup.style.display = "block";
 }
 
-// UPDATE
-function updateRow(){
+// UPDATE + GOOGLE SHEET
+async function updateRow(){
 
   currentRow.children[1].innerText = eName.value;
   currentRow.children[2].innerText = eReg.value;
@@ -223,7 +260,26 @@ function updateRow(){
   currentRow.children[10].innerText = eStatus.value;
   currentRow.children[11].innerText = eRemark.value;
 
-  showToast("Updated ✅");
+  // 🔥 GOOGLE SHEET UPDATE
+  await fetch(API,{
+    method:"POST",
+    body:JSON.stringify({
+      action:"update",
+      name:eName.value,
+      reg:eReg.value,
+      qty:eQty.value,
+      foreign:eForeign.value,
+      other:eOther.value,
+      damaged:eDamaged.value,
+      slight:eSlight.value,
+      six:eSix.value,
+      moisture:eMoisture.value,
+      status:eStatus.value,
+      remark:eRemark.value
+    })
+  });
+
+  showToast("Updated + Synced to Sheet ✅");
   closePopup();
 }
 
