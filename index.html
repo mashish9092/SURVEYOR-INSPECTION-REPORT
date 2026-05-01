@@ -165,6 +165,21 @@ function closePopup(){
 
 // UPDATE ROW
 function updateRow(){
+   let data = {
+    action:"update",
+    name:editName.value,
+    reg:editReg.value,
+    qty:editQty.value,
+    m:editMoisture.value,
+    s:editStatus.value
+  };
+
+  await fetch("YOUR_API_URL",{
+    method:"POST",
+    body:JSON.stringify(data)
+  });
+
+  showToast("Updated Successfully 🔄");
 
   document.getElementById("name"+currentEditRow).value = editName.value;
   document.getElementById("reg"+currentEditRow).value = editReg.value;
@@ -183,41 +198,51 @@ window.onload = () => {
 // SAVE
 async function saveData(){
 
-  let rows=[];
-
   for(let i=1;i<=rowCount;i++){
 
     let name = document.getElementById("name"+i)?.value;
 
     if(name){
-      rows.push({
+
+      let data = {
+        action:"add",
         name,
-        reg:document.getElementById("reg"+i)?.value,
-        qty:document.getElementById("qty"+i)?.value,
-        m:document.getElementById("m"+i)?.value,
-        s:document.getElementById("s"+i)?.value
+        reg:document.getElementById("reg"+i).value,
+        qty:document.getElementById("qty"+i).value,
+        f:document.getElementById("f"+i).value,
+        o:document.getElementById("o"+i).value,
+        d2:document.getElementById("d2"+i).value,
+        d4:document.getElementById("d4"+i).value,
+        d6:document.getElementById("d6"+i).value,
+        m:document.getElementById("m"+i).value,
+        s:document.getElementById("s"+i).value,
+        r:document.getElementById("r"+i).value
+      };
+
+      await fetch("YOUR_API_URL",{
+        method:"POST",
+        body:JSON.stringify(data)
       });
     }
   }
 
-  let data = {
-    grader:grader.value,
-    warehouse:warehouse.value,
-    society:society.value,
-    date:date.value,
-    sign1:sign1.value,
-    sign2:sign2.value,
-    rows
-  };
+  showToast("Saved Successfully ✅");
+}
+  async function deleteRow(id){
 
-  localStorage.setItem("reportData", JSON.stringify(data));
+  let reg = document.getElementById("reg"+id).value;
 
-  await fetch("YOUR_GOOGLE_API_URL",{
+  await fetch("YOUR_API_URL",{
     method:"POST",
-    body:JSON.stringify(data)
+    body:JSON.stringify({
+      action:"delete",
+      reg:reg
+    })
   });
 
-  window.location.href="report.html";
+  document.getElementById("row"+id).remove();
+
+  showToast("Deleted Successfully ❌");
 }
 
 // EXPORT
