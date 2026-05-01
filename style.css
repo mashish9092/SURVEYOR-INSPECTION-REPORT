@@ -11,32 +11,26 @@ body {
   color: white;
   display: flex;
   align-items: center;
-  padding-left: 20px;
-  font-size: 18px;
+  justify-content: center;   /* 🔥 ADD THIS */
+  font-size: 20px;
   font-weight: bold;
-
-  position: fixed;   /* 🔥 IMPORTANT */
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
 }
 
 /* SIDEBAR */
 .sidebar {
-  width: 150px;   
-  background: #1e1e2f;
+  width: 150px;
+  background: #1e1e2f;   /* dark base */
   color: white;
-  position: fixed;
-  top: 60px;
-  bottom: 0;
-  left: 0;
 }
 
-.sidebar a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.sidebar a:hover {
+  background: #007bff;   /* blue highlight */
+  color: #fff;
+  border-radius: 5px;
 }
 
 .sidebar a:hover {
