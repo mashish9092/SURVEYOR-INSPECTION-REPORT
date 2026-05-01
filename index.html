@@ -21,8 +21,8 @@
 <h2>Survey Entry Form</h2>
 
 <input id="grader" placeholder="Grader Name">
-<input id="warehouse" placeholder="Warehouse Name & Location">
-<input id="society" placeholder="Society / Procurement Centre">
+<input id="warehouse" placeholder="Warehouse">
+<input id="society" placeholder="Society">
 <input type="date" id="date">
 
 <br><br>
@@ -33,13 +33,13 @@
 <tr>
 <th>Sr.No</th>
 <th>Name</th>
-<th>Registration</th>
+<th>Reg</th>
 <th>Qty</th>
 <th>Foreign</th>
 <th>Other</th>
-<th>Damaged (2%)</th>
-<th>Slight (4%)</th>
-<th>Damaged (6%)</th>
+<th>D2</th>
+<th>D4</th>
+<th>D6</th>
 <th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
@@ -53,28 +53,19 @@
 
 <br>
 
-<div class="form-actions">
-  <button class="btn add" onclick="addRow()">➕ Add Row</button>
-  <button class="btn save" onclick="saveData()">💾 Save & Generate Report</button>
-</div>
+<button onclick="addRow()">➕ Add Row</button>
+<button onclick="saveData()">💾 Save & Generate Report</button>
 
 </div>
 </div>
 
-<div class="footer">
-© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
-</div>
-
-<div id="toast"></div>
+<div class="footer">© 2026 Survey System</div>
 
 <script>
 
 let rowCount = 0;
-const API = "PASTE_YOUR_API_URL_HERE"; // optional
 
-// ADD ROW
 function addRow(){
-
   rowCount++;
 
   let row = `
@@ -99,93 +90,61 @@ function addRow(){
     <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
-  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
-
-  updateSerialNumbers();
+  tableBody.insertAdjacentHTML("beforeend", row);
+  updateSr();
 }
 
-// DELETE
 function deleteRow(id){
   document.getElementById("row"+id).remove();
-  updateSerialNumbers();
-  showToast("Row Deleted ❌");
+  updateSr();
 }
 
-// FIX SR.NO
-function updateSerialNumbers(){
-  let rows = document.querySelectorAll("#tableBody tr");
-  rows.forEach((row, index)=>{
-    row.cells[0].innerText = index + 1;
+function updateSr(){
+  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
+    row.cells[0].innerText = i+1;
   });
 }
 
-// SAVE
 function saveData(){
 
-  let rowsData = [];
+  let rows = [];
 
-  document.querySelectorAll("#tableBody tr").forEach((row)=>{
-
+  document.querySelectorAll("#tableBody tr").forEach(row=>{
     let i = row.id.replace("row","");
 
-    let name = document.getElementById("name"+i).value;
-
-    if(name){
-      rowsData.push({
-        name,
-        reg: document.getElementById("reg"+i).value,
-        qty: document.getElementById("qty"+i).value,
-        foreign: document.getElementById("f"+i).value,
-        other: document.getElementById("o"+i).value,
-        damaged2: document.getElementById("d2"+i).value,
-        slight: document.getElementById("d4"+i).value,
-        damaged6: document.getElementById("d6"+i).value,
-        moisture: document.getElementById("m"+i).value,
-        status: document.getElementById("s"+i).value,
-        remark: document.getElementById("r"+i).value
-      });
-    }
-
+    rows.push({
+      name: name0(i),
+      reg: val("reg"+i),
+      qty: val("qty"+i),
+      foreign: val("f"+i),
+      other: val("o"+i),
+      damaged2: val("d2"+i),
+      slight: val("d4"+i),
+      damaged6: val("d6"+i),
+      moisture: val("m"+i),
+      status: val("s"+i),
+      remark: val("r"+i)
+    });
   });
 
-  let finalData = {
+  localStorage.setItem("reportData", JSON.stringify({
     grader: grader.value,
     warehouse: warehouse.value,
     society: society.value,
     date: date.value,
-    rows: rowsData
-  };
+    rows
+  }));
 
-  // 🔥 LOCAL STORAGE SAVE
-  localStorage.setItem("reportData", JSON.stringify(finalData));
-
-  showToast("Saved Successfully ✅");
-
-  setTimeout(()=>{
-    window.location.href="report.html";
-  },800);
+  window.location.href="report.html";
 }
 
-// TOAST
-function showToast(msg){
-  let t = document.getElementById("toast");
-
-  t.innerText = msg;
-  t.style.position = "fixed";
-  t.style.bottom = "20px";
-  t.style.right = "20px";
-  t.style.background = "#28a745";
-  t.style.color = "white";
-  t.style.padding = "10px 15px";
-  t.style.borderRadius = "6px";
-  t.style.display = "block";
-
-  setTimeout(()=>{
-    t.style.display = "none";
-  },3000);
+function val(id){
+  return document.getElementById(id)?.value || "";
+}
+function name0(i){
+  return document.getElementById("name"+i)?.value || "";
 }
 
-// INIT
 window.onload = ()=> addRow();
 
 </script>
