@@ -28,36 +28,38 @@
 <br>
 
 <!-- BASIC DETAILS -->
+<div class="report-info">
 <p><b>Grader:</b> Aradhya</p>
 <p><b>Warehouse:</b> Mehra</p>
 <p><b>Society:</b> Mumbai</p>
 <p><b>Date:</b> 2026-05-01</p>
+</div>
 
 <br>
 
 <!-- TABLE -->
 <div class="table-container">
 
-<table>
+<table id="reportTable">
 
 <thead>
 <tr>
 <th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals</th>
-<th>Foreign (0.75%)</th>
-<th>Other (2%)</th>
-<th>Damaged (2%)</th>
-<th>Slight (4%)</th>
-<th>Damaged (6%)</th>
-<th>Moisture (12%)</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
 </tr>
 </thead>
 
-<tbody>
+<tbody id="tableBody">
 
 <tr>
 <td>1</td>
@@ -83,23 +85,78 @@
 <br><br>
 
 <!-- SIGNATURE -->
+<div class="sign-section">
 <p><b>Surveyor Sign:</b> ____________________</p>
 <p><b>Manager Sign:</b> ____________________</p>
+</div>
 
 <br>
 
 <!-- BUTTONS -->
-<button class="btn-excel">⬇ Export Excel</button>
-<button class="btn" onclick="window.location.href='index.html'">✏ Edit Data</button>
+<div class="btn-group">
+
+<button class="btn excel" onclick="exportExcel()">
+⬇ Export Excel
+</button>
+
+<button class="btn edit" onclick="goToEdit()">
+✏ Edit Data
+</button>
 
 </div>
 
+</div>
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
 © 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
+
+<!-- SCRIPT -->
+<script>
+
+function goToEdit(){
+  window.location.href = "index.html";
+}
+
+// ✅ FIXED EXPORT (NO ERROR IN EXCEL)
+function exportExcel(){
+
+  let csv = [];
+
+  // HEADER
+  let headers = [];
+  document.querySelectorAll("#reportTable thead th").forEach(th=>{
+    headers.push(th.innerText);
+  });
+  csv.push(headers);
+
+  // ROWS
+  document.querySelectorAll("#reportTable tbody tr").forEach(row=>{
+    let cols = row.querySelectorAll("td");
+    let data = [];
+
+    cols.forEach(td=>{
+      data.push(td.innerText.replace(/,/g, "")); // comma remove
+    });
+
+    csv.push(data);
+  });
+
+  // CONVERT
+  let csvContent = csv.map(e => e.join(",")).join("\n");
+
+  let blob = new Blob([csvContent], { type: "text/csv" });
+  let url = URL.createObjectURL(blob);
+
+  let a = document.createElement("a");
+  a.href = url;
+  a.download = "Survey_Report.csv";
+  a.click();
+}
+
+</script>
 
 </body>
 </html>
