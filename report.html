@@ -22,6 +22,8 @@
 
 <div id="info"></div>
 
+<!-- ✅ TABLE SCROLL FIX -->
+<div class="table-container">
 <table id="reportTable">
 <thead>
 <tr>
@@ -43,6 +45,7 @@
 
 <tbody></tbody>
 </table>
+</div>
 
 <br>
 <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
@@ -50,114 +53,129 @@
 </div>
 </div>
 
-<!-- POPUP -->
-<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#0005;">
-<div class="box popup-box">
+<!-- ✅ FIXED POPUP -->
+<div id="popup">
+  <div class="popup-box">
 
-<h3>Edit Row</h3>
+    <h3>Edit Row</h3>
 
-<input id="eName">
-<input id="eReg">
-<input id="eQty">
-<input id="eForeign">
-<input id="eOther">
-<input id="eDamaged2">
-<input id="eSlight">
-<input id="eDamaged6">
-<input id="eMoisture">
+    <input id="eName" placeholder="Name">
+    <input id="eReg" placeholder="Registration">
+    <input id="eQty" placeholder="Qty">
 
-<select id="eStatus">
-<option>FAQ</option>
-<option>Non-FAQ</option>
-</select>
+    <input id="eForeign" placeholder="Foreign Matter">
+    <input id="eOther" placeholder="Other Food Grains">
 
-<input id="eRemark">
+    <input id="eDamaged2" placeholder="Damaged Grains (2%)">
+    <input id="eSlight" placeholder="Slight Damaged (4%)">
+    <input id="eDamaged6" placeholder="Damaged Grains (6%)">
 
-<br><br>
-<button class="btn save" onclick="updateRow()">Update</button>
-<button class="btn" onclick="closePopup()">Cancel</button>
+    <input id="eMoisture" placeholder="Moisture">
 
-</div>
+    <select id="eStatus">
+      <option>FAQ</option>
+      <option>Non-FAQ</option>
+    </select>
+
+    <input id="eRemark" placeholder="Remark">
+
+    <br><br>
+
+    <button class="btn save" onclick="updateRow()">Update</button>
+    <button class="btn" onclick="closePopup()">Cancel</button>
+
+  </div>
 </div>
 
 <script src="config.js"></script>
 
 <script>
 
-let data=JSON.parse(localStorage.getItem("reportData"))||{rows:[]};
-let currentIndex=0;
+let data = JSON.parse(localStorage.getItem("reportData")) || {rows:[]};
+let currentIndex = 0;
 
+// LOAD
 function load(){
-  info.innerHTML=`
-  <b>Grader:</b> ${data.grader||""} |
-  <b>Warehouse:</b> ${data.warehouse||""} |
-  <b>Society:</b> ${data.society||""} |
-  <b>Date:</b> ${data.date||""}`;
+  document.getElementById("info").innerHTML = `
+  <b>Grader:</b> ${data.grader || ""} |
+  <b>Warehouse:</b> ${data.warehouse || ""} |
+  <b>Society:</b> ${data.society || ""} |
+  <b>Date:</b> ${data.date || ""}`;
   render();
 }
 
+// RENDER TABLE
 function render(){
-  let html="";
+
+  let html = "";
+
   data.rows.forEach((r,i)=>{
-    html+=`
+    html += `
     <tr>
-    <td>${i+1}</td>
-    <td>${r.name}</td>
-    <td>${r.reg}</td>
-    <td>${r.qty}</td>
-    <td>${r.foreign}</td>
-    <td>${r.other}</td>
-    <td>${r.damaged2}</td>
-    <td>${r.slight}</td>
-    <td>${r.damaged6}</td>
-    <td>${r.moisture}</td>
-    <td>${r.status}</td>
-    <td>${r.remark}</td>
-    <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.foreign}</td>
+      <td>${r.other}</td>
+      <td>${r.damaged2}</td>
+      <td>${r.slight}</td>
+      <td>${r.damaged6}</td>
+      <td>${r.moisture}</td>
+      <td>${r.status}</td>
+      <td>${r.remark}</td>
+      <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
-  document.querySelector("#reportTable tbody").innerHTML=html;
+  document.querySelector("#reportTable tbody").innerHTML = html;
 }
 
+// EDIT
 function editRow(i){
-  currentIndex=i;
-  let r=data.rows[i];
 
-  eName.value=r.name;
-  eReg.value=r.reg;
-  eQty.value=r.qty;
-  eForeign.value=r.foreign;
-  eOther.value=r.other;
-  eDamaged2.value=r.damaged2;
-  eSlight.value=r.slight;
-  eDamaged6.value=r.damaged6;
-  eMoisture.value=r.moisture;
-  eStatus.value=r.status;
-  eRemark.value=r.remark;
+  currentIndex = i;
+  let r = data.rows[i];
 
-  popup.style.display="block";
+  eName.value = r.name;
+  eReg.value = r.reg;
+  eQty.value = r.qty;
+  eForeign.value = r.foreign;
+  eOther.value = r.other;
+  eDamaged2.value = r.damaged2;
+  eSlight.value = r.slight;
+  eDamaged6.value = r.damaged6;
+  eMoisture.value = r.moisture;
+  eStatus.value = r.status;
+  eRemark.value = r.remark;
+
+  // 🔥 FIX: center popup
+  popup.style.display = "flex";
+  document.body.style.overflow = "hidden";
 }
 
+// CLOSE POPUP
 function closePopup(){
-  popup.style.display="none";
+  popup.style.display = "none";
+  document.body.style.overflow = "auto";
 }
 
+// UPDATE
 async function updateRow(){
 
-  let r=data.rows[currentIndex];
+  let r = data.rows[currentIndex];
 
-  r.name=eName.value;
-  r.reg=eReg.value;
-  r.qty=eQty.value;
-  r.foreign=eForeign.value;
-  r.other=eOther.value;
-  r.damaged2=eDamaged2.value;
-  r.slight=eSlight.value;
-  r.damaged6=eDamaged6.value;
-  r.moisture=eMoisture.value;
-  r.status=eStatus.value;
-  r.remark=eRemark.value;
+  r.name = eName.value;
+  r.reg = eReg.value;
+  r.qty = eQty.value;
+  r.foreign = eForeign.value;
+  r.other = eOther.value;
+  r.damaged2 = eDamaged2.value;
+  r.slight = eSlight.value;
+  r.damaged6 = eDamaged6.value;
+  r.moisture = eMoisture.value;
+  r.status = eStatus.value;
+  r.remark = eRemark.value;
 
   await fetch(API,{
     method:"POST",
@@ -167,14 +185,16 @@ async function updateRow(){
     })
   });
 
-  localStorage.setItem("reportData",JSON.stringify(data));
+  localStorage.setItem("reportData", JSON.stringify(data));
   render();
   closePopup();
 }
 
+// EXPORT
 function exportExcel(){
 
   let csv=[];
+
   document.querySelectorAll("#reportTable tr").forEach(row=>{
     let cols=row.querySelectorAll("th,td");
     let arr=[];
@@ -189,7 +209,7 @@ function exportExcel(){
   a.click();
 }
 
-window.onload=load;
+window.onload = load;
 
 </script>
 
