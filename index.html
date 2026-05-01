@@ -26,8 +26,8 @@ h2 { text-align: center; }
 
 input, select {
   width: 100%;
-  padding: 10px;
-  margin: 6px 0;
+  padding: 8px;
+  margin: 5px 0;
   border: 1px solid #ccc;
   border-radius: 5px;
   box-sizing: border-box;
@@ -57,9 +57,8 @@ td {
 
 td input, td select {
   width: 100%;
-  height: 30px;
-  padding: 4px;
-  box-sizing: border-box;
+  height: 28px;
+  font-size: 12px;
 }
 
 .btn {
@@ -75,6 +74,11 @@ td input, td select {
 .save { background: green; width: 100%; }
 .excel { background: #28a745; }
 .del { background: red; }
+
+@media (max-width: 768px) {
+  th, td { font-size: 10px; }
+  input { font-size: 14px; }
+}
 
 </style>
 </head>
@@ -132,11 +136,10 @@ let rowCount = 0;
 function addRow() {
 
   rowCount++;
-  const sr = document.querySelectorAll("#tableBody tr").length + 1;
 
   const row = `
   <tr id="row${rowCount}">
-    <td class="sr">${sr}</td>
+    <td class="sr"></td>
 
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
@@ -164,23 +167,61 @@ function addRow() {
   updateSr();
 }
 
-// DELETE ROW
+// DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-// FIX SERIAL NUMBER
+// SERIAL FIX
 function updateSr(){
   document.querySelectorAll(".sr").forEach((el,i)=>el.innerText=i+1);
 }
 
-// DEFAULT ROWS
-window.onload = () => {
-  for(let i=0;i<5;i++) addRow();
-}
 
-// SAVE DATA (FINAL FIX)
+// ✅ SINGLE ONLOAD (FINAL FIX)
+window.onload = () => {
+
+  let edit = localStorage.getItem("editMode");
+  let data = JSON.parse(localStorage.getItem("reportData"));
+
+  if(edit === "true" && data){
+
+    grader.value = data.grader;
+    warehouse.value = data.warehouse;
+    society.value = data.society;
+    date.value = data.date;
+    sign1.value = data.sign1;
+    sign2.value = data.sign2;
+
+    tableBody.innerHTML = "";
+    rowCount = 0;
+
+    data.rows.forEach(r=>{
+      addRow();
+
+      document.getElementById("name"+rowCount).value = r.name;
+      document.getElementById("reg"+rowCount).value = r.reg;
+      document.getElementById("qty"+rowCount).value = r.qty;
+      document.getElementById("f"+rowCount).value = r.f;
+      document.getElementById("o"+rowCount).value = r.o;
+      document.getElementById("d2"+rowCount).value = r.d2;
+      document.getElementById("d4"+rowCount).value = r.d4;
+      document.getElementById("d6"+rowCount).value = r.d6;
+      document.getElementById("m"+rowCount).value = r.m;
+      document.getElementById("s"+rowCount).value = r.s;
+      document.getElementById("r"+rowCount).value = r.r;
+    });
+
+    localStorage.removeItem("editMode");
+
+  } else {
+    for(let i=0;i<5;i++) addRow();
+  }
+};
+
+
+// SAVE DATA
 async function saveData(){
 
   let rows=[];
@@ -215,7 +256,6 @@ async function saveData(){
     rows
   };
 
-  // LOCAL SAVE
   localStorage.setItem("reportData",JSON.stringify(data));
 
   try {
@@ -223,67 +263,21 @@ async function saveData(){
       method:"POST",
       body:JSON.stringify(data)
     });
-  } catch(err){
-    console.log(err);
-  }
+  } catch(e){}
 
-  // ✅ REDIRECT FIX
   window.location.href = "report.html";
 }
 
+
 // EXCEL EXPORT
 function exportExcel(){
-
   let table = document.querySelector("table").outerHTML;
-
   let blob = new Blob([table], {type:"application/vnd.ms-excel"});
-  let url = URL.createObjectURL(blob);
-
   let a = document.createElement("a");
-  a.href = url;
+  a.href = URL.createObjectURL(blob);
   a.download = "Survey_Report.xls";
   a.click();
 }
-  // EDIT MODE LOAD
-window.onload = () => {
-
-  let edit = localStorage.getItem("editMode");
-  let data = JSON.parse(localStorage.getItem("reportData"));
-
-  if(edit === "true" && data){
-
-    grader.value = data.grader;
-    warehouse.value = data.warehouse;
-    society.value = data.society;
-    date.value = data.date;
-    sign1.value = data.sign1;
-    sign2.value = data.sign2;
-
-    document.getElementById("tableBody").innerHTML = "";
-    rowCount = 0;
-
-    data.rows.forEach(r=>{
-      addRow();
-
-      document.getElementById("name"+rowCount).value = r.name;
-      document.getElementById("reg"+rowCount).value = r.reg;
-      document.getElementById("qty"+rowCount).value = r.qty;
-      document.getElementById("f"+rowCount).value = r.f;
-      document.getElementById("o"+rowCount).value = r.o;
-      document.getElementById("d2"+rowCount).value = r.d2;
-      document.getElementById("d4"+rowCount).value = r.d4;
-      document.getElementById("d6"+rowCount).value = r.d6;
-      document.getElementById("m"+rowCount).value = r.m;
-      document.getElementById("s"+rowCount).value = r.s;
-      document.getElementById("r"+rowCount).value = r.r;
-    });
-
-    localStorage.removeItem("editMode");
-
-  } else {
-    for(let i=0;i<5;i++) addRow();
-  }
-};
 
 </script>
 
