@@ -4,51 +4,70 @@
   <title>Survey Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+
+  <style>
+    .popup-box{
+      max-height:80vh;
+      overflow-y:auto;
+    }
+
+    .report-grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:15px;
+      margin-bottom:15px;
+    }
+
+    .report-item{
+      flex:1 1 220px;
+      background:#eef2ff;
+      padding:12px;
+      border-radius:10px;
+    }
+  </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
 <div class="header">Survey System</div>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
   <a href="report.html" class="active">📄 Report</a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 <div class="box">
 
-<h2 class="report-title">📄 SURVEYOR INSPECTION REPORT</h2>
+<h2>📄 SURVEYOR INSPECTION REPORT</h2>
 
 <!-- INFO -->
 <div class="report-grid">
-  <div class="report-item"><span>👤 Grader</span><strong id="grader"></strong></div>
-  <div class="report-item"><span>🏢 Warehouse</span><strong id="warehouse"></strong></div>
-  <div class="report-item"><span>📍 Society</span><strong id="society"></strong></div>
-  <div class="report-item"><span>📅 Date</span><strong id="date"></strong></div>
+  <div class="report-item"><b>👤 Grader:</b> <span id="grader"></span></div>
+  <div class="report-item"><b>🏢 Warehouse:</b> <span id="warehouse"></span></div>
+  <div class="report-item"><b>📍 Society:</b> <span id="society"></span></div>
+  <div class="report-item"><b>📅 Date:</b> <span id="date"></span></div>
 </div>
 
 <!-- TABLE -->
 <div class="table-container">
 <table id="reportTable">
+
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN METTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -64,23 +83,22 @@
 <p><b>Manager Sign:</b> _____________</p>
 </div>
 
-<!-- BUTTONS -->
-<div class="btn-group">
+<!-- BUTTON -->
 <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
-</div>
 
 </div>
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
 © 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
 
 <!-- POPUP -->
-<div id="popup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5);">
-  <div style="background:#fff; padding:20px; margin:100px auto; width:300px;">
-   <h3>Edit Row</h3>
+<div id="popup" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);">
+
+<div class="popup-box" style="background:#fff;padding:20px;margin:80px auto;width:350px;">
+
+<h3>Edit Row</h3>
 
 <label>Name</label>
 <input id="eName">
@@ -91,114 +109,107 @@
 <label>Qty</label>
 <input id="eQty">
 
-<label>Foreign (0.75%)</label>
+<label>Foreign</label>
 <input id="eForeign">
 
-<label>Other (2%)</label>
+<label>Other</label>
 <input id="eOther">
 
-<label>Damaged (2%)</label>
+<label>Damaged</label>
 <input id="eDamaged">
 
-<label>Slight (4%)</label>
+<label>Slight</label>
 <input id="eSlight">
 
-<label>Damaged (6%)</label>
+<label>6%</label>
 <input id="eSix">
 
-<label>Moisture (12%)</label>
+<label>Moisture</label>
 <input id="eMoisture">
 
 <label>Status</label>
 <select id="eStatus">
-  <option>FAQ</option>
-  <option>Non-FAQ</option>
+<option>FAQ</option>
+<option>Non-FAQ</option>
 </select>
 
 <label>Remark</label>
 <input id="eRemark">
-    </select>
 
-    <input id="eRemark" placeholder="Remark">
+<br><br>
 
-    <br><br>
-    <button class="btn save" onclick="updateRow()">Update</button>
-    <button class="btn edit" onclick="closePopup()">Cancel</button>
-  </div>
+<button class="btn" onclick="updateRow()">Update</button>
+<button class="btn edit" onclick="closePopup()">Cancel</button>
+
+</div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <script>
 
-const API = "PASTE_YOUR_API_URL_HERE";
-
 let currentRow = null;
 
-// LOAD DATA FROM LOCAL STORAGE
+// LOAD DATA
 window.onload = function(){
 
   let data = JSON.parse(localStorage.getItem("reportData"));
 
   if(!data) return;
 
-  document.getElementById("grader").innerText = data.grader;
-  document.getElementById("warehouse").innerText = data.warehouse;
-  document.getElementById("society").innerText = data.society;
-  document.getElementById("date").innerText = data.date;
+  grader.innerText = data.grader;
+  warehouse.innerText = data.warehouse;
+  society.innerText = data.society;
+  date.innerText = data.date;
 
   let html = "";
 
- data.rows.forEach((r,i)=>{
-  html += `
-  <tr>
-    <td>${i+1}</td>
-    <td>${r.name || ""}</td>
-    <td>${r.reg || ""}</td>
-    <td>${r.qty || ""}</td>
-    <td>${r.foreign || ""}</td>
-    <td>${r.other || ""}</td>
-    <td>${r.damaged || ""}</td>
-    <td>${r.slight || ""}</td>
-    <td>${r.six || ""}</td>
-    <td>${r.moisture || ""}</td>
-    <td>${r.status || ""}</td>
-    <td>${r.remark || ""}</td>
-    <td><button onclick="editRow(this)">Edit</button></td>
-  </tr>`;
-});
+  data.rows.forEach((r,i)=>{
+
+    html += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.name || ""}</td>
+      <td>${r.reg || ""}</td>
+      <td>${r.qty || ""}</td>
+      <td>${r.foreign || ""}</td>
+      <td>${r.other || ""}</td>
+      <td>${r.damaged || ""}</td>
+      <td>${r.slight || ""}</td>
+      <td>${r.six || ""}</td>
+      <td>${r.moisture || ""}</td>
+      <td>${r.status || ""}</td>
+      <td>${r.remark || ""}</td>
+      <td><button onclick="editRow(this)">Edit</button></td>
+    </tr>
+    `;
+  });
 
   tableBody.innerHTML = html;
 }
 
-// OPEN POPUP
+// EDIT
 function editRow(btn){
 
   currentRow = btn.parentElement.parentElement;
 
-  eName.value = currentRow.children[1].innerText || "";
-  eReg.value = currentRow.children[2].innerText || "";
-  eQty.value = currentRow.children[3].innerText || "";
-  eForeign.value = currentRow.children[4].innerText || "";
-  eOther.value = currentRow.children[5].innerText || "";
-  eDamaged.value = currentRow.children[6].innerText || "";
-  eSlight.value = currentRow.children[7].innerText || "";
-  eSix.value = currentRow.children[8].innerText || "";
-  eMoisture.value = currentRow.children[9].innerText || "";
-  eStatus.value = currentRow.children[10].innerText || "FAQ";
-  eRemark.value = currentRow.children[11].innerText || "";
+  eName.value = currentRow.children[1].innerText;
+  eReg.value = currentRow.children[2].innerText;
+  eQty.value = currentRow.children[3].innerText;
+  eForeign.value = currentRow.children[4].innerText;
+  eOther.value = currentRow.children[5].innerText;
+  eDamaged.value = currentRow.children[6].innerText;
+  eSlight.value = currentRow.children[7].innerText;
+  eSix.value = currentRow.children[8].innerText;
+  eMoisture.value = currentRow.children[9].innerText;
+  eStatus.value = currentRow.children[10].innerText;
+  eRemark.value = currentRow.children[11].innerText;
 
   popup.style.display = "block";
 }
 
-// CLOSE POPUP
-function closePopup(){
-  popup.style.display = "none";
-}
-
 // UPDATE
-async function updateRow(){
+function updateRow(){
 
   currentRow.children[1].innerText = eName.value;
   currentRow.children[2].innerText = eReg.value;
@@ -212,27 +223,12 @@ async function updateRow(){
   currentRow.children[10].innerText = eStatus.value;
   currentRow.children[11].innerText = eRemark.value;
 
-  // API UPDATE
- await fetch(API,{
-  method:"POST",
-  body: JSON.stringify({
-    action:"update",
-    reg:eReg.value,
-    name:eName.value,
-    qty:eQty.value,
-    foreign:eForeign.value,
-    other:eOther.value,
-    damaged:eDamaged.value,
-    slight:eSlight.value,
-    six:eSix.value,
-    moisture:eMoisture.value,
-    status:eStatus.value,
-    remark:eRemark.value
-  })
-});
-
-  showToast("Updated Successfully ✅");
+  showToast("Updated ✅");
   closePopup();
+}
+
+function closePopup(){
+  popup.style.display = "none";
 }
 
 // EXPORT
@@ -261,10 +257,9 @@ function exportExcel(){
 
 // TOAST
 function showToast(msg){
-  let t = document.getElementById("toast");
-  t.innerText = msg;
-  t.style.display = "block";
-  setTimeout(()=> t.style.display="none",3000);
+  toast.innerText = msg;
+  toast.style.display = "block";
+  setTimeout(()=>toast.style.display="none",3000);
 }
 
 </script>
