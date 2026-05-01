@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Surve Report</title>
+<title>Survey Report</title>
 
 <style>
 body { font-family: Arial; background:#f4f6f9; padding:20px; }
@@ -68,70 +68,72 @@ th, td { border:1px solid black; font-size:12px; padding:5px; text-align:center;
 
 <script>
 
-const data = JSON.parse(localStorage.getItem("reportData"));
+// LOAD DATA
+let data = JSON.parse(localStorage.getItem("reportData"));
 
-document.getElementById("grader").innerText = data.grader;
-document.getElementById("warehouse").innerText = data.warehouse;
-document.getElementById("society").innerText = data.society;
-document.getElementById("date").innerText = data.date;
-document.getElementById("sign1").innerText = data.sign1;
-document.getElementById("sign2").innerText = data.sign2;
+if(!data){
+  alert("No Data Found ❌");
+} else {
 
-let html = "";
+  document.getElementById("grader").innerText = data.grader;
+  document.getElementById("warehouse").innerText = data.warehouse;
+  document.getElementById("society").innerText = data.society;
+  document.getElementById("date").innerText = data.date;
+  document.getElementById("sign1").innerText = data.sign1;
+  document.getElementById("sign2").innerText = data.sign2;
 
-data.rows.forEach((r,i)=>{
-  html += `
-  <tr>
-    <td>${i+1}</td>
-    <td>${r.name}</td>
-    <td>${r.reg}</td>
-    <td>${r.qty}</td>
-    <td>${r.f}</td>
-    <td>${r.o}</td>
-    <td>${r.d2}</td>
-    <td>${r.d4}</td>
-    <td>${r.d6}</td>
-    <td>${r.m}</td>
-    <td>${r.s}</td>
-    <td>${r.r}</td>
-  </tr>`;
-});
+  let html = "";
 
-document.getElementById("table").innerHTML = html;
+  data.rows.forEach((r,i)=>{
+    html += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.f}</td>
+      <td>${r.o}</td>
+      <td>${r.d2}</td>
+      <td>${r.d4}</td>
+      <td>${r.d6}</td>
+      <td>${r.m}</td>
+      <td>${r.s}</td>
+      <td>${r.r}</td>
+    </tr>`;
+  });
 
-// EDIT BUTTON FIX
+  document.getElementById("table").innerHTML = html;
+}
+
+
+// EDIT BUTTON
 function editData(){
-  localStorage.setItem("editMode", "true");
+  localStorage.setItem("editMode","true");
   window.location.href = "index.html";
 }
 
+
 // EXCEL EXPORT
-<script>
 function exportExcel(){
 
-  const data = JSON.parse(localStorage.getItem("reportData"));
+  let data = JSON.parse(localStorage.getItem("reportData"));
 
   let excel = "";
 
-  // HEADER DATA
   excel += "Grader," + data.grader + "\n";
   excel += "Warehouse," + data.warehouse + "\n";
   excel += "Society," + data.society + "\n";
   excel += "Date," + data.date + "\n\n";
 
-  // COLUMN HEADERS (FULL NAME)
   excel += "Sr.No,Name Of Farmer/Society,Farmer Registration,Qty In Quintals (Approx),FOREIGN METTER (0.75%),OTHER FOOD GRAINS (2%),DAMAGED GRAINS (2%),SLIGHT DAMAGED GRAINS (4%),DAMAGED GRAINS (6%),MOISTURE (12%),Status FAQ/Non FAQ,Remark If Any\n";
 
-  // ROW DATA
   data.rows.forEach((r,i)=>{
     excel += `${i+1},${r.name},${r.reg},${r.qty},${r.f},${r.o},${r.d2},${r.d4},${r.d6},${r.m},${r.s},${r.r}\n`;
   });
 
-  // SIGNATURES
   excel += "\nSurveyor Sign," + data.sign1;
   excel += "\nManager Sign," + data.sign2;
 
-  // DOWNLOAD
   let blob = new Blob([excel], { type: "application/vnd.ms-excel" });
   let url = URL.createObjectURL(blob);
 
@@ -140,7 +142,7 @@ function exportExcel(){
   a.download = "Survey_Report.xls";
   a.click();
 }
-</script>
+
 </script>
 
 </body>
