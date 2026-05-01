@@ -16,12 +16,10 @@
   <a href="dashboard.html" class="active">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
   <a href="report.html">📄 Report</a>
-  
 </div>
 
 <!-- MAIN -->
 <div class="main">
-
 <div class="box">
 
 <h2>📊 Dashboard Overview</h2>
@@ -31,32 +29,38 @@
 
   <div class="card">
     <h3>Total Entries</h3>
-    <p id="total"></p>
+    <p id="total">0</p>
   </div>
 
   <div class="card">
     <h3>Total Quantity</h3>
-    <p id="qty"></p>
+    <p id="qty">0</p>
   </div>
 
   <div class="card">
     <h3>Avg Moisture</h3>
-    <p id="moisture"></p>
+    <p id="moisture">0</p>
   </div>
 
   <div class="card">
     <h3>FAQ Count</h3>
-    <p id="faq"></p>
+    <p id="faq">0</p>
   </div>
 
 </div>
 
 <br>
-<input type="text" placeholder="Search..." onkeyup="searchData()">
 
+<!-- SEARCH -->
+<input type="text" id="search" placeholder="Search..." onkeyup="searchData()">
+
+<br><br>
+
+<!-- PAGINATION -->
 <button onclick="prevPage()">Prev</button>
 <button onclick="nextPage()">Next</button>
-<!-- TABLE VIEW -->
+
+<!-- TABLE -->
 <h3>📋 Data Summary</h3>
 
 <div class="table-container">
@@ -64,92 +68,145 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
+<th>Name</th>
+<th>Registration</th>
 <th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
 <th>Moisture</th>
 <th>Status</th>
+<th>Remark</th>
 </tr>
 </thead>
 
 <tbody id="table"></tbody>
-
 </table>
 </div>
 
 </div>
-
 </div>
 
 <!-- FOOTER -->
 <div class="footer">
-  © 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
+© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
 </div>
+
 <script>
 
-const API_URL = "https://script.google.com/macros/s/AKfycbyIX4TF2-PfxoY725Yj4diHysjXbGO0wVXamCGC1dVyWQO8CSk2DjJhnayCIwHLPDsP/exec"; // 👈 यहाँ URL डालो
+const API_URL = "https://script.google.com/macros/s/AKfycbyIX4TF2-PfxoY725Yj4diHysjXbGO0wVXamCGC1dVyWQO8CSk2DjJhnayCIwHLPDsP/exec";
 
-let fullData = [];
+let allData = [];
+let filteredData = [];
 let currentPage = 1;
-let rowsPerPage = 10;
+const perPage = 5;
 
 // LOAD DATA
 async function loadData(){
-  const res = await fetch(API_URL);
-  fullData = await res.json();
 
-  renderTable();
+  const res = await fetch(API_URL);
+  const data = await res.json();
+
+  allData = data;
+  filteredData = data;
+
   updateStats();
+  renderTable();
 }
 
-// TABLE SHOW
+// TABLE RENDER
 function renderTable(){
 
-  let start = (currentPage - 1) * rowsPerPage;
-  let end = start + rowsPerPage;
+  let start = (currentPage - 1) * perPage;
+  let end = start + perPage;
 
-  let data = fullData.slice(start, end);
+  let pageData = filteredData.slice(start, end);
 
   let html = "";
 
-  data.forEach((r,i)=>{
+  pageData.forEach((r,i)=>{
+
     html += `
     <tr>
-      <td>${start+i+1}</td>
-      <td>${r["Name Of Farmer/Society"]}</td>
-      <td>${r["Farmer Registration"]}</td>
-      <td>${r["Qty In Quintals (Approx)"]}</td>
-      <td>${r["MOISTURE (12%)"]}</td>
-      <td>${r["Status FAQ/Non FAQ"]}</td>
-    </tr>`;
+      <td>${start + i + 1}</td>
+      <td>${r["Name Of Farmer/Society"] || ""}</td>
+      <td>${r["Farmer Registration"] || ""}</td>
+      <td>${r["Qty In Quintals (Approx)"] || ""}</td>
+      <td>${r["FOREIGN METTER (0.75%)"] || ""}</td>
+      <td>${r["OTHER FOOD GRAINS (2%)"] || ""}</td>
+      <td>${r["DAMAGED GRAINS (2%)"] || ""}</td>
+      <td>${r["SLIGHT DAMAGED GRAINS (4%)"] || ""}</td>
+      <td>${r["DAMAGED GRAINS (6%)"] || ""}</td>
+      <td>${r["MOISTURE (12%)"] || ""}</td>
+      <td>${r["Status FAQ/Non FAQ"] || ""}</td>
+      <td>${r["Remark If Any"] || ""}</td>
+    </tr>
+    `;
   });
 
   document.getElementById("table").innerHTML = html;
 }
 
+// SEARCH
+function searchData(){
+
+  let val = document.getElementById("search").value.toLowerCase();
+
+  filteredData = allData.filter(r =>
+    JSON.stringify(r).toLowerCase().includes(val)
+  );
+
+  currentPage = 1;
+  renderTable();
+}
+
+// PAGINATION
+function nextPage(){
+  if(currentPage * perPage < filteredData.length){
+    currentPage++;
+    renderTable();
+  }
+}
+
+function prevPage(){
+  if(currentPage > 1){
+    currentPage--;
+    renderTable();
+  }
+}
+
 // STATS
 function updateStats(){
 
-  document.getElementById("total").innerText = fullData.length;
+  document.getElementById("total").innerText = allData.length;
 
   let totalQty = 0;
-  let moisture = 0;
+  let totalMoisture = 0;
   let faq = 0;
 
-  fullData.forEach(r=>{
-    totalQty += Number(r["Qty In Quintals (Approx)"] || 0);
-    moisture += Number(r["MOISTURE (12%)"] || 0);
+  allData.forEach(r => {
+
+    totalQty += Number(r["Qty In Quintals (Approx)"]) || 0;
+    totalMoisture += Number(r["MOISTURE (12%)"]) || 0;
 
     if(r["Status FAQ/Non FAQ"] === "FAQ") faq++;
+
   });
 
   document.getElementById("qty").innerText = totalQty;
-  document.getElementById("moisture").innerText = (moisture/fullData.length).toFixed(2);
+
+  document.getElementById("moisture").innerText =
+    (totalMoisture / allData.length).toFixed(2);
+
   document.getElementById("faq").innerText = faq;
 }
 
-// LOAD
+// INIT
 loadData();
 
 </script>
+
 </body>
 </html>
