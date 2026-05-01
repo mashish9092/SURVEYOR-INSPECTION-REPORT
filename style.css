@@ -150,6 +150,70 @@ td:nth-child(11) {
   font-weight: bold;
   transition: 0.3s;
 }
+/* REPORT TITLE */
+.report-title {
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+/* REPORT GRID */
+.report-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px,1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.report-item {
+  background: #f1f5ff;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #007bff;
+}
+
+.report-item span {
+  font-size: 12px;
+  color: #555;
+}
+
+.report-item strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+/* BUTTON FIX */
+.btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  color: white;
+  opacity: 1 !important;   /* 🔥 FORCE SHOW */
+}
+
+/* EXCEL */
+.excel {
+  background: linear-gradient(45deg, #28a745, #218838);
+}
+
+/* EDIT */
+.edit {
+  background: linear-gradient(45deg, #007bff, #0056b3);
+}
+
+/* HOVER */
+.btn:hover {
+  transform: scale(1.05);
+}
 
 /* EXCEL BUTTON */
 .excel {
