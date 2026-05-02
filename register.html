@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>खरीदी रजिस्टर</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./style.css">
+</head>
+
+<body class="page-container">
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left"></div>
+  <div class="title">📘 खरीदी रजिस्टर</div>
+  <div id="dateTime"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <a href="dashboard.html">📊 Dashboard</a>
+  <a href="index.html">📋 Entry Form</a>
+  <a href="report.html">📄 Report</a>
+  <a href="register.html" class="active">📘 Register</a>
+  <a href="contact.html">📞 Contact</a>
+</div>
+
+<!-- MAIN -->
+<div class="main content">
+<div class="box">
+
+<h2>📘 खरीदी रजिस्टर</h2>
+
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th>दिनांक</th>
+<th>केंद्र का नाम</th>
+<th>क्र.</th>
+<th>किसान का नाम/पिता का नाम</th>
+<th>किसान कोड</th>
+<th>बोरी</th>
+<th>मात्रा</th>
+<th>कुल राशि</th>
+<th>लिंकिंग भुगतान राशि</th>
+<th>शुद्ध भुगतान</th>
+<th>कृषक हस्ताक्षर</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="tableBody"></tbody>
+</table>
+</div>
+
+<br>
+
+<div class="btn-group">
+<button class="btn add" onclick="addRow()">➕ Row Add</button>
+<button class="btn save" onclick="saveAll()">💾 Save All</button>
+</div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  © <span id="year"></span> Survey System | All Rights Reserved <br>
+  Developed by <b>Ashish Mehra</b>
+</div>
+
+<script src="config.js"></script>
+
+<script>
+
+let rowCount = 0;
+
+// ADD ROW
+function addRow(){
+  rowCount++;
+
+  let row = `
+  <tr id="row${rowCount}">
+    <td><input id="date${rowCount}"></td>
+    <td><input id="center${rowCount}"></td>
+    <td></td>
+    <td><input id="name${rowCount}"></td>
+    <td><input id="code${rowCount}"></td>
+    <td><input id="bori${rowCount}" type="number"></td>
+    <td><input id="qty${rowCount}" type="number"></td>
+    <td><input id="amount${rowCount}" type="number"></td>
+    <td><input id="link${rowCount}" type="number"></td>
+    <td><input id="net${rowCount}" type="number"></td>
+    <td><input id="sign${rowCount}"></td>
+    <td><button class="btn cancel" onclick="deleteRow(${rowCount})">❌</button></td>
+  </tr>`;
+
+  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+  updateSr();
+}
+
+// DELETE
+function deleteRow(id){
+  document.getElementById("row"+id).remove();
+  updateSr();
+}
+
+// AUTO SR NO
+function updateSr(){
+  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
+    row.cells[2].innerText = i + 1;
+  });
+}
+
+// SAVE ALL
+async function saveAll(){
+
+  let rows = document.querySelectorAll("#tableBody tr");
+
+  for(let row of rows){
+
+    let i = row.id.replace("row","");
+
+    let data = {
+      action: "register",
+      date: getVal("date"+i),
+      center: getVal("center"+i),
+      sr: i,
+      name: getVal("name"+i),
+      code: getVal("code"+i),
+      bori: getVal("bori"+i),
+      qty: getVal("qty"+i),
+      amount: getVal("amount"+i),
+      link: getVal("link"+i),
+      net: getVal("net"+i),
+      sign: getVal("sign"+i)
+    };
+
+    if(!data.name) continue;
+
+    await fetch(API,{
+      method:"POST",
+      body:JSON.stringify(data)
+    });
+  }
+
+  alert("सभी डेटा सेव हो गया ✅");
+}
+
+// GET VALUE
+function getVal(id){
+  return document.getElementById(id)?.value || "";
+}
+
+// DATE TIME
+function updateDateTime(){
+  let now = new Date();
+  document.getElementById("dateTime").innerText =
+    now.toLocaleDateString() + " | " + now.toLocaleTimeString();
+}
+
+// INIT
+window.onload = function(){
+  addRow();
+  updateDateTime();
+  setInterval(updateDateTime,1000);
+  document.getElementById("year").innerText = new Date().getFullYear();
+};
+
+</script>
+
+</body>
+</html>
