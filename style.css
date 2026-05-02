@@ -82,8 +82,8 @@ body {
 }
 
 .sidebar a:hover {
-  background: #1976d2;
-  color: #fff;
+  background: #e3f2fd;   /* light blue */
+  color: #1976d2;        /* dark blue text */
 }
 
 .sidebar a.active {
