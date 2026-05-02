@@ -139,7 +139,7 @@ async function saveAll(){
 
     if(!data.name) continue;
 
-    await fetch(API,{
+    await fetch(API_REGISTER,{
       method:"POST",
       body:JSON.stringify(data)
     });
