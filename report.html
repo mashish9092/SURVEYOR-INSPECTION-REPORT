@@ -1,3 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Survey Report</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+<div class="header">📄 Survey Report</div>
+
+<div class="sidebar">
+  <a href="dashboard.html">📊 Dashboard</a>
+  <a href="index.html">📋 Entry Form</a>
+  <a href="report.html" class="active">📄 Report</a>
+  <a href="contact.html">📞 Contact</a>
+</div>
+
+<div class="main">
+<div class="box">
+
+<h2>📄 Survey Report</h2>
+
+<div id="info"></div>
+
+<button class="btn save" onclick="exportExcel()">⬇ Export Excel</button>
+
+<table id="reportTable">
+  <thead>
+    <tr>
+      <th>Sr.No</th>
+      <th>Name</th>
+      <th>Registration</th>
+      <th>Qty</th>
+      <th>Foreign</th>
+      <th>Other</th>
+      <th>Damaged</th>
+      <th>Slight</th>
+      <th>6%</th>
+      <th>Moisture</th>
+      <th>Status</th>
+      <th>Remark</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+
+  <tbody id="reportBody"></tbody>
+</table>
+
+</div>
+</div>
+
+<div class="footer">
+© <span id="year"></span> Survey System | Developed by Ashish Mehra
+</div>
+
+<!-- CONFIG -->
 <script src="config.js"></script>
 
 <script>
@@ -5,7 +67,7 @@
 let currentData = [];
 let currentIndex = 0;
 
-// 🔥 LOAD FROM GOOGLE SHEET
+// 🔥 LOAD DATA FROM GOOGLE SHEET
 async function load(){
 
   try{
@@ -19,12 +81,19 @@ async function load(){
     render();
 
   }catch(err){
-    console.error("Error loading data:", err);
+    console.error("Load Error:", err);
   }
 }
 
 // 🔥 RENDER TABLE
 function render(){
+
+  let body = document.getElementById("reportBody");
+
+  if(!body){
+    console.error("Table body missing");
+    return;
+  }
 
   let html = "";
 
@@ -44,52 +113,43 @@ function render(){
       <td>${r.Moisture || ""}</td>
       <td>${r.Status || ""}</td>
       <td>${r.Remark || ""}</td>
-      <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
+      <td>
+        <button class="btn add" onclick="editRow(${i})">Edit</button>
+      </td>
     </tr>`;
   });
 
-  document.querySelector("#reportTable tbody").innerHTML = html;
+  body.innerHTML = html;
 }
 
 // 🔥 EDIT
 function editRow(i){
 
   currentIndex = i;
+
   let r = currentData[i];
 
-  eName.value = r.Name;
-  eReg.value = r.Registration;
-  eQty.value = r.Qty;
-  eForeign.value = r.Foreign;
-  eOther.value = r.Other;
-  eDamaged2.value = r.Damaged;
-  eSlight.value = r.Slight;
-  eDamaged6.value = r["6%"];
-  eMoisture.value = r.Moisture;
-  eStatus.value = r.Status;
-  eRemark.value = r.Remark;
+  let name = prompt("Name", r.Name);
+  let reg = prompt("Registration", r.Registration);
+  let qty = prompt("Qty", r.Qty);
 
-  popup.style.display = "flex";
+  if(name === null) return;
+
+  updateRow({
+    name, reg, qty,
+    foreign:r.Foreign,
+    other:r.Other,
+    damaged2:r.Damaged,
+    slight:r.Slight,
+    damaged6:r["6%"],
+    moisture:r.Moisture,
+    status:r.Status,
+    remark:r.Remark
+  });
 }
 
-// 🔥 UPDATE (GOOGLE SHEET)
-async function updateRow(){
-
-  let r = currentData[currentIndex];
-
-  let updated = {
-    name: eName.value,
-    reg: eReg.value,
-    qty: eQty.value,
-    foreign: eForeign.value,
-    other: eOther.value,
-    damaged2: eDamaged2.value,
-    slight: eSlight.value,
-    damaged6: eDamaged6.value,
-    moisture: eMoisture.value,
-    status: eStatus.value,
-    remark: eRemark.value
-  };
+// 🔥 UPDATE GOOGLE SHEET
+async function updateRow(data){
 
   try{
 
@@ -97,40 +157,33 @@ async function updateRow(){
       method:"POST",
       body:JSON.stringify({
         action:"update",
-        ...updated
+        ...data
       })
     });
 
-    alert("Updated successfully");
+    alert("Updated Successfully");
 
-    closePopup();
-    load(); // 🔥 reload fresh data
+    load();
 
   }catch(e){
     alert("Update failed");
   }
 }
 
-// CLOSE
-function closePopup(){
-  popup.style.display = "none";
-}
-
-// 🔥 EXPORT FROM SHEET DATA
+// 🔥 EXPORT EXCEL
 function exportExcel(){
 
-  let dataArr = [];
+  let arr = [];
 
   let headers = [
     "Sr.No","Name","Registration","Qty","Foreign","Other",
     "Damaged","Slight","6%","Moisture","Status","Remark"
   ];
 
-  dataArr.push(headers);
+  arr.push(headers);
 
   currentData.forEach((r,i)=>{
-
-    dataArr.push([
+    arr.push([
       i+1,
       r.Name,
       r.Registration,
@@ -146,26 +199,20 @@ function exportExcel(){
     ]);
   });
 
-  let ws = XLSX.utils.aoa_to_sheet(dataArr);
+  let ws = XLSX.utils.aoa_to_sheet(arr);
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
   XLSX.writeFile(wb, "Survey_Report.xlsx");
 }
 
-// DATE TIME
-function updateDateTime(){
-  let now = new Date();
-  document.getElementById("dateTime").innerText =
-    now.toLocaleDateString('en-IN') + " | " + now.toLocaleTimeString();
-}
+// YEAR
+document.getElementById("year").innerText = new Date().getFullYear();
 
 // INIT
-window.onload = function(){
-  load(); // 🔥 IMPORTANT
-  updateDateTime();
-  setInterval(updateDateTime,1000);
-  document.getElementById("year").innerText = new Date().getFullYear();
-};
+window.onload = load;
 
 </script>
+
+</body>
+</html>
