@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Contact</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="header">📞 Contact</div>
+
+<div class="sidebar">
+  <a href="dashboard.html">📊 Dashboard</a>
+  <a href="index.html">📋 Entry Form</a>
+  <a href="report.html">📄 Report</a>
+  <a href="contact.html" class="active">📞 Contact</a>
+</div>
+
+<div class="main">
+<div class="box">
+
+<h2>📞 Contact Information</h2>
+
+<p><b>Name:</b> Ashish Mehra</p>
+<p><b>Phone:</b> <a href="tel:7974215295">7974215295</a></p>
+
+<p><b>WhatsApp:</b> 
+<a href="https://wa.me/917974215295" target="_blank">
+  Chat on WhatsApp
+</a>
+</p>
+
+<p><b>Email:</b> 
+<a href="mailto:your@email.com">
+  your@email.com
+</a>
+</p>
+
+<br>
+
+<button class="btn add" onclick="callNow()">📞 Call Now</button>
+<button class="btn save" onclick="openWhatsApp()">💬 WhatsApp</button>
+
+</div>
+</div>
+
+<div class="footer">
+© <span id="year"></span> Survey System | Developed by Ashish Mehra
+</div>
+
+<script>
+function callNow(){
+  window.location.href = "tel:7974215295";
+}
+
+function openWhatsApp(){
+  window.open("https://wa.me/917974215295", "_blank");
+}
+
+// auto year
+document.getElementById("year").innerText = new Date().getFullYear();
+</script>
+
+</body>
+</html>
