@@ -11,7 +11,10 @@
 <body>
 
 <!-- HEADER -->
-<div class="header">📊 Survey System Dashboard</div>
+<div class="header">
+  <div>📊 Survey System Dashboard</div>
+  <div id="dateTime"></div>
+</div>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -29,67 +32,36 @@
 
 <!-- CARDS -->
 <div class="cards">
-
-  <div class="card blue">
-    <h3>Total Entries</h3>
-    <p id="total">0</p>
-  </div>
-
-  <div class="card green">
-    <h3>Total Quantity</h3>
-    <p id="qty">0</p>
-  </div>
-
-  <div class="card orange">
-    <h3>Avg Moisture</h3>
-    <p id="moisture">0</p>
-  </div>
-
-  <div class="card purple">
-    <h3>FAQ Count</h3>
-    <p id="faq">0</p>
-  </div>
-
+  <div class="card blue"><h3>Total Entries</h3><p id="total">0</p></div>
+  <div class="card green"><h3>Total Quantity</h3><p id="qty">0</p></div>
+  <div class="card orange"><h3>Avg Moisture</h3><p id="moisture">0</p></div>
+  <div class="card purple"><h3>FAQ Count</h3><p id="faq">0</p></div>
 </div>
 
-<!-- SEARCH -->
 <input type="text" id="search" placeholder="🔍 Search..." onkeyup="searchData()">
 
 <br><br>
 
-<!-- 🔥 LAST UPDATED -->
 <div id="status" style="font-size:12px;color:gray;margin-bottom:10px;"></div>
 
-<!-- TABLE HEADER -->
 <div class="table-header">
   <h3>📋 Data Summary</h3>
   <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
 </div>
 
-<!-- TABLE -->
 <div class="table-container">
 <table>
 <thead>
 <tr>
-<th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Sr.No</th><th>Name</th><th>Registration</th><th>Qty</th>
+<th>Foreign</th><th>Other</th><th>Damaged</th>
+<th>Slight</th><th>6%</th><th>Moisture</th>
+<th>Status</th><th>Remark</th>
 </tr>
 </thead>
-
 <tbody id="table"></tbody>
 </table>
 
-<!-- PAGINATION -->
 <div class="pagination">
   <button onclick="prevPage()">⬅ Prev</button>
   <span id="pageInfo"></span>
@@ -97,13 +69,11 @@
 </div>
 
 </div>
-
 </div>
 </div>
 
 <!-- FOOTER -->
-<!-- FOOTER -->
-<div class="footer">
+<div class="footer-card">
   © <span id="year"></span> Survey System | All Rights Reserved  
   <br>
   Developed by <b>Ashish Mehra</b>
@@ -116,11 +86,10 @@ let filteredData = [];
 let currentPage = 1;
 const perPage = 10;
 
-// 🔥 LOAD DATA
+// LOAD DATA
 async function loadData(){
-
   try {
-    const res = await fetch(API + "?t=" + new Date().getTime()); // cache fix
+    const res = await fetch(API + "?t=" + new Date().getTime());
     const data = await res.json();
 
     allData = data;
@@ -129,7 +98,6 @@ async function loadData(){
     updateStats();
     renderTable();
 
-    // LAST UPDATED TIME
     document.getElementById("status").innerText =
       "Last Updated: " + new Date().toLocaleTimeString();
 
@@ -138,9 +106,8 @@ async function loadData(){
   }
 }
 
-// 🔥 RENDER TABLE
+// TABLE
 function renderTable(){
-
   let start = (currentPage - 1) * perPage;
   let pageData = filteredData.slice(start, start + perPage);
 
@@ -149,18 +116,18 @@ function renderTable(){
   pageData.forEach((r,i)=>{
     html += `
     <tr>
-      <td>${start + i + 1}</td>
-      <td>${r["Name Of Farmer/Society"] || ""}</td>
-      <td>${r["Farmer Registration"] || ""}</td>
-      <td>${r["Qty In Quintals (Approx)"] || ""}</td>
-      <td>${r["FOREIGN MATTER (0.75%)"] || ""}</td>
-      <td>${r["OTHER FOOD GRAINS (2%)"] || ""}</td>
-      <td>${r["DAMAGED GRAINS (2%)"] || ""}</td>
-      <td>${r["SLIGHT DAMAGED GRAINS (4%)"] || ""}</td>
-      <td>${r["DAMAGED GRAINS (6%)"] || ""}</td>
-      <td>${r["MOISTURE (12%)"] || ""}</td>
-      <td>${r["Status FAQ/Non FAQ"] || ""}</td>
-      <td>${r["Remark If Any"] || ""}</td>
+      <td>${start+i+1}</td>
+      <td>${r["Name Of Farmer/Society"]||""}</td>
+      <td>${r["Farmer Registration"]||""}</td>
+      <td>${r["Qty In Quintals (Approx)"]||""}</td>
+      <td>${r["FOREIGN MATTER (0.75%)"]||""}</td>
+      <td>${r["OTHER FOOD GRAINS (2%)"]||""}</td>
+      <td>${r["DAMAGED GRAINS (2%)"]||""}</td>
+      <td>${r["SLIGHT DAMAGED GRAINS (4%)"]||""}</td>
+      <td>${r["DAMAGED GRAINS (6%)"]||""}</td>
+      <td>${r["MOISTURE (12%)"]||""}</td>
+      <td>${r["Status FAQ/Non FAQ"]||""}</td>
+      <td>${r["Remark If Any"]||""}</td>
     </tr>`;
   });
 
@@ -171,62 +138,41 @@ function renderTable(){
     `Page ${currentPage} of ${totalPages}`;
 }
 
-// 🔥 SEARCH
+// SEARCH
 function searchData(){
-
-  let val = document.getElementById("search").value.toLowerCase();
-
+  let val = search.value.toLowerCase();
   filteredData = allData.filter(r =>
     JSON.stringify(r).toLowerCase().includes(val)
   );
-
   currentPage = 1;
   renderTable();
 }
 
-// 🔥 PAGINATION
-function nextPage(){
-  if(currentPage < Math.ceil(filteredData.length / perPage)){
-    currentPage++;
-    renderTable();
-  }
-}
+// PAGINATION
+function nextPage(){ if(currentPage < Math.ceil(filteredData.length/perPage)){currentPage++; renderTable();}}
+function prevPage(){ if(currentPage>1){currentPage--; renderTable();}}
 
-function prevPage(){
-  if(currentPage > 1){
-    currentPage--;
-    renderTable();
-  }
-}
-
-// 🔥 STATS
+// STATS
 function updateStats(){
+  total.innerText = allData.length;
 
-  document.getElementById("total").innerText = allData.length;
-
-  let totalQty = 0;
-  let totalMoisture = 0;
-  let faq = 0;
+  let qty=0, moisture=0, faq=0;
 
   allData.forEach(r=>{
-    totalQty += Number(r["Qty In Quintals (Approx)"]) || 0;
-    totalMoisture += Number(r["MOISTURE (12%)"]) || 0;
-
-    if(r["Status FAQ/Non FAQ"] === "FAQ") faq++;
+    qty += Number(r["Qty In Quintals (Approx)"])||0;
+    moisture += Number(r["MOISTURE (12%)"])||0;
+    if(r["Status FAQ/Non FAQ"]==="FAQ") faq++;
   });
 
-  document.getElementById("qty").innerText = totalQty;
-
+  document.getElementById("qty").innerText = qty;
   document.getElementById("moisture").innerText =
-    allData.length ? (totalMoisture / allData.length).toFixed(2) : 0;
-
+    allData.length ? (moisture/allData.length).toFixed(2) : 0;
   document.getElementById("faq").innerText = faq;
 }
 
-// 🔥 EXPORT
+// EXPORT
 function exportExcel(){
-
-  let csv = "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
+  let csv="Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
 
   allData.forEach((r,i)=>{
     csv += [
@@ -242,23 +188,32 @@ function exportExcel(){
       r["MOISTURE (12%)"],
       r["Status FAQ/Non FAQ"],
       r["Remark If Any"]
-    ].join(",") + "\n";
+    ].join(",")+"\n";
   });
 
-  let blob = new Blob([csv]);
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "Dashboard_Report.csv";
+  let blob=new Blob([csv]);
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="Dashboard_Report.csv";
   a.click();
 }
 
+// 🔥 LIVE DATE TIME
+function updateDateTime(){
+  let now = new Date();
+  document.getElementById("dateTime").innerText =
+    now.toLocaleDateString("en-IN") + " | " + now.toLocaleTimeString();
+}
+setInterval(updateDateTime,1000);
+updateDateTime();
+
 // INIT
 loadData();
+setInterval(loadData,10000);
 
-// 🔥 AUTO REFRESH (10 sec)
-setInterval(loadData, 10000);
-// 🔥 AUTO YEAR
-document.getElementById("year").innerText = new Date().getFullYear();
+// YEAR
+document.getElementById("year").innerText=new Date().getFullYear();
+
 </script>
 
 </body>
