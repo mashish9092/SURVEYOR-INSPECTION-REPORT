@@ -89,8 +89,8 @@ body {
 .sidebar a.active {
   background: #1976d2;
   color: #fff;
+  font-weight: bold;
 }
-
 /* =========================
    MAIN CONTENT
 ========================= */
