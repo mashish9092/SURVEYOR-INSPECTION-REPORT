@@ -74,21 +74,18 @@ body {
 }
 
 .sidebar a {
-  display: block;
-  padding: 12px 15px;
-  color: #333;
-  text-decoration: none;
-  font-weight: 500;
+  transition: 0.3s;
 }
 
 .sidebar a:hover {
-  background: #e3f2fd;   /* light blue */
-  color: #1976d2;        /* dark blue text */
+  background: #e3f2fd;
+  color: #1976d2;
 }
 
 .sidebar a.active {
-  background: #1976d2;
-  color: #fff;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-left: 4px solid #1976d2;
   font-weight: bold;
 }
 /* =========================
