@@ -6,14 +6,14 @@
   <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
+<body class="page-container">
 
 <!-- HEADER -->
 <div class="header">
 
   <div class="header-left"></div>
 
-  <div class="title">📋 Survey Entry Form</div>
+  <div class="title">📊 Survey System</div>
 
   <div id="dateTime"></div>
 
@@ -28,12 +28,11 @@
 </div>
 
 <!-- MAIN -->
-<div class="main">
+<div class="main content">
 <div class="box">
 
 <h2>📋 Survey Entry Form</h2>
 
-<!-- FORM -->
 <input id="grader" placeholder="Grader Name">
 <input id="warehouse" placeholder="Warehouse">
 <input id="society" placeholder="Society">
@@ -41,7 +40,6 @@
 
 <br>
 
-<!-- TABLE -->
 <div class="table-container">
 <table>
 <thead>
@@ -68,7 +66,6 @@
 
 <br>
 
-<!-- BUTTONS -->
 <div class="btn-group">
 <button class="btn add" onclick="addRow()">➕ Add Row</button>
 <button class="btn save" onclick="saveData()">💾 Save & Generate</button>
@@ -77,7 +74,7 @@
 </div>
 </div>
 
-<!-- FOOTER -->
+<!-- FOOTER (FIXED) -->
 <div class="footer">
   © <span id="year"></span> Survey System | All Rights Reserved <br>
   Developed by <b>Ashish Mehra</b>
@@ -89,7 +86,6 @@
 
 let rowCount = 0;
 
-// ADD ROW
 function addRow(){
   rowCount++;
 
@@ -119,20 +115,17 @@ function addRow(){
   updateSr();
 }
 
-// DELETE
 function deleteRow(id){
   document.getElementById("row"+id).remove();
   updateSr();
 }
 
-// SR NO UPDATE
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
     row.cells[0].innerText = i + 1;
   });
 }
 
-// SAVE
 async function saveData(){
 
   let rows = [];
@@ -171,7 +164,6 @@ async function saveData(){
     return;
   }
 
-  // API CALL
   if(typeof API !== "undefined"){
     await fetch(API,{
       method:"POST",
@@ -182,7 +174,6 @@ async function saveData(){
     });
   }
 
-  // LOCAL STORAGE
   localStorage.setItem("reportData",JSON.stringify({
     grader:getVal("grader"),
     warehouse:getVal("warehouse"),
@@ -195,7 +186,6 @@ async function saveData(){
   window.location.href = "report.html";
 }
 
-// GET VALUE
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
@@ -210,15 +200,12 @@ function updateDateTime(){
 }
 
 setInterval(updateDateTime,1000);
+updateDateTime();
 
-// YEAR AUTO
+// YEAR
 document.getElementById("year").innerText = new Date().getFullYear();
 
-// LOAD
-window.onload = ()=>{
-  addRow();
-  updateDateTime();
-};
+window.onload = ()=> addRow();
 
 </script>
 
