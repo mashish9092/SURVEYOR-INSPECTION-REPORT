@@ -84,25 +84,15 @@
 
 <script>
 
-// 🔥 LOAD DATA
 let data = JSON.parse(localStorage.getItem("currentReport")) || [];
-
-// 🔥 FIX → ensure ID exists
-data = data.map(r => ({
-  id: r.id || r.ID || "",
-  ...r
-}));
-
 let currentIndex = null;
 
-
-// 🔥 RENDER TABLE
+// RENDER TABLE
 function render(){
 
   let html = "";
 
   data.forEach((r,i)=>{
-
     html += `
     <tr>
       <td>${i+1}</td>
@@ -117,91 +107,65 @@ function render(){
       <td>${r.moisture || ""}</td>
       <td>${r.status || ""}</td>
       <td>${r.remark || ""}</td>
-      <td><button onclick="editRow(${i})">Edit</button></td>
+      <td>
+        <button onclick="editRow(${i})">Edit</button>
+      </td>
     </tr>`;
   });
 
   document.getElementById("reportBody").innerHTML = html;
 }
 
-
-// 🔥 EDIT
+// EDIT
 function editRow(i){
-
   currentIndex = i;
+
   let r = data[i];
 
-  // 🔥 ID save (IMPORTANT)
-  document.getElementById("popup").dataset.id = r.id;
-
-  e_name.value = r.name || "";
-  e_reg.value = r.reg || "";
-  e_qty.value = r.qty || "";
-  e_foreign.value = r.foreign || "";
-  e_other.value = r.other || "";
-  e_damaged2.value = r.damaged2 || "";
-  e_slight.value = r.slight || "";
-  e_damaged6.value = r.damaged6 || "";
-  e_moisture.value = r.moisture || "";
-  e_status.value = r.status || "";
-  e_remark.value = r.remark || "";
-
-  popup.style.display = "block";
-}
-
-
-// 🔥 SAVE EDIT (FINAL FIX)
-function saveEdit(){
-
-  let id = document.getElementById("popup").dataset.id;
-
   let updated = {
-    id: id,   // 🔥 MUST
-    name: e_name.value,
-    reg: e_reg.value,
-    qty: e_qty.value,
-    foreign: e_foreign.value,
-    other: e_other.value,
-    damaged2: e_damaged2.value,
-    slight: e_slight.value,
-    damaged6: e_damaged6.value,
-    moisture: e_moisture.value,
-    status: e_status.value,
-    remark: e_remark.value
+    id: r.id, // 🔥 IMPORTANT
+    name: prompt("Name", r.name),
+    reg: prompt("Registration", r.reg),
+    qty: prompt("Qty", r.qty),
+    foreign: r.foreign,
+    other: r.other,
+    damaged2: r.damaged2,
+    slight: r.slight,
+    damaged6: r.damaged6,
+    moisture: r.moisture,
+    status: r.status,
+    remark: r.remark
   };
 
-  fetch(API_MAIN,{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
-  body: JSON.stringify({
-    action:"update",
-    ...updated
-  })
-})
-.then(async res => {
-  console.log("STATUS:", res.status);
-  const text = await res.text();   // पहले text पढ़ो
-  console.log("RAW RESPONSE:", text);
-  try {
-    const json = JSON.parse(text);
-    alert(json.status || "No status");
-  } catch(e){
-    alert("Invalid JSON ❌ (Apps Script issue)");
-  }
-})
-.catch(err => {
-  console.error("FETCH ERROR:", err);
-  alert("Network/CORS Error ❌");
-});
-
-
-// CLOSE
-function closePopup(){
-  popup.style.display = "none";
+  updateRow(updated);
 }
 
+// UPDATE API
+async function updateRow(updated){
+
+  try{
+
+    const res = await fetch(API_MAIN,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        action:"update",
+        ...updated
+      })
+    });
+
+    const text = await res.text();
+    console.log("API:", text);
+
+    alert("Updated Successfully ✅");
+
+  }catch(err){
+    console.error(err);
+    alert("Update Failed ❌");
+  }
+}
 
 // EXPORT
 function exportExcel(){
@@ -234,19 +198,13 @@ function exportExcel(){
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  XLSX.writeFile(wb, "Survey_Report.xlsx");
-
-  localStorage.removeItem("currentReport");
-
-  alert("Export done ✅");
-  location.reload();
+  XLSX.writeFile(wb, "Report.xlsx");
 }
-
 
 // INIT
 window.onload = render;
 
 </script>
-
+  
 </body>
 </html>
