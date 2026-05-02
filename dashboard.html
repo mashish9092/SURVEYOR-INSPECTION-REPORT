@@ -3,21 +3,21 @@
 <head>
   <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="style.css">
+  <script src="config.js"></script>
 </head>
+
 <body>
 
-<!-- HEADER -->
-<div class="header">Survey System Dashboard</div>
+<div class="header">📊 Survey System Dashboard</div>
 
-<!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html" class="active">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
   <a href="report.html">📄 Report</a>
 </div>
 
-<!-- MAIN -->
 <div class="main">
 <div class="box">
 
@@ -26,46 +26,39 @@
 <!-- CARDS -->
 <div class="cards">
 
-  <div class="card">
+  <div class="card blue">
     <h3>Total Entries</h3>
     <p id="total">0</p>
   </div>
 
-  <div class="card">
+  <div class="card green">
     <h3>Total Quantity</h3>
     <p id="qty">0</p>
   </div>
 
-  <div class="card">
+  <div class="card orange">
     <h3>Avg Moisture</h3>
     <p id="moisture">0</p>
   </div>
 
-  <div class="card">
+  <div class="card purple">
     <h3>FAQ Count</h3>
     <p id="faq">0</p>
   </div>
 
 </div>
 
-<br>
-
 <!-- SEARCH -->
-<input type="text" id="search" placeholder="Search..." onkeyup="searchData()">
+<input type="text" id="search" placeholder="🔍 Search..." onkeyup="searchData()">
 
 <br><br>
 
-
-<!-- TABLE -->
-  
+<!-- TABLE HEADER -->
 <div class="table-header">
-
   <h3>📋 Data Summary</h3>
-
-  <button class="btn-excel" onclick="exportExcel()">
-    ⬇ Export Excel
-  </button>
+  <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
 </div>
+
 <div class="table-container">
 <table>
 <thead>
@@ -87,26 +80,23 @@
 
 <tbody id="table"></tbody>
 </table>
-  
-<!-- PAGINATION -->
+
 <div class="pagination">
   <button onclick="prevPage()">⬅ Prev</button>
   <span id="pageInfo"></span>
   <button onclick="nextPage()">Next ➡</button>
 </div>
+
 </div>
 
 </div>
 </div>
 
-<!-- FOOTER -->
 <div class="footer">
-© 2026 Survey System | Developed by Ashish Mehra | Maintenance & Support Active
+© 2026 Survey System | Developed by Ashish Mehra
 </div>
 
 <script>
-
-const API_URL = "https://script.google.com/macros/s/AKfycbyIX4TF2-PfxoY725Yj4diHysjXbGO0wVXamCGC1dVyWQO8CSk2DjJhnayCIwHLPDsP/exec";
 
 let allData = [];
 let filteredData = [];
@@ -116,7 +106,7 @@ const perPage = 10;
 // LOAD DATA
 async function loadData(){
 
-  const res = await fetch(API_URL);
+  const res = await fetch(API);
   const data = await res.json();
 
   allData = data;
@@ -126,25 +116,22 @@ async function loadData(){
   renderTable();
 }
 
-// TABLE RENDER
+// RENDER
 function renderTable(){
 
   let start = (currentPage - 1) * perPage;
-  let end = start + perPage;
-
-  let pageData = filteredData.slice(start, end);
+  let pageData = filteredData.slice(start, start + perPage);
 
   let html = "";
 
   pageData.forEach((r,i)=>{
-
     html += `
     <tr>
       <td>${start + i + 1}</td>
       <td>${r["Name Of Farmer/Society"] || ""}</td>
       <td>${r["Farmer Registration"] || ""}</td>
       <td>${r["Qty In Quintals (Approx)"] || ""}</td>
-      <td>${r["FOREIGN METTER (0.75%)"] || ""}</td>
+      <td>${r["FOREIGN MATTER (0.75%)"] || ""}</td>
       <td>${r["OTHER FOOD GRAINS (2%)"] || ""}</td>
       <td>${r["DAMAGED GRAINS (2%)"] || ""}</td>
       <td>${r["SLIGHT DAMAGED GRAINS (4%)"] || ""}</td>
@@ -157,7 +144,6 @@ function renderTable(){
 
   document.getElementById("table").innerHTML = html;
 
-  // PAGE INFO 🔥
   let totalPages = Math.ceil(filteredData.length / perPage);
   document.getElementById("pageInfo").innerText =
     `Page ${currentPage} of ${totalPages}`;
@@ -165,7 +151,6 @@ function renderTable(){
 
 // SEARCH
 function searchData(){
-
   let val = document.getElementById("search").value.toLowerCase();
 
   filteredData = allData.filter(r =>
@@ -178,9 +163,7 @@ function searchData(){
 
 // PAGINATION
 function nextPage(){
-  let totalPages = Math.ceil(filteredData.length / perPage);
-
-  if(currentPage < totalPages){
+  if(currentPage < Math.ceil(filteredData.length / perPage)){
     currentPage++;
     renderTable();
   }
@@ -202,57 +185,50 @@ function updateStats(){
   let totalMoisture = 0;
   let faq = 0;
 
-  allData.forEach(r => {
-
+  allData.forEach(r=>{
     totalQty += Number(r["Qty In Quintals (Approx)"]) || 0;
     totalMoisture += Number(r["MOISTURE (12%)"]) || 0;
 
     if(r["Status FAQ/Non FAQ"] === "FAQ") faq++;
-
   });
 
   document.getElementById("qty").innerText = totalQty;
 
   document.getElementById("moisture").innerText =
-    (totalMoisture / allData.length).toFixed(2);
+    allData.length ? (totalMoisture / allData.length).toFixed(2) : 0;
 
   document.getElementById("faq").innerText = faq;
 }
+
+// EXPORT
 function exportExcel(){
 
-  let excel = "";
+  let csv = "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
 
-  // HEADER
-  excel += "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
-
-  // DATA (🔥 IMPORTANT FIX)
   allData.forEach((r,i)=>{
-    excel += [
+    csv += [
       i+1,
-      r["Name Of Farmer/Society"] || "",
-      r["Farmer Registration"] || "",
-      r["Qty In Quintals (Approx)"] || "",
-      r["FOREIGN METTER (0.75%)"] || "",
-      r["OTHER FOOD GRAINS (2%)"] || "",
-      r["DAMAGED GRAINS (2%)"] || "",
-      r["SLIGHT DAMAGED GRAINS (4%)"] || "",
-      r["DAMAGED GRAINS (6%)"] || "",
-      r["MOISTURE (12%)"] || "",
-      r["Status FAQ/Non FAQ"] || "",
-      r["Remark If Any"] || ""
+      r["Name Of Farmer/Society"],
+      r["Farmer Registration"],
+      r["Qty In Quintals (Approx)"],
+      r["FOREIGN MATTER (0.75%)"],
+      r["OTHER FOOD GRAINS (2%)"],
+      r["DAMAGED GRAINS (2%)"],
+      r["SLIGHT DAMAGED GRAINS (4%)"],
+      r["DAMAGED GRAINS (6%)"],
+      r["MOISTURE (12%)"],
+      r["Status FAQ/Non FAQ"],
+      r["Remark If Any"]
     ].join(",") + "\n";
   });
 
-  let blob = new Blob([excel], { type: "application/vnd.ms-excel" });
-  let url = URL.createObjectURL(blob);
-
+  let blob = new Blob([csv]);
   let a = document.createElement("a");
-  a.href = url;
-  a.download = "Survey_Report.csv";
+  a.href = URL.createObjectURL(blob);
+  a.download = "Dashboard_Report.csv";
   a.click();
 }
 
-// INIT
 loadData();
 
 </script>
