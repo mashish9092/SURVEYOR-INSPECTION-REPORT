@@ -3,18 +3,19 @@
 <head>
   <title>Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
   <script src="config.js"></script>
 </head>
 
-<body>
+<body class="page-container">
 
 <!-- HEADER -->
 <div class="header">
-  <div class="title">📊 Survey System Dashboard</div>
+  <div class="header-left"></div>
+  <div class="title">📊 Survey System</div>
   <div id="dateTime"></div>
 </div>
+
 <!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html" class="active">📊 Dashboard</a>
@@ -24,7 +25,7 @@
 </div>
 
 <!-- MAIN -->
-<div class="main">
+<div class="main content">
 <div class="box">
 
 <h2>📊 Dashboard Overview</h2>
@@ -52,10 +53,18 @@
 <table>
 <thead>
 <tr>
-<th>Sr.No</th><th>Name</th><th>Registration</th><th>Qty</th>
-<th>Foreign</th><th>Other</th><th>Damaged</th>
-<th>Slight</th><th>6%</th><th>Moisture</th>
-<th>Status</th><th>Remark</th>
+<th>Sr.No</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 </tr>
 </thead>
 <tbody id="table"></tbody>
@@ -72,9 +81,8 @@
 </div>
 
 <!-- FOOTER -->
-<div class="footer-card">
-  © <span id="year"></span> Survey System | All Rights Reserved  
-  <br>
+<div class="footer">
+  © <span id="year"></span> Survey System | All Rights Reserved <br>
   Developed by <b>Ashish Mehra</b>
 </div>
 
@@ -107,6 +115,7 @@ async function loadData(){
 
 // TABLE
 function renderTable(){
+
   let start = (currentPage - 1) * perPage;
   let pageData = filteredData.slice(start, start + perPage);
 
@@ -139,7 +148,7 @@ function renderTable(){
 
 // SEARCH
 function searchData(){
-  let val = search.value.toLowerCase();
+  let val = document.getElementById("search").value.toLowerCase();
   filteredData = allData.filter(r =>
     JSON.stringify(r).toLowerCase().includes(val)
   );
@@ -148,30 +157,45 @@ function searchData(){
 }
 
 // PAGINATION
-function nextPage(){ if(currentPage < Math.ceil(filteredData.length/perPage)){currentPage++; renderTable();}}
-function prevPage(){ if(currentPage>1){currentPage--; renderTable();}}
+function nextPage(){
+  if(currentPage < Math.ceil(filteredData.length/perPage)){
+    currentPage++;
+    renderTable();
+  }
+}
+
+function prevPage(){
+  if(currentPage > 1){
+    currentPage--;
+    renderTable();
+  }
+}
 
 // STATS
 function updateStats(){
-  total.innerText = allData.length;
 
-  let qty=0, moisture=0, faq=0;
+  document.getElementById("total").innerText = allData.length;
+
+  let qty = 0, moisture = 0, faq = 0;
 
   allData.forEach(r=>{
     qty += Number(r["Qty In Quintals (Approx)"])||0;
     moisture += Number(r["MOISTURE (12%)"])||0;
-    if(r["Status FAQ/Non FAQ"]==="FAQ") faq++;
+    if(r["Status FAQ/Non FAQ"] === "FAQ") faq++;
   });
 
   document.getElementById("qty").innerText = qty;
+
   document.getElementById("moisture").innerText =
     allData.length ? (moisture/allData.length).toFixed(2) : 0;
+
   document.getElementById("faq").innerText = faq;
 }
 
 // EXPORT
 function exportExcel(){
-  let csv="Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
+
+  let csv = "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
 
   allData.forEach((r,i)=>{
     csv += [
@@ -187,45 +211,35 @@ function exportExcel(){
       r["MOISTURE (12%)"],
       r["Status FAQ/Non FAQ"],
       r["Remark If Any"]
-    ].join(",")+"\n";
+    ].join(",") + "\n";
   });
 
-  let blob=new Blob([csv]);
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="Dashboard_Report.csv";
+  let blob = new Blob([csv]);
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Dashboard_Report.csv";
   a.click();
 }
 
-// 🔥 LIVE DATE TIME
+// DATE TIME
 function updateDateTime(){
-
   let now = new Date();
-
-  let date = now.toLocaleDateString("en-IN", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric"
-  });
-
-  let time = now.toLocaleTimeString("en-IN");
+  let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
 
   document.getElementById("dateTime").innerText =
-    date + " | " + time;
+    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
 }
 
-setInterval(updateDateTime, 1000);
-updateDateTime();
-setInterval(updateDateTime,1000);
-updateDateTime();
-
 // INIT
-loadData();
-setInterval(loadData,10000);
+window.onload = function(){
+  updateDateTime();
+  setInterval(updateDateTime,1000);
 
-// YEAR
-document.getElementById("year").innerText=new Date().getFullYear();
+  loadData();
+  setInterval(loadData,10000);
+
+  document.getElementById("year").innerText = new Date().getFullYear();
+};
 
 </script>
 
