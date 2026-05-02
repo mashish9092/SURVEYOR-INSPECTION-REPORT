@@ -3,12 +3,19 @@
 <head>
   <title>Contact</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="./style.css">
 </head>
 
-<body>
-<div class="header">📞 Contact</div>
+<body class="page-container">
 
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left"></div>
+  <div class="title">📊 Survey System</div>
+  <div id="dateTime"></div>
+</div>
+
+<!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
@@ -16,13 +23,17 @@
   <a href="contact.html" class="active">📞 Contact</a>
 </div>
 
-<div class="main">
+<!-- MAIN -->
+<div class="main content">
 <div class="box">
 
 <h2>📞 Contact Information</h2>
 
 <p><b>Name:</b> Ashish Mehra</p>
-<p><b>Phone:</b> <a href="tel:7974215295">+91 7974215295</a></p>
+
+<p><b>Phone:</b> 
+<a href="tel:7974215295">+91 7974215295</a>
+</p>
 
 <p><b>WhatsApp:</b> 
 <a href="https://wa.me/917974215295" target="_blank">
@@ -31,34 +42,56 @@
 </p>
 
 <p><b>Email:</b> 
-<a href="mailto:your@email.com">
- mashish9092@email.com
+<a href="mailto:mashish9092@email.com">
+  mashish9092@email.com
 </a>
 </p>
 
 <br>
 
-<button class="btn add" onclick="callNow()">📞 Call Now</button>
-<button class="btn save" onclick="openWhatsApp()">💬 WhatsApp</button>
+<div class="btn-group">
+  <button class="btn add" onclick="callNow()">📞 Call Now</button>
+  <button class="btn save" onclick="openWhatsApp()">💬 WhatsApp</button>
+</div>
 
 </div>
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
-© <span id="year"></span> Survey System | Developed by Ashish Mehra
+  © <span id="year"></span> Survey System | All Rights Reserved <br>
+  Developed by <b>Ashish Mehra</b>
 </div>
 
 <script>
+
+// CALL
 function callNow(){
   window.location.href = "tel:7974215295";
 }
 
+// WHATSAPP
 function openWhatsApp(){
   window.open("https://wa.me/917974215295", "_blank");
 }
 
-// auto year
-document.getElementById("year").innerText = new Date().getFullYear();
+// DATE TIME
+function updateDateTime(){
+  let now = new Date();
+  let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
+
+  document.getElementById("dateTime").innerText =
+    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
+}
+
+// INIT
+window.onload = function(){
+  updateDateTime();
+  setInterval(updateDateTime,1000);
+
+  document.getElementById("year").innerText = new Date().getFullYear();
+};
+
 </script>
 
 </body>
