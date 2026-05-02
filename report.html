@@ -4,6 +4,9 @@
   <title>Survey Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./style.css">
+
+  <!-- ✅ Excel Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
 <body>
@@ -22,7 +25,6 @@
 
 <div id="info"></div>
 
-<!-- ✅ TABLE SCROLL FIX -->
 <div class="table-container">
 <table id="reportTable">
 <thead>
@@ -42,7 +44,6 @@
 <th>Action</th>
 </tr>
 </thead>
-
 <tbody></tbody>
 </table>
 </div>
@@ -53,7 +54,7 @@
 </div>
 </div>
 
-<!-- ✅ FIXED POPUP -->
+<!-- POPUP -->
 <div id="popup">
   <div class="popup-box">
 
@@ -82,7 +83,8 @@
     <br><br>
 
     <button class="btn save" onclick="updateRow()">Update</button>
-<button class="btn cancel" onclick="closePopup()">Cancel</button>
+    <button class="btn cancel" onclick="closePopup()">Cancel</button>
+
   </div>
 </div>
 
@@ -103,7 +105,7 @@ function load(){
   render();
 }
 
-// RENDER TABLE
+// RENDER
 function render(){
 
   let html = "";
@@ -148,12 +150,11 @@ function editRow(i){
   eStatus.value = r.status;
   eRemark.value = r.remark;
 
-  // 🔥 FIX: center popup
   popup.style.display = "flex";
   document.body.style.overflow = "hidden";
 }
 
-// CLOSE POPUP
+// CLOSE
 function closePopup(){
   popup.style.display = "none";
   document.body.style.overflow = "auto";
@@ -189,33 +190,52 @@ async function updateRow(){
   closePopup();
 }
 
-// EXPORT
+//
+// 🔥 PROFESSIONAL EXCEL EXPORT
+//
 function exportExcel(){
 
-  let csv = [];
+  let dataArr = [];
 
-  document.querySelectorAll("#reportTable tr").forEach(row=>{
-    
-    let cols = row.querySelectorAll("th,td");
-    let arr = [];
+  let headers = [
+    "Sr.No",
+    "Name Of Farmer/Society",
+    "Farmer Registration",
+    "Qty In Quintals (Approx)",
+    "FOREIGN MATTER (0.75%)",
+    "OTHER FOOD GRAINS (2%)",
+    "DAMAGED GRAINS (2%)",
+    "SLIGHT DAMAGED GRAINS (4%)",
+    "DAMAGED GRAINS (6%)",
+    "MOISTURE (12%)",
+    "Status FAQ/Non FAQ",
+    "Remark If Any"
+  ];
+
+  dataArr.push(headers);
+
+  document.querySelectorAll("#reportTable tbody tr").forEach(row=>{
+
+    let cols = row.querySelectorAll("td");
+    let rowData = [];
 
     cols.forEach((c, index)=>{
-      
-      // ❌ LAST COLUMN SKIP (Action)
-      if(index !== cols.length - 1){
-        arr.push(c.innerText);
+      if(index !== cols.length - 1){ // skip Action
+        rowData.push(c.innerText);
       }
-
     });
 
-    csv.push(arr.join(","));
+    dataArr.push(rowData);
   });
 
-  let blob = new Blob([csv.join("\n")]);
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "Survey_Report.csv";
-  a.click();
+  let ws = XLSX.utils.aoa_to_sheet(dataArr);
+  let wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Survey Report");
+
+  ws['!cols'] = headers.map(()=>({wch:25}));
+
+  XLSX.writeFile(wb, "Survey_Report.csv");
 }
 
 window.onload = load;
