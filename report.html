@@ -1,147 +1,49 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Survey Report</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
-  <!-- Excel -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <link rel="icon" href="favicon.ico">
-</head>
-
-<body class="page-container">
-
-<!-- HEADER -->
-<div class="header">
-  <div class="header-left"></div>
-  <div class="title">📊 Survey System</div>
-  <div id="dateTime"></div>
-</div>
-
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <a href="dashboard.html">📊 Dashboard</a>
-  <a href="index.html">📋 Entry Form</a>
-  <a href="report.html" class="active">📄 Report</a>
-  <a href="register.html">📘 खरीदी रजिस्टर</a>
-  <a href="contact.html">📞 Contact</a>
-</div>
-
-<!-- MAIN -->
-<div class="main content">
-<div class="box">
-
-<h2>📄 Survey Report</h2>
-
-<div id="info"></div>
-
-<div class="table-container">
-<table id="reportTable">
-<thead>
-<tr>
-<th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
-</table>
-</div>
-
-<br>
-<button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
-
-</div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-  © <span id="year"></span> Survey System | All Rights Reserved <br>
-  Developed by <b>Ashish Mehra</b>
-</div>
-
-<!-- POPUP -->
-<div id="popup">
-  <div class="popup-box">
-
-    <h3>Edit Row</h3>
-
-    <input id="eName" placeholder="Name">
-    <input id="eReg" placeholder="Registration">
-    <input id="eQty" placeholder="Qty">
-
-    <input id="eForeign" placeholder="Foreign">
-    <input id="eOther" placeholder="Other">
-
-    <input id="eDamaged2" placeholder="Damaged">
-    <input id="eSlight" placeholder="Slight">
-    <input id="eDamaged6" placeholder="6%">
-
-    <input id="eMoisture" placeholder="Moisture">
-
-    <select id="eStatus">
-      <option>FAQ</option>
-      <option>Non-FAQ</option>
-    </select>
-
-    <input id="eRemark" placeholder="Remark">
-
-    <br><br>
-
-    <button class="btn save" onclick="updateRow()">Update</button>
-    <button class="btn cancel" onclick="closePopup()">Cancel</button>
-
-  </div>
-</div>
-
 <script src="config.js"></script>
 
 <script>
 
-let data = JSON.parse(localStorage.getItem("reportData")) || {rows:[]};
+let currentData = [];
 let currentIndex = 0;
 
-// LOAD
-function load(){
-  document.getElementById("info").innerHTML = `
-  <b>Grader:</b> ${data.grader || ""} |
-  <b>Warehouse:</b> ${data.warehouse || ""} |
-  <b>Society:</b> ${data.society || ""} |
-  <b>Date:</b> ${data.date || ""}`;
+// 🔥 LOAD FROM GOOGLE SHEET
+async function load(){
 
-  render();
+  try{
+    const res = await fetch(API_MAIN);
+    const data = await res.json();
+
+    console.log("Sheet Data:", data);
+
+    currentData = data;
+
+    render();
+
+  }catch(err){
+    console.error("Error loading data:", err);
+  }
 }
 
-// RENDER
+// 🔥 RENDER TABLE
 function render(){
 
   let html = "";
 
-  data.rows.forEach((r,i)=>{
+  currentData.forEach((r,i)=>{
+
     html += `
     <tr>
       <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.foreign}</td>
-      <td>${r.other}</td>
-      <td>${r.damaged2}</td>
-      <td>${r.slight}</td>
-      <td>${r.damaged6}</td>
-      <td>${r.moisture}</td>
-      <td>${r.status}</td>
-      <td>${r.remark}</td>
+      <td>${r.Name || ""}</td>
+      <td>${r.Registration || ""}</td>
+      <td>${r.Qty || ""}</td>
+      <td>${r.Foreign || ""}</td>
+      <td>${r.Other || ""}</td>
+      <td>${r.Damaged || ""}</td>
+      <td>${r.Slight || ""}</td>
+      <td>${r["6%"] || ""}</td>
+      <td>${r.Moisture || ""}</td>
+      <td>${r.Status || ""}</td>
+      <td>${r.Remark || ""}</td>
       <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
@@ -149,69 +51,72 @@ function render(){
   document.querySelector("#reportTable tbody").innerHTML = html;
 }
 
-// EDIT
+// 🔥 EDIT
 function editRow(i){
 
   currentIndex = i;
-  let r = data.rows[i];
+  let r = currentData[i];
 
-  eName.value = r.name;
-  eReg.value = r.reg;
-  eQty.value = r.qty;
-  eForeign.value = r.foreign;
-  eOther.value = r.other;
-  eDamaged2.value = r.damaged2;
-  eSlight.value = r.slight;
-  eDamaged6.value = r.damaged6;
-  eMoisture.value = r.moisture;
-  eStatus.value = r.status;
-  eRemark.value = r.remark;
+  eName.value = r.Name;
+  eReg.value = r.Registration;
+  eQty.value = r.Qty;
+  eForeign.value = r.Foreign;
+  eOther.value = r.Other;
+  eDamaged2.value = r.Damaged;
+  eSlight.value = r.Slight;
+  eDamaged6.value = r["6%"];
+  eMoisture.value = r.Moisture;
+  eStatus.value = r.Status;
+  eRemark.value = r.Remark;
 
   popup.style.display = "flex";
-  document.body.style.overflow = "hidden";
+}
+
+// 🔥 UPDATE (GOOGLE SHEET)
+async function updateRow(){
+
+  let r = currentData[currentIndex];
+
+  let updated = {
+    name: eName.value,
+    reg: eReg.value,
+    qty: eQty.value,
+    foreign: eForeign.value,
+    other: eOther.value,
+    damaged2: eDamaged2.value,
+    slight: eSlight.value,
+    damaged6: eDamaged6.value,
+    moisture: eMoisture.value,
+    status: eStatus.value,
+    remark: eRemark.value
+  };
+
+  try{
+
+    await fetch(API_MAIN,{
+      method:"POST",
+      body:JSON.stringify({
+        action:"update",
+        ...updated
+      })
+    });
+
+    alert("Updated successfully");
+
+    closePopup();
+    load(); // 🔥 reload fresh data
+
+  }catch(e){
+    alert("Update failed");
+  }
 }
 
 // CLOSE
 function closePopup(){
   popup.style.display = "none";
-  document.body.style.overflow = "auto";
 }
 
-// UPDATE
-async function updateRow(){
-
-  let r = data.rows[currentIndex];
-
-  r.name = eName.value;
-  r.reg = eReg.value;
-  r.qty = eQty.value;
-  r.foreign = eForeign.value;
-  r.other = eOther.value;
-  r.damaged2 = eDamaged2.value;
-  r.slight = eSlight.value;
-  r.damaged6 = eDamaged6.value;
-  r.moisture = eMoisture.value;
-  r.status = eStatus.value;
-  r.remark = eRemark.value;
-
-  try{
-    await fetch(API_MAIN,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"update",
-        ...r
-      })
-    });
-  }catch(e){
-    console.log("API Error", e);
-  }
-
-  localStorage.setItem("reportData", JSON.stringify(data));
-  render();
-  closePopup();
-}
-
-// EXPORT
+// 🔥 EXPORT FROM SHEET DATA
 function exportExcel(){
 
   let dataArr = [];
@@ -223,17 +128,22 @@ function exportExcel(){
 
   dataArr.push(headers);
 
-  document.querySelectorAll("#reportTable tbody tr").forEach(row=>{
-    let cols = row.querySelectorAll("td");
-    let rowData = [];
+  currentData.forEach((r,i)=>{
 
-    cols.forEach((c, index)=>{
-      if(index !== cols.length - 1){
-        rowData.push(c.innerText);
-      }
-    });
-
-    dataArr.push(rowData);
+    dataArr.push([
+      i+1,
+      r.Name,
+      r.Registration,
+      r.Qty,
+      r.Foreign,
+      r.Other,
+      r.Damaged,
+      r.Slight,
+      r["6%"],
+      r.Moisture,
+      r.Status,
+      r.Remark
+    ]);
   });
 
   let ws = XLSX.utils.aoa_to_sheet(dataArr);
@@ -246,21 +156,16 @@ function exportExcel(){
 // DATE TIME
 function updateDateTime(){
   let now = new Date();
-  let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
-
   document.getElementById("dateTime").innerText =
-    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
+    now.toLocaleDateString('en-IN') + " | " + now.toLocaleTimeString();
 }
 
 // INIT
 window.onload = function(){
-  load();
+  load(); // 🔥 IMPORTANT
   updateDateTime();
   setInterval(updateDateTime,1000);
   document.getElementById("year").innerText = new Date().getFullYear();
 };
 
 </script>
-
-</body>
-</html>
