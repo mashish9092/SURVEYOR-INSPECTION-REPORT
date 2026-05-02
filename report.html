@@ -215,12 +215,11 @@ function exportExcel(){
   dataArr.push(headers);
 
   document.querySelectorAll("#reportTable tbody tr").forEach(row=>{
-
     let cols = row.querySelectorAll("td");
     let rowData = [];
 
     cols.forEach((c, index)=>{
-      if(index !== cols.length - 1){ // skip Action
+      if(index !== cols.length - 1){
         rowData.push(c.innerText);
       }
     });
@@ -229,11 +228,25 @@ function exportExcel(){
   });
 
   let ws = XLSX.utils.aoa_to_sheet(dataArr);
+
+  // 🔥 IMPORTANT WIDTH FIX
+  ws['!cols'] = [
+    {wch:8},
+    {wch:25},
+    {wch:20},
+    {wch:22},
+    {wch:25},
+    {wch:25},
+    {wch:22},
+    {wch:28},
+    {wch:22},
+    {wch:18},
+    {wch:22},
+    {wch:20}
+  ];
+
   let wb = XLSX.utils.book_new();
-
   XLSX.utils.book_append_sheet(wb, ws, "Survey Report");
-
-  ws['!cols'] = headers.map(()=>({wch:25}));
 
   XLSX.writeFile(wb, "Survey_Report.csv");
 }
