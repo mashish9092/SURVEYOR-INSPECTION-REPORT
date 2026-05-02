@@ -29,17 +29,17 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN MATTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -50,28 +50,47 @@
 </div>
 </div>
 
-<!-- 🔥 EDIT POPUP -->
+<!-- 🔥 EDIT POPUP (SAME COLUMN NAME LABELS) -->
 <div id="popup">
   <div class="popup-box">
 
     <h3>Edit Record</h3>
 
-    <input id="e_name" placeholder="Name">
-    <input id="e_reg" placeholder="Registration">
-    <input id="e_qty" type="number" placeholder="Qty">
-    <input id="e_foreign" type="number" placeholder="Foreign">
-    <input id="e_other" type="number" placeholder="Other">
-    <input id="e_damaged2" type="number" placeholder="Damaged">
-    <input id="e_slight" type="number" placeholder="Slight">
-    <input id="e_damaged6" type="number" placeholder="6%">
-    <input id="e_moisture" type="number" placeholder="Moisture">
+    <label>Name Of Farmer/Society</label>
+    <input id="e_name">
 
+    <label>Farmer Registration</label>
+    <input id="e_reg">
+
+    <label>Qty In Quintals (Approx)</label>
+    <input id="e_qty" type="number">
+
+    <label>FOREIGN MATTER (0.75%)</label>
+    <input id="e_foreign" type="number">
+
+    <label>OTHER FOOD GRAINS (2%)</label>
+    <input id="e_other" type="number">
+
+    <label>DAMAGED GRAINS (2%)</label>
+    <input id="e_damaged2" type="number">
+
+    <label>SLIGHT DAMAGED GRAINS (4%)</label>
+    <input id="e_slight" type="number">
+
+    <label>DAMAGED GRAINS (6%)</label>
+    <input id="e_damaged6" type="number">
+
+    <label>MOISTURE (12%)</label>
+    <input id="e_moisture" type="number">
+
+    <label>Status FAQ/Non FAQ</label>
     <select id="e_status">
       <option>FAQ</option>
       <option>Non-FAQ</option>
     </select>
 
-    <input id="e_remark" placeholder="Remark">
+    <label>Remark If Any</label>
+    <input id="e_remark">
 
     <br><br>
 
@@ -92,7 +111,7 @@
 let data = JSON.parse(localStorage.getItem("currentReport")) || [];
 let currentIndex = null;
 
-// 🔥 RENDER
+// 🔥 RENDER TABLE
 function render(){
 
   let html = "";
@@ -158,7 +177,6 @@ function saveEdit(){
   r.status = e_status.value;
   r.remark = e_remark.value;
 
-  // 🔥 UPDATE SHEET
   fetch(API_MAIN,{
     method:"POST",
     mode:"no-cors",
@@ -168,7 +186,6 @@ function saveEdit(){
     })
   });
 
-  // 🔥 UPDATE LOCAL
   localStorage.setItem("currentReport", JSON.stringify(data));
 
   closePopup();
@@ -177,19 +194,29 @@ function saveEdit(){
   alert("Updated Successfully ✅");
 }
 
-// CLOSE
+// CLOSE POPUP
 function closePopup(){
   popup.style.display = "none";
 }
 
-// 🔥 EXPORT
+// 🔥 EXPORT SAME COLUMN NAME
 function exportExcel(){
 
   let arr = [];
 
   arr.push([
-    "Sr.No","Name","Registration","Qty","Foreign","Other",
-    "Damaged","Slight","6%","Moisture","Status","Remark"
+    "Sr.No",
+    "Name Of Farmer/Society",
+    "Farmer Registration",
+    "Qty In Quintals (Approx)",
+    "FOREIGN MATTER (0.75%)",
+    "OTHER FOOD GRAINS (2%)",
+    "DAMAGED GRAINS (2%)",
+    "SLIGHT DAMAGED GRAINS (4%)",
+    "DAMAGED GRAINS (6%)",
+    "MOISTURE (12%)",
+    "Status FAQ/Non FAQ",
+    "Remark If Any"
   ]);
 
   data.forEach((r,i)=>{
@@ -213,7 +240,7 @@ function exportExcel(){
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  XLSX.writeFile(wb, "Current_Report.xlsx");
+  XLSX.writeFile(wb, "Survey_Report.xlsx");
 
   localStorage.removeItem("currentReport");
 
