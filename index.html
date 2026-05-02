@@ -168,7 +168,7 @@ async function saveData(){
 
   try{
     if(typeof API !== "undefined"){
-      await fetch(API,{
+      await fetch(API_MAIN,{
         method:"POST",
         body:JSON.stringify({
           action:"bulkAdd",
