@@ -171,32 +171,30 @@ function saveEdit(){
   };
 
   fetch(API_MAIN,{
-    method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      action:"update",
-      ...updated
-    })
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body: JSON.stringify({
+    action:"update",
+    ...updated
   })
-  .then(res => res.json())
-  .then(res => {
-    console.log(res);
-    alert(res.status || "Updated");
-  })
-  .catch(err => {
-    console.error(err);
-    alert("Update Failed ❌");
-  });
-
-  // local update
-  data[currentIndex] = updated;
-  localStorage.setItem("currentReport", JSON.stringify(data));
-
-  closePopup();
-  render();
-}
+})
+.then(async res => {
+  console.log("STATUS:", res.status);
+  const text = await res.text();   // पहले text पढ़ो
+  console.log("RAW RESPONSE:", text);
+  try {
+    const json = JSON.parse(text);
+    alert(json.status || "No status");
+  } catch(e){
+    alert("Invalid JSON ❌ (Apps Script issue)");
+  }
+})
+.catch(err => {
+  console.error("FETCH ERROR:", err);
+  alert("Network/CORS Error ❌");
+});
 
 
 // CLOSE
