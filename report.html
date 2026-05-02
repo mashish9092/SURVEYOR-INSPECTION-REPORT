@@ -30,15 +30,15 @@
 <th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN MATTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -55,22 +55,22 @@
 
     <h3>Edit Record</h3>
 
-    <input id="e_name">
-    <input id="e_reg">
-    <input id="e_qty" type="number">
-    <input id="e_foreign" type="number">
-    <input id="e_other" type="number">
-    <input id="e_damaged2" type="number">
-    <input id="e_slight" type="number">
-    <input id="e_damaged6" type="number">
-    <input id="e_moisture" type="number">
+    <input id="e_name" placeholder="Name">
+    <input id="e_reg" placeholder="Registration">
+    <input id="e_qty" type="number" placeholder="Qty">
+    <input id="e_foreign" type="number" placeholder="Foreign">
+    <input id="e_other" type="number" placeholder="Other">
+    <input id="e_damaged2" type="number" placeholder="Damaged">
+    <input id="e_slight" type="number" placeholder="Slight">
+    <input id="e_damaged6" type="number" placeholder="6%">
+    <input id="e_moisture" type="number" placeholder="Moisture">
 
     <select id="e_status">
       <option>FAQ</option>
       <option>Non-FAQ</option>
     </select>
 
-    <input id="e_remark">
+    <input id="e_remark" placeholder="Remark">
 
     <br><br>
 
@@ -87,7 +87,7 @@
 // 🔥 LOAD DATA
 let data = JSON.parse(localStorage.getItem("currentReport")) || [];
 
-// 🔥 IMPORTANT → ensure ID exists
+// 🔥 FIX → ensure ID exists
 data = data.map(r => ({
   id: r.id || r.ID || "",
   ...r
@@ -96,7 +96,7 @@ data = data.map(r => ({
 let currentIndex = null;
 
 
-// 🔥 RENDER
+// 🔥 RENDER TABLE
 function render(){
 
   let html = "";
@@ -131,32 +131,32 @@ function editRow(i){
   currentIndex = i;
   let r = data[i];
 
-  // 🔥 store ID
+  // 🔥 ID save (IMPORTANT)
   document.getElementById("popup").dataset.id = r.id;
 
-  e_name.value = r.name;
-  e_reg.value = r.reg;
-  e_qty.value = r.qty;
-  e_foreign.value = r.foreign;
-  e_other.value = r.other;
-  e_damaged2.value = r.damaged2;
-  e_slight.value = r.slight;
-  e_damaged6.value = r.damaged6;
-  e_moisture.value = r.moisture;
-  e_status.value = r.status;
-  e_remark.value = r.remark;
+  e_name.value = r.name || "";
+  e_reg.value = r.reg || "";
+  e_qty.value = r.qty || "";
+  e_foreign.value = r.foreign || "";
+  e_other.value = r.other || "";
+  e_damaged2.value = r.damaged2 || "";
+  e_slight.value = r.slight || "";
+  e_damaged6.value = r.damaged6 || "";
+  e_moisture.value = r.moisture || "";
+  e_status.value = r.status || "";
+  e_remark.value = r.remark || "";
 
   popup.style.display = "block";
 }
 
 
-// 🔥 SAVE EDIT (FIXED)
+// 🔥 SAVE EDIT (FINAL FIX)
 function saveEdit(){
 
   let id = document.getElementById("popup").dataset.id;
 
   let updated = {
-    id: id,
+    id: id,   // 🔥 MUST
     name: e_name.value,
     reg: e_reg.value,
     qty: e_qty.value,
@@ -180,16 +180,17 @@ function saveEdit(){
       ...updated
     })
   })
-  .then(res=>res.json())
-  .then(res=>{
+  .then(res => res.json())
+  .then(res => {
     console.log(res);
-    alert("Updated Successfully ✅");
+    alert(res.status || "Updated");
   })
-  .catch(err=>{
+  .catch(err => {
     console.error(err);
     alert("Update Failed ❌");
   });
 
+  // local update
   data[currentIndex] = updated;
   localStorage.setItem("currentReport", JSON.stringify(data));
 
@@ -198,23 +199,20 @@ function saveEdit(){
 }
 
 
-// 🔥 CLOSE
+// CLOSE
 function closePopup(){
   popup.style.display = "none";
 }
 
 
-// 🔥 EXPORT
+// EXPORT
 function exportExcel(){
 
   let arr = [];
 
   arr.push([
-    "Sr.No","Name Of Farmer/Society","Farmer Registration",
-    "Qty In Quintals (Approx)","FOREIGN MATTER (0.75%)",
-    "OTHER FOOD GRAINS (2%)","DAMAGED GRAINS (2%)",
-    "SLIGHT DAMAGED GRAINS (4%)","DAMAGED GRAINS (6%)",
-    "MOISTURE (12%)","Status FAQ/Non FAQ","Remark If Any"
+    "Sr.No","Name","Registration","Qty","Foreign","Other",
+    "Damaged","Slight","6%","Moisture","Status","Remark"
   ]);
 
   data.forEach((r,i)=>{
@@ -243,7 +241,6 @@ function exportExcel(){
   localStorage.removeItem("currentReport");
 
   alert("Export done ✅");
-
   location.reload();
 }
 
