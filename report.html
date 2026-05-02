@@ -6,7 +6,6 @@
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- Excel Export -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 
@@ -26,30 +25,28 @@
 
 <h2>📄 Survey Report</h2>
 
-<div id="info"></div>
-
 <button class="btn save" onclick="exportExcel()">⬇ Export Excel</button>
 
-<table id="reportTable">
-  <thead>
-    <tr>
-      <th>Sr.No</th>
-      <th>Name</th>
-      <th>Registration</th>
-      <th>Qty</th>
-      <th>Foreign</th>
-      <th>Other</th>
-      <th>Damaged</th>
-      <th>Slight</th>
-      <th>6%</th>
-      <th>Moisture</th>
-      <th>Status</th>
-      <th>Remark</th>
-      <th>Action</th>
-    </tr>
-  </thead>
+<table>
+<thead>
+<tr>
+<th>Sr.No</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
+<th>Action</th>
+</tr>
+</thead>
 
-  <tbody id="reportBody"></tbody>
+<tbody id="reportBody"></tbody>
 </table>
 
 </div>
@@ -59,137 +56,93 @@
 © <span id="year"></span> Survey System | Developed by Ashish Mehra
 </div>
 
-<!-- CONFIG -->
 <script src="config.js"></script>
 
 <script>
 
-let currentData = [];
-let currentIndex = 0;
+// 🔥 CURRENT DATA ONLY
+let data = JSON.parse(localStorage.getItem("currentReport")) || [];
 
-// 🔥 LOAD DATA FROM GOOGLE SHEET
-async function load(){
-
-  try{
-    const res = await fetch(API_MAIN);
-    const data = await res.json();
-
-    console.log("Sheet Data:", data);
-
-    currentData = data;
-
-    render();
-
-  }catch(err){
-    console.error("Load Error:", err);
-  }
-}
-
-// 🔥 RENDER TABLE
-
-  function render(){
+// 🔥 RENDER
+function render(){
 
   let body = document.getElementById("reportBody");
 
+  if(!body) return;
+
   let html = "";
 
-  currentData.forEach((r,i)=>{
+  data.forEach((r,i)=>{
 
     html += `
     <tr>
       <td>${i+1}</td>
-      <td>${r["Name Of Farmer/Society"] || ""}</td>
-      <td>${r["Farmer Registration"] || ""}</td>
-      <td>${r["Qty In Quintals (Approx)"] || ""}</td>
-      <td>${r["FOREIGN MATTER (0.75%)"] || ""}</td>
-      <td>${r["Other"] || ""}</td>
-      <td>${r["Damaged"] || ""}</td>
-      <td>${r["Slight"] || ""}</td>
-      <td>${r["6%"] || ""}</td>
-      <td>${r["Moisture"] || ""}</td>
-      <td>${r["Status"] || ""}</td>
-      <td>${r["Remark"] || ""}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.foreign}</td>
+      <td>${r.other}</td>
+      <td>${r.damaged2}</td>
+      <td>${r.slight}</td>
+      <td>${r.damaged6}</td>
+      <td>${r.moisture}</td>
+      <td>${r.status}</td>
+      <td>${r.remark}</td>
       <td><button onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
   body.innerHTML = html;
 }
-  
-// 🔥 EDIT
+
+// 🔥 EDIT + UPDATE
 function editRow(i){
 
-  currentIndex = i;
+  let r = data[i];
 
-  let r = currentData[i];
+  r.name = prompt("Name", r.name) || r.name;
+  r.qty = prompt("Qty", r.qty) || r.qty;
 
-  let name = prompt("Name", r.Name);
-  let reg = prompt("Registration", r.Registration);
-  let qty = prompt("Qty", r.Qty);
-
-  if(name === null) return;
-
-  updateRow({
-    name, reg, qty,
-    foreign:r.Foreign,
-    other:r.Other,
-    damaged2:r.Damaged,
-    slight:r.Slight,
-    damaged6:r["6%"],
-    moisture:r.Moisture,
-    status:r.Status,
-    remark:r.Remark
+  // 🔥 UPDATE SHEET
+  fetch(API_MAIN,{
+    method:"POST",
+    mode:"no-cors",
+    body:JSON.stringify({
+      action:"update",
+      ...r
+    })
   });
+
+  // 🔥 UPDATE LOCAL
+  localStorage.setItem("currentReport", JSON.stringify(data));
+
+  render();
 }
 
-// 🔥 UPDATE GOOGLE SHEET
-async function updateRow(data){
-
-  try{
-
-    await fetch(API_MAIN,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"update",
-        ...data
-      })
-    });
-
-    alert("Updated Successfully");
-
-    load();
-
-  }catch(e){
-    alert("Update failed");
-  }
-}
-
-// 🔥 EXPORT EXCEL
+// 🔥 EXPORT CURRENT DATA ONLY
 function exportExcel(){
 
   let arr = [];
 
-  let headers = [
+  arr.push([
     "Sr.No","Name","Registration","Qty","Foreign","Other",
     "Damaged","Slight","6%","Moisture","Status","Remark"
-  ];
+  ]);
 
-  arr.push(headers);
-
-  currentData.forEach((r,i)=>{
+  data.forEach((r,i)=>{
     arr.push([
       i+1,
-      r.Name,
-      r.Registration,
-      r.Qty,
-      r.Foreign,
-      r.Other,
-      r.Damaged,
-      r.Slight,
-      r["6%"],
-      r.Moisture,
-      r.Status,
-      r.Remark
+      r.name,
+      r.reg,
+      r.qty,
+      r.foreign,
+      r.other,
+      r.damaged2,
+      r.slight,
+      r.damaged6,
+      r.moisture,
+      r.status,
+      r.remark
     ]);
   });
 
@@ -197,14 +150,20 @@ function exportExcel(){
   let wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  XLSX.writeFile(wb, "Survey_Report.xlsx");
+  XLSX.writeFile(wb, "Current_Report.xlsx");
+
+  // 🔥 CLEAR DATA AFTER EXPORT
+  localStorage.removeItem("currentReport");
+
+  alert("Export done ✅ Table cleared");
+
+  location.reload();
 }
 
-// YEAR
-document.getElementById("year").innerText = new Date().getFullYear();
-
 // INIT
-window.onload = load;
+window.onload = render;
+
+document.getElementById("year").innerText = new Date().getFullYear();
 
 </script>
 
