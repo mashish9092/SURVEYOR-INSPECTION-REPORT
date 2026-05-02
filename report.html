@@ -5,13 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./style.css">
 
-  <!-- ✅ Excel Library -->
+  <!-- Excel -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 
-<body>
-<div class="header">Survey Report</div>
+<body class="page-container">
 
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left"></div>
+  <div class="title">📊 Survey System</div>
+  <div id="dateTime"></div>
+</div>
+
+<!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
@@ -19,7 +26,8 @@
   <a href="contact.html">📞 Contact</a>
 </div>
 
-<div class="main">
+<!-- MAIN -->
+<div class="main content">
 <div class="box">
 
 <h2>📄 Survey Report</h2>
@@ -31,17 +39,17 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN MATTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -55,6 +63,12 @@
 </div>
 </div>
 
+<!-- FOOTER -->
+<div class="footer">
+  © <span id="year"></span> Survey System | All Rights Reserved <br>
+  Developed by <b>Ashish Mehra</b>
+</div>
+
 <!-- POPUP -->
 <div id="popup">
   <div class="popup-box">
@@ -65,12 +79,12 @@
     <input id="eReg" placeholder="Registration">
     <input id="eQty" placeholder="Qty">
 
-    <input id="eForeign" placeholder="Foreign Matter">
-    <input id="eOther" placeholder="Other Food Grains">
+    <input id="eForeign" placeholder="Foreign">
+    <input id="eOther" placeholder="Other">
 
-    <input id="eDamaged2" placeholder="Damaged Grains (2%)">
-    <input id="eSlight" placeholder="Slight Damaged (4%)">
-    <input id="eDamaged6" placeholder="Damaged Grains (6%)">
+    <input id="eDamaged2" placeholder="Damaged">
+    <input id="eSlight" placeholder="Slight">
+    <input id="eDamaged6" placeholder="6%">
 
     <input id="eMoisture" placeholder="Moisture">
 
@@ -103,6 +117,7 @@ function load(){
   <b>Warehouse:</b> ${data.warehouse || ""} |
   <b>Society:</b> ${data.society || ""} |
   <b>Date:</b> ${data.date || ""}`;
+
   render();
 }
 
@@ -178,39 +193,31 @@ async function updateRow(){
   r.status = eStatus.value;
   r.remark = eRemark.value;
 
-  await fetch(API,{
-    method:"POST",
-    body:JSON.stringify({
-      action:"update",
-      ...r
-    })
-  });
+  try{
+    await fetch(API,{
+      method:"POST",
+      body:JSON.stringify({
+        action:"update",
+        ...r
+      })
+    });
+  }catch(e){
+    console.log("API Error", e);
+  }
 
   localStorage.setItem("reportData", JSON.stringify(data));
   render();
   closePopup();
 }
 
-//
-// 🔥 PROFESSIONAL EXCEL EXPORT
-//
+// EXPORT
 function exportExcel(){
 
   let dataArr = [];
 
   let headers = [
-    "Sr.No",
-    "Name Of Farmer/Society",
-    "Farmer Registration",
-    "Qty In Quintals (Approx)",
-    "FOREIGN MATTER (0.75%)",
-    "OTHER FOOD GRAINS (2%)",
-    "DAMAGED GRAINS (2%)",
-    "SLIGHT DAMAGED GRAINS (4%)",
-    "DAMAGED GRAINS (6%)",
-    "MOISTURE (12%)",
-    "Status FAQ/Non FAQ",
-    "Remark If Any"
+    "Sr.No","Name","Registration","Qty","Foreign","Other",
+    "Damaged","Slight","6%","Moisture","Status","Remark"
   ];
 
   dataArr.push(headers);
@@ -229,30 +236,28 @@ function exportExcel(){
   });
 
   let ws = XLSX.utils.aoa_to_sheet(dataArr);
-
-  // 🔥 IMPORTANT WIDTH FIX
-  ws['!cols'] = [
-    {wch:8},
-    {wch:25},
-    {wch:20},
-    {wch:22},
-    {wch:25},
-    {wch:25},
-    {wch:22},
-    {wch:28},
-    {wch:22},
-    {wch:18},
-    {wch:22},
-    {wch:20}
-  ];
-
   let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Survey Report");
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
 
-  XLSX.writeFile(wb, "Survey_Report.csv");
+  XLSX.writeFile(wb, "Survey_Report.xlsx");
 }
 
-window.onload = load;
+// DATE TIME
+function updateDateTime(){
+  let now = new Date();
+  let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
+
+  document.getElementById("dateTime").innerText =
+    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
+}
+
+// INIT
+window.onload = function(){
+  load();
+  updateDateTime();
+  setInterval(updateDateTime,1000);
+  document.getElementById("year").innerText = new Date().getFullYear();
+};
 
 </script>
 
