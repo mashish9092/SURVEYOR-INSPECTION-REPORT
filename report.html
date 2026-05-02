@@ -86,14 +86,10 @@ async function load(){
 }
 
 // 🔥 RENDER TABLE
-function render(){
+
+  function render(){
 
   let body = document.getElementById("reportBody");
-
-  if(!body){
-    console.error("Table body missing");
-    return;
-  }
 
   let html = "";
 
@@ -102,26 +98,24 @@ function render(){
     html += `
     <tr>
       <td>${i+1}</td>
-      <td>${r.Name || ""}</td>
-      <td>${r.Registration || ""}</td>
-      <td>${r.Qty || ""}</td>
-      <td>${r.Foreign || ""}</td>
-      <td>${r.Other || ""}</td>
-      <td>${r.Damaged || ""}</td>
-      <td>${r.Slight || ""}</td>
+      <td>${r["Name Of Farmer/Society"] || ""}</td>
+      <td>${r["Farmer Registration"] || ""}</td>
+      <td>${r["Qty In Quintals (Approx)"] || ""}</td>
+      <td>${r["FOREIGN MATTER (0.75%)"] || ""}</td>
+      <td>${r["Other"] || ""}</td>
+      <td>${r["Damaged"] || ""}</td>
+      <td>${r["Slight"] || ""}</td>
       <td>${r["6%"] || ""}</td>
-      <td>${r.Moisture || ""}</td>
-      <td>${r.Status || ""}</td>
-      <td>${r.Remark || ""}</td>
-      <td>
-        <button class="btn add" onclick="editRow(${i})">Edit</button>
-      </td>
+      <td>${r["Moisture"] || ""}</td>
+      <td>${r["Status"] || ""}</td>
+      <td>${r["Remark"] || ""}</td>
+      <td><button onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
   body.innerHTML = html;
 }
-
+  
 // 🔥 EDIT
 function editRow(i){
 
