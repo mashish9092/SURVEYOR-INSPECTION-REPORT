@@ -102,13 +102,9 @@ async function loadData(){
     const res = await fetch(API_MAIN + "?t=" + new Date().getTime());
     const json = await res.json();
 
-    if(json.status === "success"){
-      allData = json.data;
-      filteredData = json.data;
-    } else {
-      allData = [];
-      filteredData = [];
-    }
+    // ✅ DIRECT DATA USE
+    allData = json;
+    filteredData = json;
 
     updateStats();
     renderTable();
@@ -120,7 +116,6 @@ async function loadData(){
     console.log("API Error:", e);
   }
 }
-
 // TABLE
 function renderTable(){
 
