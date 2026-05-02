@@ -166,32 +166,31 @@ async function saveData(){
     return;
   }
 
-  try{
-    if(typeof API !== "undefined"){
-   await fetch(API_MAIN,{
-  method:"POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    action:"bulkAdd",
-    rows: rows
-  })
-});
-    }
-  }catch(err){
-    console.error("API Error:", err);
+  console.log("Sending Data:", rows);
+
+  try {
+    const res = await fetch(API_MAIN,{
+      method:"POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action:"bulkAdd",
+        rows: rows
+      })
+    });
+
+    const result = await res.text();
+    console.log("API Response:", result);
+
+  } catch(err){
+    console.error("Error:", err);
+    alert("Error saving data");
+    return;
   }
 
-  localStorage.setItem("reportData",JSON.stringify({
-    grader:getVal("grader"),
-    warehouse:getVal("warehouse"),
-    society:getVal("society"),
-    date:getVal("date"),
-    rows
-  }));
-
   alert("Saved Successfully ✅");
+
   window.location.href = "report.html";
 }
 
