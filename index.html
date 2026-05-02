@@ -42,17 +42,17 @@
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN MATTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -105,13 +105,12 @@ function addRow(){
       </select>
     </td>
     <td><input id="remark${rowCount}"></td>
-    <td><button class="btn cancel" onclick="deleteRow(${rowCount})">❌</button></td>
+    <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
   document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
   updateSr();
 }
-
 // ❌ DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
