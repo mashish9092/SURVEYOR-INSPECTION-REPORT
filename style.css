@@ -83,9 +83,8 @@ body {
 }
 
 .sidebar a.active {
-  background: #e3f2fd;
+  background: rgba(25, 118, 210, 0.1);
   color: #1976d2;
-  border-left: 4px solid #1976d2;
   font-weight: bold;
 }
 /* =========================
