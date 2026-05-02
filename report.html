@@ -195,7 +195,7 @@ async function updateRow(){
   r.remark = eRemark.value;
 
   try{
-    await fetch(API,{
+    await fetch(API_MAIN,{
       method:"POST",
       body:JSON.stringify({
         action:"update",
