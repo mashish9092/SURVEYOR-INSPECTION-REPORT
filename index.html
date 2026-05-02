@@ -11,7 +11,6 @@
 
 <!-- HEADER -->
 <div class="header">
-  <div class="header-left"></div>
   <div class="title">📊 Survey System</div>
   <div id="dateTime"></div>
 </div>
@@ -21,7 +20,7 @@
   <a href="dashboard.html">📊 Dashboard</a>
   <a href="index.html" class="active">📋 Entry Form</a>
   <a href="report.html">📄 Report</a>
-   <a href="register.html">📘 खरीदी रजिस्टर</a>
+  <a href="register.html">📘 खरीदी रजिस्टर</a>
   <a href="contact.html">📞 Contact</a>
 </div>
 
@@ -74,8 +73,7 @@
 
 <!-- FOOTER -->
 <div class="footer">
-  © <span id="year"></span> Survey System | All Rights Reserved <br>
-  Developed by <b>Ashish Mehra</b>
+  © <span id="year"></span> Survey System | Developed by <b>Ashish Mehra</b>
 </div>
 
 <script src="config.js"></script>
@@ -84,7 +82,7 @@
 
 let rowCount = 0;
 
-// ADD ROW
+// ➕ ADD ROW
 function addRow(){
   rowCount++;
 
@@ -114,26 +112,27 @@ function addRow(){
   updateSr();
 }
 
-// DELETE ROW
+// ❌ DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-// UPDATE SR NO
+// 🔢 SR NO
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
     row.cells[0].innerText = i + 1;
   });
 }
 
-// SAVE DATA
+// 💾 SAVE DATA
 async function saveData(){
 
   let rows = [];
   let allRows = document.querySelectorAll("#tableBody tr");
 
   for(let row of allRows){
+
     let i = row.id.replace("row","");
 
     let data = {
@@ -160,37 +159,45 @@ async function saveData(){
 
   console.log("Sending Data:", rows);
 
-  await fetch(API_MAIN,{
-    method:"POST",
-    mode:"no-cors",   // 🔥 CORS FIX
-    headers:{
-      "Content-Type":"application/json"
-    },
-    body: JSON.stringify({
-      action:"bulkAdd",
-      rows: rows
-    })
-  });
+  try{
 
-  alert("Saved Successfully ✅");
+    // 🔥 SAVE TO GOOGLE SHEET
+    await fetch(API_MAIN,{
+      method:"POST",
+      mode:"no-cors",
+      body: JSON.stringify({
+        action:"bulkAdd",
+        rows: rows
+      })
+    });
 
-  window.location.href = "report.html";
+    // 🔥 SAVE CURRENT SESSION (IMPORTANT)
+    localStorage.setItem("currentReport", JSON.stringify(rows));
+
+    alert("Saved Successfully ✅");
+
+    // 🔥 GO TO REPORT
+    window.location.href = "report.html";
+
+  }catch(e){
+    alert("Error saving data ❌");
+  }
 }
 
-// GET VALUE SAFE
+// 🔎 GET VALUE
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
-// DATE TIME FIX
+// 🕒 DATE TIME
 function updateDateTime(){
   let now = new Date();
-  let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
 
   document.getElementById("dateTime").innerText =
-    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
+    now.toLocaleDateString('en-IN') + " | " + now.toLocaleTimeString();
 }
-// INIT AFTER LOAD
+
+// 🚀 INIT
 window.onload = function(){
   addRow();
   updateDateTime();
