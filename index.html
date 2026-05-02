@@ -161,14 +161,16 @@ async function saveData(){
   try{
 
     // 🔥 SAVE TO GOOGLE SHEET
-    await fetch(API_MAIN,{
-      method:"POST",
-      mode:"no-cors",
-      body: JSON.stringify({
-        action:"bulkAdd",
-        rows: rows
-      })
-    });
+   fetch(API_MAIN,{
+  method:"POST",
+  headers:{
+    "Content-Type":"application/json"
+  },
+  body: JSON.stringify({
+    action:"bulkAdd",
+    rows: rows
+  })
+})
 
     // 🔥 SAVE CURRENT SESSION (IMPORTANT)
     localStorage.setItem("currentReport", JSON.stringify(rows));
