@@ -133,13 +133,7 @@ async function saveData(){
   let rows = [];
   let allRows = document.querySelectorAll("#tableBody tr");
 
-  if(allRows.length === 0){
-    alert("Add at least 1 row");
-    return;
-  }
-
   for(let row of allRows){
-
     let i = row.id.replace("row","");
 
     let data = {
@@ -156,9 +150,7 @@ async function saveData(){
       remark:getVal("remark"+i)
     };
 
-    if(!data.name) continue;
-
-    rows.push(data);
+    if(data.name) rows.push(data);
   }
 
   if(rows.length === 0){
@@ -168,26 +160,17 @@ async function saveData(){
 
   console.log("Sending Data:", rows);
 
-  try {
-    const res = await fetch(API_MAIN,{
-      method:"POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        action:"bulkAdd",
-        rows: rows
-      })
-    });
-
-    const result = await res.text();
-    console.log("API Response:", result);
-
-  } catch(err){
-    console.error("Error:", err);
-    alert("Error saving data");
-    return;
-  }
+  await fetch(API_MAIN,{
+    method:"POST",
+    mode:"no-cors",   // 🔥 CORS FIX
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
+      action:"bulkAdd",
+      rows: rows
+    })
+  });
 
   alert("Saved Successfully ✅");
 
