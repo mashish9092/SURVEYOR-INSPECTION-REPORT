@@ -3,9 +3,7 @@
 <head>
   <title>Survey Report</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="stylesheet" href="style.css">
-
   <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 
@@ -52,6 +50,37 @@
 </div>
 </div>
 
+<!-- 🔥 EDIT POPUP -->
+<div id="popup">
+  <div class="popup-box">
+
+    <h3>Edit Record</h3>
+
+    <input id="e_name" placeholder="Name">
+    <input id="e_reg" placeholder="Registration">
+    <input id="e_qty" type="number" placeholder="Qty">
+    <input id="e_foreign" type="number" placeholder="Foreign">
+    <input id="e_other" type="number" placeholder="Other">
+    <input id="e_damaged2" type="number" placeholder="Damaged">
+    <input id="e_slight" type="number" placeholder="Slight">
+    <input id="e_damaged6" type="number" placeholder="6%">
+    <input id="e_moisture" type="number" placeholder="Moisture">
+
+    <select id="e_status">
+      <option>FAQ</option>
+      <option>Non-FAQ</option>
+    </select>
+
+    <input id="e_remark" placeholder="Remark">
+
+    <br><br>
+
+    <button class="btn save" onclick="saveEdit()">💾 Update</button>
+    <button class="btn cancel" onclick="closePopup()">❌ Cancel</button>
+
+  </div>
+</div>
+
 <div class="footer">
 © <span id="year"></span> Survey System | Developed by Ashish Mehra
 </div>
@@ -60,15 +89,11 @@
 
 <script>
 
-// 🔥 CURRENT DATA ONLY
 let data = JSON.parse(localStorage.getItem("currentReport")) || [];
+let currentIndex = null;
 
 // 🔥 RENDER
 function render(){
-
-  let body = document.getElementById("reportBody");
-
-  if(!body) return;
 
   let html = "";
 
@@ -88,20 +113,50 @@ function render(){
       <td>${r.moisture}</td>
       <td>${r.status}</td>
       <td>${r.remark}</td>
-      <td><button onclick="editRow(${i})">Edit</button></td>
+      <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
-  body.innerHTML = html;
+  document.getElementById("reportBody").innerHTML = html;
 }
 
-// 🔥 EDIT + UPDATE
+// 🔥 OPEN EDIT
 function editRow(i){
 
+  currentIndex = i;
   let r = data[i];
 
-  r.name = prompt("Name", r.name) || r.name;
-  r.qty = prompt("Qty", r.qty) || r.qty;
+  e_name.value = r.name;
+  e_reg.value = r.reg;
+  e_qty.value = r.qty;
+  e_foreign.value = r.foreign;
+  e_other.value = r.other;
+  e_damaged2.value = r.damaged2;
+  e_slight.value = r.slight;
+  e_damaged6.value = r.damaged6;
+  e_moisture.value = r.moisture;
+  e_status.value = r.status;
+  e_remark.value = r.remark;
+
+  popup.style.display = "flex";
+}
+
+// 🔥 SAVE EDIT
+function saveEdit(){
+
+  let r = data[currentIndex];
+
+  r.name = e_name.value;
+  r.reg = e_reg.value;
+  r.qty = e_qty.value;
+  r.foreign = e_foreign.value;
+  r.other = e_other.value;
+  r.damaged2 = e_damaged2.value;
+  r.slight = e_slight.value;
+  r.damaged6 = e_damaged6.value;
+  r.moisture = e_moisture.value;
+  r.status = e_status.value;
+  r.remark = e_remark.value;
 
   // 🔥 UPDATE SHEET
   fetch(API_MAIN,{
@@ -116,10 +171,18 @@ function editRow(i){
   // 🔥 UPDATE LOCAL
   localStorage.setItem("currentReport", JSON.stringify(data));
 
+  closePopup();
   render();
+
+  alert("Updated Successfully ✅");
 }
 
-// 🔥 EXPORT CURRENT DATA ONLY
+// CLOSE
+function closePopup(){
+  popup.style.display = "none";
+}
+
+// 🔥 EXPORT
 function exportExcel(){
 
   let arr = [];
@@ -152,7 +215,6 @@ function exportExcel(){
 
   XLSX.writeFile(wb, "Current_Report.xlsx");
 
-  // 🔥 CLEAR DATA AFTER EXPORT
   localStorage.removeItem("currentReport");
 
   alert("Export done ✅ Table cleared");
@@ -162,7 +224,6 @@ function exportExcel(){
 
 // INIT
 window.onload = render;
-
 document.getElementById("year").innerText = new Date().getFullYear();
 
 </script>
