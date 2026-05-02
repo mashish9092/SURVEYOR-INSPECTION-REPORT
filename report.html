@@ -15,7 +15,6 @@
   <a href="dashboard.html">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
   <a href="report.html" class="active">📄 Report</a>
-  <a href="contact.html">📞 Contact</a>
 </div>
 
 <div class="main">
@@ -24,6 +23,7 @@
 <h2>📄 Survey Report</h2>
 
 <button class="btn save" onclick="exportExcel()">⬇ Export Excel</button>
+
 <table>
 <thead>
 <tr>
@@ -49,68 +49,54 @@
 </div>
 </div>
 
-<!-- 🔥 EDIT POPUP (SAME COLUMN NAME LABELS) -->
-<div id="popup">
+<!-- EDIT POPUP -->
+<div id="popup" style="display:none;">
   <div class="popup-box">
 
     <h3>Edit Record</h3>
 
-    <label>Name Of Farmer/Society</label>
     <input id="e_name">
-
-    <label>Farmer Registration</label>
     <input id="e_reg">
-
-    <label>Qty In Quintals (Approx)</label>
     <input id="e_qty" type="number">
-
-    <label>FOREIGN MATTER (0.75%)</label>
     <input id="e_foreign" type="number">
-
-    <label>OTHER FOOD GRAINS (2%)</label>
     <input id="e_other" type="number">
-
-    <label>DAMAGED GRAINS (2%)</label>
     <input id="e_damaged2" type="number">
-
-    <label>SLIGHT DAMAGED GRAINS (4%)</label>
     <input id="e_slight" type="number">
-
-    <label>DAMAGED GRAINS (6%)</label>
     <input id="e_damaged6" type="number">
-
-    <label>MOISTURE (12%)</label>
     <input id="e_moisture" type="number">
 
-    <label>Status FAQ/Non FAQ</label>
     <select id="e_status">
       <option>FAQ</option>
       <option>Non-FAQ</option>
     </select>
 
-    <label>Remark If Any</label>
     <input id="e_remark">
 
     <br><br>
 
-    <button class="btn save" onclick="saveEdit()">💾 Update</button>
-    <button class="btn cancel" onclick="closePopup()">❌ Cancel</button>
+    <button onclick="saveEdit()">Update</button>
+    <button onclick="closePopup()">Cancel</button>
 
   </div>
-</div>
-
-<div class="footer">
-© <span id="year"></span> Survey System | Developed by Ashish Mehra
 </div>
 
 <script src="config.js"></script>
 
 <script>
 
+// 🔥 LOAD DATA
 let data = JSON.parse(localStorage.getItem("currentReport")) || [];
+
+// 🔥 IMPORTANT → ensure ID exists
+data = data.map(r => ({
+  id: r.id || r.ID || "",
+  ...r
+}));
+
 let currentIndex = null;
 
-// 🔥 RENDER TABLE
+
+// 🔥 RENDER
 function render(){
 
   let html = "";
@@ -120,29 +106,33 @@ function render(){
     html += `
     <tr>
       <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.foreign}</td>
-      <td>${r.other}</td>
-      <td>${r.damaged2}</td>
-      <td>${r.slight}</td>
-      <td>${r.damaged6}</td>
-      <td>${r.moisture}</td>
-      <td>${r.status}</td>
-      <td>${r.remark}</td>
-      <td><button class="btn edit" onclick="editRow(${i})">Edit</button></td>
+      <td>${r.name || ""}</td>
+      <td>${r.reg || ""}</td>
+      <td>${r.qty || ""}</td>
+      <td>${r.foreign || ""}</td>
+      <td>${r.other || ""}</td>
+      <td>${r.damaged2 || ""}</td>
+      <td>${r.slight || ""}</td>
+      <td>${r.damaged6 || ""}</td>
+      <td>${r.moisture || ""}</td>
+      <td>${r.status || ""}</td>
+      <td>${r.remark || ""}</td>
+      <td><button onclick="editRow(${i})">Edit</button></td>
     </tr>`;
   });
 
   document.getElementById("reportBody").innerHTML = html;
 }
 
-// 🔥 OPEN EDIT
+
+// 🔥 EDIT
 function editRow(i){
 
   currentIndex = i;
   let r = data[i];
+
+  // 🔥 store ID
+  document.getElementById("popup").dataset.id = r.id;
 
   e_name.value = r.name;
   e_reg.value = r.reg;
@@ -156,66 +146,75 @@ function editRow(i){
   e_status.value = r.status;
   e_remark.value = r.remark;
 
-  popup.style.display = "flex";
+  popup.style.display = "block";
 }
 
-// 🔥 SAVE EDIT
+
+// 🔥 SAVE EDIT (FIXED)
 function saveEdit(){
 
-  let r = data[currentIndex];
+  let id = document.getElementById("popup").dataset.id;
 
-  r.name = e_name.value;
-  r.reg = e_reg.value;
-  r.qty = e_qty.value;
-  r.foreign = e_foreign.value;
-  r.other = e_other.value;
-  r.damaged2 = e_damaged2.value;
-  r.slight = e_slight.value;
-  r.damaged6 = e_damaged6.value;
-  r.moisture = e_moisture.value;
-  r.status = e_status.value;
-  r.remark = e_remark.value;
+  let updated = {
+    id: id,
+    name: e_name.value,
+    reg: e_reg.value,
+    qty: e_qty.value,
+    foreign: e_foreign.value,
+    other: e_other.value,
+    damaged2: e_damaged2.value,
+    slight: e_slight.value,
+    damaged6: e_damaged6.value,
+    moisture: e_moisture.value,
+    status: e_status.value,
+    remark: e_remark.value
+  };
 
   fetch(API_MAIN,{
     method:"POST",
-    mode:"no-cors",
-    body:JSON.stringify({
+    headers:{
+      "Content-Type":"application/json"
+    },
+    body: JSON.stringify({
       action:"update",
-      ...r
+      ...updated
     })
+  })
+  .then(res=>res.json())
+  .then(res=>{
+    console.log(res);
+    alert("Updated Successfully ✅");
+  })
+  .catch(err=>{
+    console.error(err);
+    alert("Update Failed ❌");
   });
 
+  data[currentIndex] = updated;
   localStorage.setItem("currentReport", JSON.stringify(data));
 
   closePopup();
   render();
-
-  alert("Updated Successfully ✅");
 }
 
-// CLOSE POPUP
+
+// 🔥 CLOSE
 function closePopup(){
   popup.style.display = "none";
 }
 
-// 🔥 EXPORT SAME COLUMN NAME
+
+// 🔥 EXPORT
 function exportExcel(){
 
   let arr = [];
 
   arr.push([
-    "Sr.No",
-    "Name Of Farmer/Society",
-    "Farmer Registration",
-    "Qty In Quintals (Approx)",
-    "FOREIGN MATTER (0.75%)",
-    "OTHER FOOD GRAINS (2%)",
-    "DAMAGED GRAINS (2%)",
-    "SLIGHT DAMAGED GRAINS (4%)",
-    "DAMAGED GRAINS (6%)",
-    "MOISTURE (12%)",
-    "Status FAQ/Non FAQ",
-    "Remark If Any"
+    "Sr.No","Name Of Farmer/Society","Farmer Registration",
+    "Qty In Quintals (Approx)","FOREIGN MATTER (0.75%)",
+    "OTHER FOOD GRAINS (2%)","DAMAGED GRAINS (2%)",
+    "SLIGHT DAMAGED GRAINS (4%)","DAMAGED GRAINS (6%)",
+    "MOISTURE (12%)","Status FAQ/Non FAQ","Remark If Any"
   ]);
 
   data.forEach((r,i)=>{
@@ -243,14 +242,14 @@ function exportExcel(){
 
   localStorage.removeItem("currentReport");
 
-  alert("Export done ✅ Table cleared");
+  alert("Export done ✅");
 
   location.reload();
 }
 
+
 // INIT
 window.onload = render;
-document.getElementById("year").innerText = new Date().getFullYear();
 
 </script>
 
