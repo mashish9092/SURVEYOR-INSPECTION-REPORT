@@ -97,11 +97,17 @@ const perPage = 10;
 // LOAD DATA
 async function loadData(){
   try {
-    const res = await fetch(API + "?t=" + new Date().getTime());
-    const data = await res.json();
 
-    allData = data;
-    filteredData = data;
+    const res = await fetch(API_MAIN + "?t=" + new Date().getTime());
+    const json = await res.json();
+
+    if(json.status === "success"){
+      allData = json.data;
+      filteredData = json.data;
+    } else {
+      allData = [];
+      filteredData = [];
+    }
 
     updateStats();
     renderTable();
