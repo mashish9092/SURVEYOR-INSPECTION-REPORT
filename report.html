@@ -192,19 +192,29 @@ async function updateRow(){
 // EXPORT
 function exportExcel(){
 
-  let csv=[];
+  let csv = [];
 
   document.querySelectorAll("#reportTable tr").forEach(row=>{
-    let cols=row.querySelectorAll("th,td");
-    let arr=[];
-    cols.forEach(c=>arr.push(c.innerText));
+    
+    let cols = row.querySelectorAll("th,td");
+    let arr = [];
+
+    cols.forEach((c, index)=>{
+      
+      // ❌ LAST COLUMN SKIP (Action)
+      if(index !== cols.length - 1){
+        arr.push(c.innerText);
+      }
+
+    });
+
     csv.push(arr.join(","));
   });
 
-  let blob=new Blob([csv.join("\n")]);
-  let a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="Survey_Report.csv";
+  let blob = new Blob([csv.join("\n")]);
+  let a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "Survey_Report.csv";
   a.click();
 }
 
