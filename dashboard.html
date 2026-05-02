@@ -10,14 +10,17 @@
 
 <body>
 
+<!-- HEADER -->
 <div class="header">📊 Survey System Dashboard</div>
 
+<!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html" class="active">📊 Dashboard</a>
   <a href="index.html">📋 Entry Form</a>
   <a href="report.html">📄 Report</a>
 </div>
 
+<!-- MAIN -->
 <div class="main">
 <div class="box">
 
@@ -53,12 +56,16 @@
 
 <br><br>
 
+<!-- 🔥 LAST UPDATED -->
+<div id="status" style="font-size:12px;color:gray;margin-bottom:10px;"></div>
+
 <!-- TABLE HEADER -->
 <div class="table-header">
   <h3>📋 Data Summary</h3>
   <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
 </div>
 
+<!-- TABLE -->
 <div class="table-container">
 <table>
 <thead>
@@ -81,6 +88,7 @@
 <tbody id="table"></tbody>
 </table>
 
+<!-- PAGINATION -->
 <div class="pagination">
   <button onclick="prevPage()">⬅ Prev</button>
   <span id="pageInfo"></span>
@@ -92,6 +100,7 @@
 </div>
 </div>
 
+<!-- FOOTER -->
 <div class="footer">
 © 2026 Survey System | Developed by Ashish Mehra
 </div>
@@ -103,20 +112,29 @@ let filteredData = [];
 let currentPage = 1;
 const perPage = 10;
 
-// LOAD DATA
+// 🔥 LOAD DATA
 async function loadData(){
 
-  const res = await fetch(API);
-  const data = await res.json();
+  try {
+    const res = await fetch(API + "?t=" + new Date().getTime()); // cache fix
+    const data = await res.json();
 
-  allData = data;
-  filteredData = data;
+    allData = data;
+    filteredData = data;
 
-  updateStats();
-  renderTable();
+    updateStats();
+    renderTable();
+
+    // LAST UPDATED TIME
+    document.getElementById("status").innerText =
+      "Last Updated: " + new Date().toLocaleTimeString();
+
+  } catch(e){
+    console.log("API Error:", e);
+  }
 }
 
-// RENDER
+// 🔥 RENDER TABLE
 function renderTable(){
 
   let start = (currentPage - 1) * perPage;
@@ -149,8 +167,9 @@ function renderTable(){
     `Page ${currentPage} of ${totalPages}`;
 }
 
-// SEARCH
+// 🔥 SEARCH
 function searchData(){
+
   let val = document.getElementById("search").value.toLowerCase();
 
   filteredData = allData.filter(r =>
@@ -161,7 +180,7 @@ function searchData(){
   renderTable();
 }
 
-// PAGINATION
+// 🔥 PAGINATION
 function nextPage(){
   if(currentPage < Math.ceil(filteredData.length / perPage)){
     currentPage++;
@@ -176,7 +195,7 @@ function prevPage(){
   }
 }
 
-// STATS
+// 🔥 STATS
 function updateStats(){
 
   document.getElementById("total").innerText = allData.length;
@@ -200,7 +219,7 @@ function updateStats(){
   document.getElementById("faq").innerText = faq;
 }
 
-// EXPORT
+// 🔥 EXPORT
 function exportExcel(){
 
   let csv = "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
@@ -229,7 +248,11 @@ function exportExcel(){
   a.click();
 }
 
+// INIT
 loadData();
+
+// 🔥 AUTO REFRESH (10 sec)
+setInterval(loadData, 10000);
 
 </script>
 
