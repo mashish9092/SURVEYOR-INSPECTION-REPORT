@@ -12,10 +12,9 @@
 
 <!-- HEADER -->
 <div class="header">
-  <div>📊 Survey System Dashboard</div>
+  <div class="title">📊 Survey System Dashboard</div>
   <div id="dateTime"></div>
 </div>
-
 <!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html" class="active">📊 Dashboard</a>
@@ -200,10 +199,24 @@ function exportExcel(){
 
 // 🔥 LIVE DATE TIME
 function updateDateTime(){
+
   let now = new Date();
+
+  let date = now.toLocaleDateString("en-IN", {
+    weekday: "short",
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  });
+
+  let time = now.toLocaleTimeString("en-IN");
+
   document.getElementById("dateTime").innerText =
-    now.toLocaleDateString("en-IN") + " | " + now.toLocaleTimeString();
+    date + " | " + time;
 }
+
+setInterval(updateDateTime, 1000);
+updateDateTime();
 setInterval(updateDateTime,1000);
 updateDateTime();
 
