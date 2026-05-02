@@ -14,6 +14,7 @@
   <div class="title">📊 Survey System</div>
   <div id="dateTime"></div>
 </div>
+
 <!-- SIDEBAR -->
 <div class="sidebar">
   <a href="dashboard.html">📊 Dashboard</a>
@@ -69,7 +70,7 @@
 </div>
 </div>
 
-<!-- FOOTER (FIXED) -->
+<!-- FOOTER -->
 <div class="footer">
   © <span id="year"></span> Survey System | All Rights Reserved <br>
   Developed by <b>Ashish Mehra</b>
@@ -81,6 +82,7 @@
 
 let rowCount = 0;
 
+// ADD ROW
 function addRow(){
   rowCount++;
 
@@ -110,17 +112,20 @@ function addRow(){
   updateSr();
 }
 
+// DELETE ROW
 function deleteRow(id){
-  document.getElementById("row"+id).remove();
+  document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
+// UPDATE SR NO
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
     row.cells[0].innerText = i + 1;
   });
 }
 
+// SAVE DATA
 async function saveData(){
 
   let rows = [];
@@ -159,14 +164,18 @@ async function saveData(){
     return;
   }
 
-  if(typeof API !== "undefined"){
-    await fetch(API,{
-      method:"POST",
-      body:JSON.stringify({
-        action:"bulkAdd",
-        rows: rows
-      })
-    });
+  try{
+    if(typeof API !== "undefined"){
+      await fetch(API,{
+        method:"POST",
+        body:JSON.stringify({
+          action:"bulkAdd",
+          rows: rows
+        })
+      });
+    }
+  }catch(err){
+    console.error("API Error:", err);
   }
 
   localStorage.setItem("reportData",JSON.stringify({
@@ -181,26 +190,28 @@ async function saveData(){
   window.location.href = "report.html";
 }
 
+// GET VALUE SAFE
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
-// DATE TIME
+// DATE TIME FIX
 function updateDateTime(){
   let now = new Date();
   let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
-  let date = now.toLocaleDateString('en-IN', options);
-  let time = now.toLocaleTimeString();
-  document.getElementById("dateTime").innerText = `${date} | ${time}`;
+
+  document.getElementById("dateTime").innerText =
+    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
 }
 
-setInterval(updateDateTime,1000);
-updateDateTime();
+// INIT AFTER LOAD
+window.onload = function(){
+  addRow();
+  updateDateTime();
+  setInterval(updateDateTime,1000);
 
-// YEAR
-document.getElementById("year").innerText = new Date().getFullYear();
-
-window.onload = ()=> addRow();
+  document.getElementById("year").innerText = new Date().getFullYear();
+};
 
 </script>
 
