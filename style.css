@@ -242,7 +242,15 @@ tr:nth-child(even) {
   text-align: center;
   padding: 10px;
 }
+/* CONTACT PAGE FIX */
+.box p {
+  margin: 8px 0;
+}
 
+.box a {
+  color: #007bff;
+  text-decoration: none;
+}
 /* MOBILE */
 @media(max-width:768px){
 
