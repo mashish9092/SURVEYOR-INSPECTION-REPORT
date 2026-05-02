@@ -22,6 +22,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+   justify-content: center; 
   padding: 0 25px;
   font-size: 18px;
   font-weight: bold;
@@ -30,6 +31,11 @@ body {
   left: 0;
   right: 0;
   z-index: 1000;
+}
+.header .title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* LEFT TITLE */
