@@ -183,6 +183,7 @@ async function saveData(){
 
     let res = await fetch(API_MAIN,{
       method:"POST",
+        mode:"no-cors", 
       headers:{
         "Content-Type":"application/json"
       },
