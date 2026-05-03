@@ -181,17 +181,16 @@ async function saveData(){
 
   try{
 
-    let res = await fetch(API_MAIN,{
-      method:"POST",
-        mode:"no-cors", 
-      headers:{
-        "Content-Type":"application/json"
-      },
-      body: JSON.stringify({
-        action:"bulkAdd",
-        rows: rows
-      })
-    });
+   let res = await fetch(API_MAIN,{
+  method:"POST",
+  headers:{
+    "Content-Type":"text/plain"
+  },
+  body: JSON.stringify({
+    action:"bulkAdd",
+    rows: rows
+  })
+});
 
     let result = await res.json();
 
