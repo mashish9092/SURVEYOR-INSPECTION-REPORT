@@ -6,6 +6,9 @@
 
 <link rel="stylesheet" href="style.css">
 
+<!-- ✅ Excel Export Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 <style>
 body{font-family:Arial;background:#f4f6f9;}
 .main{width:95%;max-width:1200px;margin:auto;}
@@ -26,19 +29,20 @@ button{
   border:none;
   border-radius:5px;
   cursor:pointer;
+  margin:3px;
 }
 
-.back{background:#4caf50;color:white;margin-bottom:10px;}
+.back{background:#4caf50;color:white;}
 .print{background:#28a745;color:white;}
+.export{background:#2196f3;color:white;}
 
 input{
   padding:8px;
   width:250px;
-  margin-bottom:10px;
+  margin:10px 0;
 }
 
 .pagination button{
-  margin:3px;
   background:#ddd;
 }
 </style>
@@ -51,6 +55,7 @@ input{
 <h2>📊 Dashboard</h2>
 
 <button class="back" onclick="goBack()">⬅ Back</button>
+<button class="export" onclick="exportExcel()">📥 Export Excel</button>
 
 <br>
 
@@ -96,7 +101,7 @@ let currentPage = 1;
 let rowsPerPage = 10;
 
 // ==============================
-// LOAD DATA
+// 🔵 LOAD DATA
 // ==============================
 async function loadData(){
   let res = await fetch(API_MAIN);
@@ -107,7 +112,7 @@ async function loadData(){
 }
 
 // ==============================
-// RENDER TABLE
+// 🔵 RENDER TABLE
 // ==============================
 function renderTable(){
 
@@ -146,7 +151,7 @@ function renderTable(){
 }
 
 // ==============================
-// SEARCH
+// 🔍 SEARCH
 // ==============================
 function filterData(){
 
@@ -161,7 +166,7 @@ function filterData(){
 }
 
 // ==============================
-// PAGINATION
+// 📄 PAGINATION
 // ==============================
 function renderPagination(){
 
@@ -181,7 +186,40 @@ function goPage(page){
 }
 
 // ==============================
-// PRINT FUNCTION (FINAL FORMAT)
+// 📥 EXPORT EXCEL
+// ==============================
+function exportExcel(){
+
+  if(allData.length === 0){
+    alert("No data found ❌");
+    return;
+  }
+
+  let excelData = allData.map((r,i)=>({
+    "Sr.No": i+1,
+    "Name Of Farmer/Society": r["Name Of Farmer/Society"],
+    "Farmer Registration": r["Farmer Registration"],
+    "Qty In Quintals (Approx)": r["Qty In Quintals (Approx)"],
+    "FOREIGN MATTER (0.75%)": r["FOREIGN MATTER (0.75%)"],
+    "OTHER FOOD GRAINS (2%)": r["OTHER FOOD GRAINS (2%)"],
+    "DAMAGED GRAINS (2%)": r["DAMAGED GRAINS (2%)"],
+    "SLIGHT DAMAGED GRAINS (4%)": r["SLIGHT DAMAGED GRAINS (4%)"],
+    "DAMAGED GRAINS (6%)": r["DAMAGED GRAINS (6%)"],
+    "MOISTURE (12%)": r["MOISTURE (12%)"],
+    "Status FAQ/Non FAQ": r["Status FAQ/Non FAQ"],
+    "Remark If Any": r["Remark If Any"]
+  }));
+
+  let ws = XLSX.utils.json_to_sheet(excelData);
+  let wb = XLSX.utils.book_new();
+
+  XLSX.utils.book_append_sheet(wb, ws, "Survey Data");
+
+  XLSX.writeFile(wb, "Survey_Report.xlsx");
+}
+
+// ==============================
+// 🖨 PRINT (FORMAT)
 // ==============================
 function printRow(data){
 
@@ -190,23 +228,14 @@ function printRow(data){
   win.document.write(`
   <html>
   <head>
-  <title>Print</title>
-
   <style>
     body{font-family:Arial;margin:10px;}
     .box{border:2px solid black;padding:10px;}
-
     .header{text-align:center;font-weight:bold;}
-    .title{font-size:20px;}
-    .sub{font-size:14px;}
-
     table{width:100%;border-collapse:collapse;margin-top:10px;}
-    th, td{border:1px solid black;padding:6px;font-size:12px;text-align:center;}
-
-    .row{display:flex;justify-content:space-between;margin-top:10px;}
+    th,td{border:1px solid black;padding:6px;text-align:center;}
     .sign{margin-top:30px;display:flex;justify-content:space-between;}
   </style>
-
   </head>
 
   <body>
@@ -214,25 +243,10 @@ function printRow(data){
   <div class="box">
 
     <div class="header">
-      <div class="title">R B ASSOCIATES GLOBAL CONNECT PVT LTD</div>
+      <h3>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h3>
       <div>SURVEYOR INSPECTION REPORT</div>
-      <div class="sub">(District Narsinghpur)</div>
-      <div class="sub">For Procurement Centre</div>
-    </div>
-
-    <br>
-
-    <div class="row">
-      <div><b>Grader/Surveyor Name :</b> __________</div>
-    </div>
-
-    <div class="row">
-      <div><b>Warehouse Name :</b> __________</div>
-      <div><b>Date :</b> __________</div>
-    </div>
-
-    <div class="row">
-      <div><b>Society :</b> __________</div>
+      <div>(District Narsinghpur)</div>
+      <div>For Procurement Centre</div>
     </div>
 
     <br>
@@ -247,9 +261,9 @@ function printRow(data){
         <th>Qty</th>
         <th>Foreign</th>
         <th>Other</th>
-        <th>Damaged(2%)</th>
+        <th>Damaged</th>
         <th>Slight</th>
-        <th>Damaged(6%)</th>
+        <th>Damaged</th>
         <th>Moisture</th>
         <th>Status</th>
         <th>Remark</th>
@@ -269,14 +283,11 @@ function printRow(data){
         <td>${data["Status FAQ/Non FAQ"]}</td>
         <td>${data["Remark If Any"]}</td>
       </tr>
-
-      ${"<tr>" + "<td></td>".repeat(12) + "</tr>".repeat(8)}
-
     </table>
 
     <div class="sign">
-      <div>Name & Signature Of Surveyor : __________</div>
-      <div>Name & Signature Of Warehouse Manager : __________</div>
+      <div>Surveyor Sign: __________</div>
+      <div>Manager Sign: __________</div>
     </div>
 
   </div>
@@ -289,8 +300,6 @@ function printRow(data){
   win.print();
 }
 
-// ==============================
-// BACK BUTTON
 // ==============================
 function goBack(){
   window.location.href = "index.html";
