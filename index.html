@@ -1,20 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Survey System</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+<title>Survey System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="header">📊 Survey System</div>
-
 <div class="main">
 
-<!-- 🔵 ENTRY FORM -->
+<!-- 🔴 TOP FORM -->
 <div class="box">
-<h2>📋 Survey Entry Form</h2>
+
+<h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+<h3>SURVEYOR INSPECTION REPORT</h3>
+
+<label>Grader/Surveyor Name</label>
+<input id="grader">
+
+<label>Warehouse Name & Location</label>
+<input id="warehouse">
+
+<label>Society/ Procurement Centre</label>
+<input id="society">
+
+<label>Date</label>
+<input type="date" id="date">
+
+<p><b>COMMODITY : WHEAT</b></p>
+
+</div>
+
+<!-- 🔵 ENTRY TABLE -->
+<div class="box">
 
 <table>
 <thead>
@@ -48,7 +67,8 @@
 
 <!-- 🔵 DATA TABLE -->
 <div class="box">
-<h2>📄 All Data</h2>
+
+<h2>Saved Data</h2>
 
 <table>
 <thead>
@@ -63,8 +83,8 @@
 <th>SLIGHT DAMAGED GRAINS (4%)</th>
 <th>DAMAGED GRAINS (6%)</th>
 <th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -76,95 +96,9 @@
 
 </div>
 
-<!-- 🔴 EDIT POPUP -->
-<div id="popup" style="display:none;">
-<div class="popup-box">
-
-<h3>Edit Record</h3>
-
-<label>Name Of Farmer/Society</label>
-<input id="e_name">
-
-<label>Farmer Registration</label>
-<input id="e_reg">
-
-<label>Qty In Quintals (Approx)</label>
-<input id="e_qty">
-
-<label>FOREIGN MATTER (0.75%)</label>
-<input id="e_foreign">
-
-<label>OTHER FOOD GRAINS (2%)</label>
-<input id="e_other">
-
-<label>DAMAGED GRAINS (2%)</label>
-<input id="e_damaged2">
-
-<label>SLIGHT DAMAGED GRAINS (4%)</label>
-<input id="e_slight">
-
-<label>DAMAGED GRAINS (6%)</label>
-<input id="e_damaged6">
-
-<label>MOISTURE (12%)</label>
-<input id="e_moisture">
-
-<label>Status FAQ/Non FAQ</label>
-<select id="e_status">
-<option>FAQ</option>
-<option>Non-FAQ</option>
-</select>
-
-<label>Remark If Any</label>
-<input id="e_remark">
-
-<br><br>
-
-<button onclick="saveEdit()">Update</button>
-<button onclick="closePopup()">Cancel</button>
-
-</div>
-</div>
-
-<!-- 🔥 PRINT AREA -->
-<div id="printArea" style="display:none">
-  <h2 style="text-align:center;">
-    R B ASSOCIATES GLOBAL CONNECT PVT LTD<br>
-    SURVEYOR INSPECTION REPORT
-  </h2>
-
-  <table border="1" width="100%" style="border-collapse:collapse;">
-    <thead>
-      <tr>
-        <th>Sr.No</th>
-        <th>Name Of Farmer/Society</th>
-        <th>Farmer Registration</th>
-        <th>Qty In Quintals (Approx)</th>
-        <th>FOREIGN MATTER (0.75%)</th>
-        <th>OTHER FOOD GRAINS (2%)</th>
-        <th>DAMAGED GRAINS (2%)</th>
-        <th>SLIGHT DAMAGED GRAINS (4%)</th>
-        <th>DAMAGED GRAINS (6%)</th>
-        <th>MOISTURE (12%)</th>
-        <th>Status FAQ/Non FAQ</th>
-        <th>Remark If Any</th>
-      </tr>
-    </thead>
-    <tbody id="printTable"></tbody>
-  </table>
-
-  <br><br>
-
-  <div style="display:flex; justify-content:space-between;">
-    <div>Name & Signature Of Surveyor : __________________</div>
-    <div>Name & Signature Of Warehouse Manager : __________________</div>
-  </div>
-</div>
-
 <script>
 
 let rowCount = 0;
-let currentIndex;
 
 // ADD ROW
 function addRow(){
@@ -209,7 +143,7 @@ function updateSr(){
   });
 }
 
-// SAVE
+// SAVE DATA
 function saveData(){
 
   let rows = [];
@@ -234,21 +168,31 @@ function saveData(){
     if(data.name) rows.push(data);
   });
 
-  localStorage.setItem("surveyData", JSON.stringify(rows));
+  let fullData = {
+    grader:grader.value,
+    warehouse:warehouse.value,
+    society:society.value,
+    date:date.value,
+    rows:rows
+  };
+
+  localStorage.setItem("surveyData", JSON.stringify(fullData));
 
   renderTable();
 
   alert("Saved ✅");
 }
 
-// RENDER
+// RENDER TABLE
 function renderTable(){
 
-  let data = JSON.parse(localStorage.getItem("surveyData")) || [];
+  let data = JSON.parse(localStorage.getItem("surveyData"));
+
+  if(!data) return;
 
   let html = "";
 
-  data.forEach((r,i)=>{
+  data.rows.forEach((r,i)=>{
     html += `
     <tr>
       <td>${i+1}</td>
@@ -263,102 +207,37 @@ function renderTable(){
       <td>${r.moisture}</td>
       <td>${r.status}</td>
       <td>${r.remark}</td>
-      <td><button onclick="editRow(${i})">Edit</button></td>
+      <td><button>Edit</button></td>
     </tr>`;
   });
 
   reportBody.innerHTML = html;
 }
 
-// EDIT
-function editRow(i){
-  let data = JSON.parse(localStorage.getItem("surveyData"));
-  let r = data[i];
-
-  currentIndex = i;
-
-  e_name.value = r.name;
-  e_reg.value = r.reg;
-  e_qty.value = r.qty;
-  e_foreign.value = r.foreign;
-  e_other.value = r.other;
-  e_damaged2.value = r.damaged2;
-  e_slight.value = r.slight;
-  e_damaged6.value = r.damaged6;
-  e_moisture.value = r.moisture;
-  e_status.value = r.status;
-  e_remark.value = r.remark;
-
-  popup.style.display = "flex";
-}
-
-// UPDATE
-function saveEdit(){
-
-  let data = JSON.parse(localStorage.getItem("surveyData"));
-
-  data[currentIndex] = {
-    name:e_name.value,
-    reg:e_reg.value,
-    qty:e_qty.value,
-    foreign:e_foreign.value,
-    other:e_other.value,
-    damaged2:e_damaged2.value,
-    slight:e_slight.value,
-    damaged6:e_damaged6.value,
-    moisture:e_moisture.value,
-    status:e_status.value,
-    remark:e_remark.value
-  };
-
-  localStorage.setItem("surveyData", JSON.stringify(data));
-
-  renderTable();
-  closePopup();
-
-  alert("Updated ✅");
-}
-
-// CLOSE
-function closePopup(){
-  popup.style.display = "none";
-}
-
 // PRINT
 function printReport(){
 
-  let data = JSON.parse(localStorage.getItem("surveyData")) || [];
+  let data = JSON.parse(localStorage.getItem("surveyData"));
 
-  let html = "";
+  let html = `
+  <h2>${data.grader}</h2>
+  <p>${data.warehouse}</p>
+  <p>${data.society}</p>
+  <p>${data.date}</p>
+  <hr>
+  `;
 
-  data.forEach((r,i)=>{
-    html += `
-    <tr>
-      <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.foreign}</td>
-      <td>${r.other}</td>
-      <td>${r.damaged2}</td>
-      <td>${r.slight}</td>
-      <td>${r.damaged6}</td>
-      <td>${r.moisture}</td>
-      <td>${r.status}</td>
-      <td>${r.remark}</td>
-    </tr>`;
+  data.rows.forEach((r,i)=>{
+    html += `${i+1} - ${r.name} - ${r.qty}<br>`;
   });
-
-  printTable.innerHTML = html;
 
   let original = document.body.innerHTML;
 
-  document.body.innerHTML = document.getElementById("printArea").innerHTML;
+  document.body.innerHTML = html;
 
   window.print();
 
   document.body.innerHTML = original;
-  location.reload();
 }
 
 // HELPER
