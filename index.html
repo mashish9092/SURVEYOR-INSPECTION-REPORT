@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Survey Entry Form</title>
+  <title>Survey System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./style.css">
-  <link rel="icon" href="favicon.ico">
 </head>
 
 <body class="page-container">
@@ -15,74 +14,77 @@
   <div id="dateTime"></div>
 </div>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <a href="dashboard.html">📊 Dashboard</a>
-  <a href="index.html" class="active">📋 Entry Form</a>
-  <a href="report.html">📄 Report</a>
-  <a href="register.html">📘 खरीदी रजिस्टर</a>
-  <a href="contact.html">📞 Contact</a>
-</div>
-
 <!-- MAIN -->
 <div class="main content">
 <div class="box">
 
 <h2>📋 Survey Entry Form</h2>
 
-<input id="grader" placeholder="Grader/Surveyor Name">
-<input id="warehouse" placeholder="Warehouse Name & Location">
-<input id="society" placeholder="Society/ Procurement Centre">
+<input id="grader" placeholder="Grader Name">
+<input id="warehouse" placeholder="Warehouse">
+<input id="society" placeholder="Society">
 <input type="date" id="date">
 
 <br>
 
-<div class="table-container">
 <table>
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN MATTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged</th>
+<th>Slight</th>
+<th>6%</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Action</th>
 </tr>
 </thead>
 
 <tbody id="tableBody"></tbody>
 </table>
-</div>
 
 <br>
 
-<div class="btn-group">
-<button class="btn add" onclick="addRow()">➕ Add Row</button>
-<button class="btn save" onclick="saveData()">💾 Save & Generate</button>
-</div>
+<button onclick="addRow()">➕ Add Row</button>
+<button onclick="saveData()">💾 Save</button>
+<button onclick="exportExcel()">⬇ Export Excel</button>
+
+<hr>
+
+<h2>📄 Current Data</h2>
+
+<table>
+<thead>
+<tr>
+<th>Sr.No</th>
+<th>Name</th>
+<th>Registration</th>
+<th>Qty</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="reportBody"></tbody>
+</table>
 
 </div>
-</div>
-
-<!-- FOOTER -->
-<div class="footer">
-  © <span id="year"></span> Survey System | Developed by <b>Ashish Mehra</b>
 </div>
 
 <script src="config.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 
 <script>
 
 let rowCount = 0;
 
-// ➕ ADD ROW
+// ADD ROW
 function addRow(){
   rowCount++;
 
@@ -91,13 +93,13 @@ function addRow(){
     <td></td>
     <td><input id="name${rowCount}"></td>
     <td><input id="reg${rowCount}"></td>
-    <td><input id="qty${rowCount}" type="number"></td>
-    <td><input id="foreign${rowCount}" type="number"></td>
-    <td><input id="other${rowCount}" type="number"></td>
-    <td><input id="damaged2${rowCount}" type="number"></td>
-    <td><input id="slight${rowCount}" type="number"></td>
-    <td><input id="damaged6${rowCount}" type="number"></td>
-    <td><input id="moisture${rowCount}" type="number"></td>
+    <td><input id="qty${rowCount}"></td>
+    <td><input id="foreign${rowCount}"></td>
+    <td><input id="other${rowCount}"></td>
+    <td><input id="damaged2${rowCount}"></td>
+    <td><input id="slight${rowCount}"></td>
+    <td><input id="damaged6${rowCount}"></td>
+    <td><input id="moisture${rowCount}"></td>
     <td>
       <select id="status${rowCount}">
         <option>FAQ</option>
@@ -111,27 +113,26 @@ function addRow(){
   document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
   updateSr();
 }
-// ❌ DELETE
+
+// DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-// 🔢 SR NO
+// SR NO
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
     row.cells[0].innerText = i + 1;
   });
 }
 
-// 💾 SAVE DATA
-async function saveData(){
+// SAVE
+function saveData(){
 
   let rows = [];
-  let allRows = document.querySelectorAll("#tableBody tr");
 
-  for(let row of allRows){
-
+  document.querySelectorAll("#tableBody tr").forEach(row=>{
     let i = row.id.replace("row","");
 
     let data = {
@@ -149,62 +150,103 @@ async function saveData(){
     };
 
     if(data.name) rows.push(data);
-  }
+  });
 
   if(rows.length === 0){
-    alert("Fill at least one row");
+    alert("Fill data first");
     return;
   }
 
-  console.log("Sending Data:", rows);
+  // SAVE LOCAL
+  localStorage.setItem("currentReport", JSON.stringify(rows));
 
-  try{
+  // OPTIONAL API (ignore if fails)
+  fetch(API_MAIN,{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ action:"bulkAdd", rows })
+  }).catch(()=>{});
 
-    // 🔥 SAVE TO GOOGLE SHEET
-   fetch(API_MAIN,{
-  method:"POST",
-  headers:{
-    "Content-Type":"application/json"
-  },
-  body: JSON.stringify({
-    action:"bulkAdd",
-    rows: rows
-  })
-})
+  alert("Saved ✅");
 
-    // 🔥 SAVE CURRENT SESSION (IMPORTANT)
-    localStorage.setItem("currentReport", JSON.stringify(rows));
-
-    alert("Saved Successfully ✅");
-
-    // 🔥 GO TO REPORT
-    window.location.href = "report.html";
-
-  }catch(e){
-    alert("Error saving data ❌");
-  }
+  renderTable();
 }
 
-// 🔎 GET VALUE
+// RENDER TABLE
+function renderTable(){
+
+  let data = JSON.parse(localStorage.getItem("currentReport")) || [];
+
+  let html = "";
+
+  data.forEach((r,i)=>{
+    html += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td><button onclick="editRow(${i})">Edit</button></td>
+    </tr>`;
+  });
+
+  document.getElementById("reportBody").innerHTML = html;
+}
+
+// EDIT
+function editRow(i){
+
+  let data = JSON.parse(localStorage.getItem("currentReport"));
+
+  let r = data[i];
+
+  r.name = prompt("Name", r.name) || r.name;
+  r.qty = prompt("Qty", r.qty) || r.qty;
+
+  localStorage.setItem("currentReport", JSON.stringify(data));
+
+  renderTable();
+}
+
+// EXPORT
+function exportExcel(){
+
+  let data = JSON.parse(localStorage.getItem("currentReport")) || [];
+
+  let arr = [["Sr.No","Name","Registration","Qty"]];
+
+  data.forEach((r,i)=>{
+    arr.push([i+1, r.name, r.reg, r.qty]);
+  });
+
+  let ws = XLSX.utils.aoa_to_sheet(arr);
+  let wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+
+  XLSX.writeFile(wb, "Survey.xlsx");
+
+  localStorage.removeItem("currentReport");
+  renderTable();
+}
+
+// GET VALUE
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
-// 🕒 DATE TIME
+// DATE TIME
 function updateDateTime(){
   let now = new Date();
-
   document.getElementById("dateTime").innerText =
-    now.toLocaleDateString('en-IN') + " | " + now.toLocaleTimeString();
+    now.toLocaleString();
 }
 
-// 🚀 INIT
+// INIT
 window.onload = function(){
   addRow();
+  renderTable();
   updateDateTime();
   setInterval(updateDateTime,1000);
-
-  document.getElementById("year").innerText = new Date().getFullYear();
 };
 
 </script>
