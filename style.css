@@ -269,6 +269,109 @@ tr:nth-child(even) {
   border-radius: 5px;
   cursor: pointer;
 }
+/*===================New Top Header ke leye===========================*/
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+/* MAIN CENTER */
+.main {
+  max-width: 1200px;
+  margin: 30px auto;
+  padding: 10px;
+}
+
+/* CARD STYLE */
+.box {
+  background: #ffffff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* HEADER TITLE */
+.box h2 {
+  text-align: center;
+  margin: 5px 0;
+}
+
+.box h3 {
+  text-align: center;
+  margin: 5px 0;
+  font-weight: normal;
+}
+
+/* INPUT */
+input, select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* TABLE */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+th {
+  background: #2c7be5;
+  color: white;
+  padding: 10px;
+  font-size: 14px;
+}
+
+td {
+  padding: 6px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+/* BUTTONS */
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:nth-child(1) {
+  background: #6c757d;
+  color: white;
+}
+
+button:nth-child(2) {
+  background: #28a745;
+  color: white;
+}
+
+button:nth-child(3) {
+  background: #007bff;
+  color: white;
+}
+
+/* DELETE BUTTON */
+td button {
+  background: red;
+  color: white;
+}
+
+/* LABEL */
+label {
+  font-weight: bold;
+}
 
 /* =========================
    FOOTER
