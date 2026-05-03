@@ -14,7 +14,6 @@
 
 <!-- 🔵 ENTRY FORM -->
 <div class="box">
-
 <h2>📋 Survey Entry Form</h2>
 
 <table>
@@ -43,12 +42,12 @@
 
 <button onclick="addRow()">➕ Add Row</button>
 <button onclick="saveData()">💾 Save</button>
+<button onclick="printReport()">🖨 Print</button>
 
 </div>
 
 <!-- 🔵 DATA TABLE -->
 <div class="box">
-
 <h2>📄 All Data</h2>
 
 <table>
@@ -127,9 +126,45 @@
 </div>
 </div>
 
+<!-- 🔥 PRINT AREA -->
+<div id="printArea" style="display:none">
+  <h2 style="text-align:center;">
+    R B ASSOCIATES GLOBAL CONNECT PVT LTD<br>
+    SURVEYOR INSPECTION REPORT
+  </h2>
+
+  <table border="1" width="100%" style="border-collapse:collapse;">
+    <thead>
+      <tr>
+        <th>Sr.No</th>
+        <th>Name Of Farmer/Society</th>
+        <th>Farmer Registration</th>
+        <th>Qty In Quintals (Approx)</th>
+        <th>FOREIGN MATTER (0.75%)</th>
+        <th>OTHER FOOD GRAINS (2%)</th>
+        <th>DAMAGED GRAINS (2%)</th>
+        <th>SLIGHT DAMAGED GRAINS (4%)</th>
+        <th>DAMAGED GRAINS (6%)</th>
+        <th>MOISTURE (12%)</th>
+        <th>Status FAQ/Non FAQ</th>
+        <th>Remark If Any</th>
+      </tr>
+    </thead>
+    <tbody id="printTable"></tbody>
+  </table>
+
+  <br><br>
+
+  <div style="display:flex; justify-content:space-between;">
+    <div>Name & Signature Of Surveyor : __________________</div>
+    <div>Name & Signature Of Warehouse Manager : __________________</div>
+  </div>
+</div>
+
 <script>
 
 let rowCount = 0;
+let currentIndex;
 
 // ADD ROW
 function addRow(){
@@ -183,7 +218,6 @@ function saveData(){
     let i = row.id.replace("row","");
 
     let data = {
-      id: Date.now()+i,
       name:getVal("name"+i),
       reg:getVal("reg"+i),
       qty:getVal("qty"+i),
@@ -207,7 +241,7 @@ function saveData(){
   alert("Saved ✅");
 }
 
-// RENDER FULL TABLE
+// RENDER
 function renderTable(){
 
   let data = JSON.parse(localStorage.getItem("surveyData")) || [];
@@ -237,10 +271,7 @@ function renderTable(){
 }
 
 // EDIT
-let currentIndex;
-
 function editRow(i){
-
   let data = JSON.parse(localStorage.getItem("surveyData"));
   let r = data[i];
 
@@ -267,7 +298,6 @@ function saveEdit(){
   let data = JSON.parse(localStorage.getItem("surveyData"));
 
   data[currentIndex] = {
-    ...data[currentIndex],
     name:e_name.value,
     reg:e_reg.value,
     qty:e_qty.value,
@@ -292,6 +322,43 @@ function saveEdit(){
 // CLOSE
 function closePopup(){
   popup.style.display = "none";
+}
+
+// PRINT
+function printReport(){
+
+  let data = JSON.parse(localStorage.getItem("surveyData")) || [];
+
+  let html = "";
+
+  data.forEach((r,i)=>{
+    html += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.foreign}</td>
+      <td>${r.other}</td>
+      <td>${r.damaged2}</td>
+      <td>${r.slight}</td>
+      <td>${r.damaged6}</td>
+      <td>${r.moisture}</td>
+      <td>${r.status}</td>
+      <td>${r.remark}</td>
+    </tr>`;
+  });
+
+  printTable.innerHTML = html;
+
+  let original = document.body.innerHTML;
+
+  document.body.innerHTML = document.getElementById("printArea").innerHTML;
+
+  window.print();
+
+  document.body.innerHTML = original;
+  location.reload();
 }
 
 // HELPER
