@@ -2,38 +2,67 @@
 <html>
 <head>
   <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+
+<style>
+body{font-family:Arial;background:#f4f6f9;}
+.main{width:95%;max-width:1200px;margin:auto;}
+
+.table-container{overflow-x:auto;background:white;padding:15px;border-radius:10px;}
+
+table{width:100%;border-collapse:collapse;}
+th{background:#2f6ecb;color:white;padding:10px;}
+td{padding:8px;border:1px solid #ddd;text-align:center;}
+
+button{padding:6px 10px;border:none;border-radius:5px;cursor:pointer;}
+.edit{background:#ff9800;color:white;}
+.update{background:#28a745;color:white;}
+.back{background:#4caf50;color:white;margin-bottom:10px;}
+
+input{padding:8px;width:250px;margin-bottom:10px;}
+</style>
 </head>
+
 <body>
 
 <div class="main">
 
 <h2>📊 Dashboard</h2>
 
-<button onclick="goBack()">⬅ Back to Entry</button>
+<button class="back" onclick="goBack()">⬅ Back</button>
+
+<br>
+
+<input type="text" id="search" placeholder="🔍 Search..." onkeyup="filterData()">
 
 <div class="table-container">
 <table>
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN MATTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
+<th>Name</th>
+<th>Reg</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged(2%)</th>
+<th>Slight</th>
+<th>Damaged(6%)</th>
+<th>Moisture</th>
 <th>Status</th>
 <th>Remark</th>
+<th>Action</th>
 </tr>
 </thead>
 
-<tbody id="dashboardBody"></tbody>
+<tbody id="dataBody"></tbody>
 </table>
 </div>
+
+<br>
+
+<div id="pagination"></div>
 
 </div>
 
@@ -41,36 +70,132 @@
 
 <script>
 
-// 🔵 LOAD DATA FROM GOOGLE SHEET
-async function loadData(){
+let allData = [];
+let filteredData = [];
+let currentPage = 1;
+let rowsPerPage = 10;
 
+// 🔵 LOAD DATA
+async function loadData(){
   let res = await fetch(API_MAIN);
-  let data = await res.json();
+  allData = await res.json();
+
+  filteredData = allData.reverse(); // latest first
+  renderTable();
+}
+
+// 🔵 RENDER TABLE
+function renderTable(){
+
+  let start = (currentPage-1) * rowsPerPage;
+  let end = start + rowsPerPage;
+
+  let pageData = filteredData.slice(start,end);
 
   let html = "";
 
-  data.forEach((r,i)=>{
+  pageData.forEach((r,i)=>{
+
     html += `
     <tr>
-      <td>${i+1}</td>
-      <td>${r["Name Of Farmer/Society"]}</td>
-      <td>${r["Farmer Registration"]}</td>
-      <td>${r["Qty In Quintals (Approx)"]}</td>
-      <td>${r["FOREIGN MATTER (0.75%)"]}</td>
-      <td>${r["OTHER FOOD GRAINS (2%)"]}</td>
-      <td>${r["DAMAGED GRAINS (2%)"]}</td>
-      <td>${r["SLIGHT DAMAGED GRAINS (4%)"]}</td>
-      <td>${r["DAMAGED GRAINS (6%)"]}</td>
-      <td>${r["MOISTURE (12%)"]}</td>
-      <td>${r["Status FAQ/Non FAQ"]}</td>
-      <td>${r["Remark If Any"]}</td>
+      <td>${start + i + 1}</td>
+
+      <td><input id="name${i}" value="${r["Name Of Farmer/Society"]}"></td>
+      <td><input id="reg${i}" value="${r["Farmer Registration"]}"></td>
+      <td><input id="qty${i}" value="${r["Qty In Quintals (Approx)"]}"></td>
+      <td><input id="foreign${i}" value="${r["FOREIGN MATTER (0.75%)"]}"></td>
+      <td><input id="other${i}" value="${r["OTHER FOOD GRAINS (2%)"]}"></td>
+      <td><input id="damaged2${i}" value="${r["DAMAGED GRAINS (2%)"]}"></td>
+      <td><input id="slight${i}" value="${r["SLIGHT DAMAGED GRAINS (4%)"]}"></td>
+      <td><input id="damaged6${i}" value="${r["DAMAGED GRAINS (6%)"]}"></td>
+      <td><input id="moisture${i}" value="${r["MOISTURE (12%)"]}"></td>
+      <td><input id="status${i}" value="${r["Status FAQ/Non FAQ"]}"></td>
+      <td><input id="remark${i}" value="${r["Remark If Any"]}"></td>
+
+      <td>
+        <button class="update" onclick="updateRow(${start + i}, ${i})">Update</button>
+      </td>
     </tr>`;
   });
 
-  document.getElementById("dashboardBody").innerHTML = html;
+  document.getElementById("dataBody").innerHTML = html;
+
+  renderPagination();
 }
 
-// 🔙 BACK BUTTON
+// 🔍 SEARCH
+function filterData(){
+
+  let val = document.getElementById("search").value.toLowerCase();
+
+  filteredData = allData.filter(r =>
+    Object.values(r).join(" ").toLowerCase().includes(val)
+  );
+
+  currentPage = 1;
+  renderTable();
+}
+
+// 📄 PAGINATION
+function renderPagination(){
+
+  let totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  let html = "";
+
+  for(let i=1;i<=totalPages;i++){
+    html += `<button onclick="goPage(${i})">${i}</button>`;
+  }
+
+  document.getElementById("pagination").innerHTML = html;
+}
+
+function goPage(page){
+  currentPage = page;
+  renderTable();
+}
+
+// 🔴 UPDATE ROW
+async function updateRow(index, i){
+
+  let row = filteredData[index];
+
+  let updated = {
+    id: row["ID"], // 🔥 MUST
+    name: document.getElementById("name"+i).value,
+    reg: document.getElementById("reg"+i).value,
+    qty: document.getElementById("qty"+i).value,
+    foreign: document.getElementById("foreign"+i).value,
+    other: document.getElementById("other"+i).value,
+    damaged2: document.getElementById("damaged2"+i).value,
+    slight: document.getElementById("slight"+i).value,
+    damaged6: document.getElementById("damaged6"+i).value,
+    moisture: document.getElementById("moisture"+i).value,
+    status: document.getElementById("status"+i).value,
+    remark: document.getElementById("remark"+i).value
+  };
+
+  try{
+
+    let res = await fetch(API_MAIN,{
+      method:"POST",
+      headers:{ "Content-Type":"text/plain" },
+      body: JSON.stringify({
+        action:"update",
+        ...updated
+      })
+    });
+
+    let result = await res.json();
+
+    alert("Updated ✅");
+    loadData();
+
+  }catch(e){
+    alert("Update Failed ❌");
+  }
+}
+
+// 🔙 BACK
 function goBack(){
   window.location.href = "index.html";
 }
