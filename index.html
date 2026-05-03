@@ -100,7 +100,8 @@
 </div>
 
 </div>
-<script src="config.js">
+<script src="config.js"></script>
+
 <script>
 
 let rowCount = 0;
@@ -131,7 +132,7 @@ function addRow(){
     <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
-  tableBody.insertAdjacentHTML("beforeend", row);
+  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
   updateSr();
 }
 
@@ -147,6 +148,7 @@ function updateSr(){
     r.cells[0].innerText = i+1;
   });
 }
+
 // SAVE DATA
 async function saveData(){
 
@@ -155,7 +157,7 @@ async function saveData(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
 
     let obj = {
-      id: Date.now() + "" + i,   // 🔥 MUST
+      id: Date.now() + "" + i,
       name: getVal("name"+(i+1)),
       reg: getVal("reg"+(i+1)),
       qty: getVal("qty"+(i+1)),
@@ -177,24 +179,25 @@ async function saveData(){
     return;
   }
 
-  console.log("Sending:", rows); // 🔥 DEBUG
+  console.log("Sending:", rows);
 
   try{
 
-   let res = await fetch(API_MAIN,{
-  method:"POST",
-  headers:{
-    "Content-Type":"text/plain"
-  },
-  body: JSON.stringify({
-    action:"bulkAdd",
-    rows: rows
-  })
-});
+    await fetch(API_MAIN,{
+      method:"POST",
+      headers:{
+        "Content-Type":"text/plain"
+      },
+      body: JSON.stringify({
+        action:"bulkAdd",
+        rows: rows
+      })
+    });
 
-    let result = await res.json();
+    // 🔥 SAVE LOCAL (for table)
+    localStorage.setItem("surveyData", JSON.stringify({rows}));
 
-    console.log("Response:", result);
+    renderTable();
 
     alert("Saved Successfully ✅");
 
@@ -208,7 +211,6 @@ async function saveData(){
 function renderTable(){
 
   let data = JSON.parse(localStorage.getItem("surveyData"));
-
   if(!data) return;
 
   let html = "";
@@ -232,33 +234,7 @@ function renderTable(){
     </tr>`;
   });
 
-  reportBody.innerHTML = html;
-}
-
-// PRINT
-function printReport(){
-
-  let data = JSON.parse(localStorage.getItem("surveyData"));
-
-  let html = `
-  <h2>${data.grader}</h2>
-  <p>${data.warehouse}</p>
-  <p>${data.society}</p>
-  <p>${data.date}</p>
-  <hr>
-  `;
-
-  data.rows.forEach((r,i)=>{
-    html += `${i+1} - ${r.name} - ${r.qty}<br>`;
-  });
-
-  let original = document.body.innerHTML;
-
-  document.body.innerHTML = html;
-
-  window.print();
-
-  document.body.innerHTML = original;
+  document.getElementById("reportBody").innerHTML = html;
 }
 
 // HELPER
