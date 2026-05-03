@@ -65,6 +65,7 @@
 
 <button onclick="addRow()">➕ Add Row</button>
 <button onclick="saveData()">💾 Save</button>
+  <button onclick="updateData()">✏️ Update</button>
 
 
 </div>
@@ -226,9 +227,9 @@ function renderTable(){
       <td>${r.moisture}</td>
       <td>${r.status}</td>
       <td>${r.remark}</td>
-      <td>
-        <button onclick="editRow(${i})">Edit</button>
-      </td>
+     <td>
+  <button onclick="editRow(${i}, '${r.id}')">Edit</button>
+</td>
     </tr>`;
   });
 
@@ -236,12 +237,12 @@ function renderTable(){
 }
 
 // ✏️ EDIT
-function editRow(index){
+function editRow(index, id){
 
   let data = JSON.parse(localStorage.getItem("surveyData")) || [];
+
   let r = data[index];
 
-  // fill first row
   document.getElementById("name1").value = r.name;
   document.getElementById("reg1").value = r.reg;
   document.getElementById("qty1").value = r.qty;
@@ -254,13 +255,15 @@ function editRow(index){
   document.getElementById("status1").value = r.status;
   document.getElementById("remark1").value = r.remark;
 
+  // 🔥 SAVE INDEX + ID
   localStorage.setItem("editIndex", index);
+  localStorage.setItem("editId", id);
 }
-
 // 🔄 UPDATE
 async function updateData(){
 
   let index = localStorage.getItem("editIndex");
+  let id = localStorage.getItem("editId");
 
   if(index === null){
     alert("Select row first");
@@ -270,7 +273,7 @@ async function updateData(){
   let data = JSON.parse(localStorage.getItem("surveyData"));
 
   let updated = {
-    id: data[index].id,
+    id: id, // 🔥 IMPORTANT
     name: getVal("name1"),
     reg: getVal("reg1"),
     qty: getVal("qty1"),
@@ -286,7 +289,7 @@ async function updateData(){
 
   try{
 
-    await fetch(API_MAIN,{
+    let res = await fetch(API_MAIN,{
       method:"POST",
       headers:{ "Content-Type":"text/plain" },
       body: JSON.stringify({
@@ -295,14 +298,20 @@ async function updateData(){
       })
     });
 
+    let result = await res.json();
+
+    console.log("Update Response:", result);
+
+    // 🔥 UPDATE LOCAL
     data[index] = updated;
     localStorage.setItem("surveyData", JSON.stringify(data));
 
     renderTable();
 
-    alert("Updated ✅");
+    alert("Updated Successfully ✅");
 
   }catch(err){
+    console.error(err);
     alert("Update Failed ❌");
   }
 }
