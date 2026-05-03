@@ -2,247 +2,80 @@
 <html>
 <head>
   <title>Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
-  <script src="config.js"></script>
-  <link rel="icon" href="favicon.ico">
+  <link rel="stylesheet" href="style.css">
 </head>
+<body>
 
-<body class="page-container">
+<div class="main">
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-left"></div>
-  <div class="title">📊 Survey System</div>
-  <div id="dateTime"></div>
-</div>
+<h2>📊 Dashboard</h2>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
-  <a href="dashboard.html" class="active">📊 Dashboard</a>
-  <a href="index.html">📋 Entry Form</a>
-  <a href="report.html">📄 Report</a>
-    <a href="register.html">📘 खरीदी रजिस्टर</a>
-  <a href="contact.html">📞 Contact</a>
-</div>
-
-<!-- MAIN -->
-<div class="main content">
-<div class="box">
-
-<h2>📊 Dashboard Overview</h2>
-
-<!-- CARDS -->
-<div class="cards">
-  <div class="card blue"><h3>Total Entries</h3><p id="total">0</p></div>
-  <div class="card green"><h3>Total Quantity</h3><p id="qty">0</p></div>
-  <div class="card orange"><h3>Avg Moisture</h3><p id="moisture">0</p></div>
-  <div class="card purple"><h3>FAQ Count</h3><p id="faq">0</p></div>
-</div>
-
-<input type="text" id="search" placeholder="🔍 Search..." onkeyup="searchData()">
-
-<br><br>
-
-<div id="status" style="font-size:12px;color:gray;margin-bottom:10px;"></div>
-
-<div class="table-header">
-  <h3>📋 Data Summary</h3>
-  <button class="btn excel" onclick="exportExcel()">⬇ Export Excel</button>
-</div>
+<button onclick="goBack()">⬅ Back to Entry</button>
 
 <div class="table-container">
 <table>
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN MATTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
 <th>Status</th>
 <th>Remark</th>
 </tr>
 </thead>
-<tbody id="table"></tbody>
+
+<tbody id="dashboardBody"></tbody>
 </table>
-
-<div class="pagination">
-  <button onclick="prevPage()">⬅ Prev</button>
-  <span id="pageInfo"></span>
-  <button onclick="nextPage()">Next ➡</button>
 </div>
 
 </div>
-</div>
-</div>
 
-<!-- FOOTER -->
-<div class="footer">
-  © <span id="year"></span> Survey System | All Rights Reserved <br>
-  Developed by <b>Ashish Mehra</b>
-</div>
+<script src="config.js"></script>
 
 <script>
 
-let allData = [];
-let filteredData = [];
-let currentPage = 1;
-const perPage = 10;
-
-// LOAD DATA
+// 🔵 LOAD DATA FROM GOOGLE SHEET
 async function loadData(){
-  try {
 
-    const res = await fetch(API_MAIN + "?t=" + new Date().getTime());
-    const json = await res.json();
-
-    // ✅ DIRECT DATA USE
-    allData = json;
-    filteredData = json;
-
-    updateStats();
-    renderTable();
-
-    document.getElementById("status").innerText =
-      "Last Updated: " + new Date().toLocaleTimeString();
-
-  } catch(e){
-    console.log("API Error:", e);
-  }
-}
-// TABLE
-function renderTable(){
-
-  let start = (currentPage - 1) * perPage;
-  let pageData = filteredData.slice(start, start + perPage);
+  let res = await fetch(API_MAIN);
+  let data = await res.json();
 
   let html = "";
 
-  pageData.forEach((r,i)=>{
+  data.forEach((r,i)=>{
     html += `
     <tr>
-      <td>${start+i+1}</td>
-      <td>${r["Name Of Farmer/Society"]||""}</td>
-      <td>${r["Farmer Registration"]||""}</td>
-      <td>${r["Qty In Quintals (Approx)"]||""}</td>
-      <td>${r["FOREIGN MATTER (0.75%)"]||""}</td>
-      <td>${r["OTHER FOOD GRAINS (2%)"]||""}</td>
-      <td>${r["DAMAGED GRAINS (2%)"]||""}</td>
-      <td>${r["SLIGHT DAMAGED GRAINS (4%)"]||""}</td>
-      <td>${r["DAMAGED GRAINS (6%)"]||""}</td>
-      <td>${r["MOISTURE (12%)"]||""}</td>
-      <td>${r["Status FAQ/Non FAQ"]||""}</td>
-      <td>${r["Remark If Any"]||""}</td>
+      <td>${i+1}</td>
+      <td>${r["Name Of Farmer/Society"]}</td>
+      <td>${r["Farmer Registration"]}</td>
+      <td>${r["Qty In Quintals (Approx)"]}</td>
+      <td>${r["FOREIGN MATTER (0.75%)"]}</td>
+      <td>${r["OTHER FOOD GRAINS (2%)"]}</td>
+      <td>${r["DAMAGED GRAINS (2%)"]}</td>
+      <td>${r["SLIGHT DAMAGED GRAINS (4%)"]}</td>
+      <td>${r["DAMAGED GRAINS (6%)"]}</td>
+      <td>${r["MOISTURE (12%)"]}</td>
+      <td>${r["Status FAQ/Non FAQ"]}</td>
+      <td>${r["Remark If Any"]}</td>
     </tr>`;
   });
 
-  document.getElementById("table").innerHTML = html;
-
-  let totalPages = Math.ceil(filteredData.length / perPage);
-  document.getElementById("pageInfo").innerText =
-    `Page ${currentPage} of ${totalPages}`;
+  document.getElementById("dashboardBody").innerHTML = html;
 }
 
-// SEARCH
-function searchData(){
-  let val = document.getElementById("search").value.toLowerCase();
-  filteredData = allData.filter(r =>
-    JSON.stringify(r).toLowerCase().includes(val)
-  );
-  currentPage = 1;
-  renderTable();
+// 🔙 BACK BUTTON
+function goBack(){
+  window.location.href = "index.html";
 }
 
-// PAGINATION
-function nextPage(){
-  if(currentPage < Math.ceil(filteredData.length/perPage)){
-    currentPage++;
-    renderTable();
-  }
-}
-
-function prevPage(){
-  if(currentPage > 1){
-    currentPage--;
-    renderTable();
-  }
-}
-
-// STATS
-function updateStats(){
-
-  document.getElementById("total").innerText = allData.length;
-
-  let qty = 0, moisture = 0, faq = 0;
-
-  allData.forEach(r=>{
-    qty += Number(r["Qty In Quintals (Approx)"])||0;
-    moisture += Number(r["MOISTURE (12%)"])||0;
-    if(r["Status FAQ/Non FAQ"] === "FAQ") faq++;
-  });
-
-  document.getElementById("qty").innerText = qty;
-
-  document.getElementById("moisture").innerText =
-    allData.length ? (moisture/allData.length).toFixed(2) : 0;
-
-  document.getElementById("faq").innerText = faq;
-}
-
-// EXPORT
-function exportExcel(){
-
-  let csv = "Sr.No,Name,Registration,Qty,Foreign,Other,Damaged,Slight,6%,Moisture,Status,Remark\n";
-
-  allData.forEach((r,i)=>{
-    csv += [
-      i+1,
-      r["Name Of Farmer/Society"],
-      r["Farmer Registration"],
-      r["Qty In Quintals (Approx)"],
-      r["FOREIGN MATTER (0.75%)"],
-      r["OTHER FOOD GRAINS (2%)"],
-      r["DAMAGED GRAINS (2%)"],
-      r["SLIGHT DAMAGED GRAINS (4%)"],
-      r["DAMAGED GRAINS (6%)"],
-      r["MOISTURE (12%)"],
-      r["Status FAQ/Non FAQ"],
-      r["Remark If Any"]
-    ].join(",") + "\n";
-  });
-
-  let blob = new Blob([csv]);
-  let a = document.createElement("a");
-  a.href = URL.createObjectURL(blob);
-  a.download = "Dashboard_Report.csv";
-  a.click();
-}
-
-// DATE TIME
-function updateDateTime(){
-  let now = new Date();
-  let options = { weekday:'short', day:'2-digit', month:'short', year:'numeric' };
-
-  document.getElementById("dateTime").innerText =
-    now.toLocaleDateString('en-IN', options) + " | " + now.toLocaleTimeString();
-}
-
-// INIT
-window.onload = function(){
-  updateDateTime();
-  setInterval(updateDateTime,1000);
-
-  loadData();
-  setInterval(loadData,10000);
-
-  document.getElementById("year").innerText = new Date().getFullYear();
-};
+window.onload = loadData;
 
 </script>
 
