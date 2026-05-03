@@ -3,69 +3,69 @@
 <head>
   <title>Survey System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body class="page-container">
 
-<!-- HEADER -->
 <div class="header">
   <div class="title">📊 Survey System</div>
-  <div id="dateTime"></div>
 </div>
 
-<!-- MAIN -->
-<div class="main content">
+<div class="main">
+
+<!-- 🔵 CARD 1: ENTRY FORM -->
 <div class="box">
 
 <h2>📋 Survey Entry Form</h2>
 
-<input id="grader" placeholder="Grader Name">
-<input id="warehouse" placeholder="Warehouse">
-<input id="society" placeholder="Society">
-<input type="date" id="date">
-
-<br>
-
+<div class="table-container">
 <table>
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
-<th>Foreign</th>
-<th>Other</th>
-<th>Damaged</th>
-<th>Slight</th>
-<th>6%</th>
-<th>Moisture</th>
-<th>Status</th>
-<th>Remark</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
+<th>FOREIGN MATTER (0.75%)</th>
+<th>OTHER FOOD GRAINS (2%)</th>
+<th>DAMAGED GRAINS (2%)</th>
+<th>SLIGHT DAMAGED GRAINS (4%)</th>
+<th>DAMAGED GRAINS (6%)</th>
+<th>MOISTURE (12%)</th>
+<th>Status FAQ/Non FAQ</th>
+<th>Remark If Any</th>
 <th>Action</th>
 </tr>
 </thead>
 
 <tbody id="tableBody"></tbody>
 </table>
+</div>
 
 <br>
 
 <button onclick="addRow()">➕ Add Row</button>
 <button onclick="saveData()">💾 Save</button>
-<button onclick="exportExcel()">⬇ Export Excel</button>
 
-<hr>
+</div>
 
-<h2>📄 Current Data</h2>
+<!-- 🔵 CARD 2: DATA TABLE -->
+<div class="box">
+
+<h2>📄 Data Records</h2>
+
+<input id="search" placeholder="Search..." onkeyup="searchData()">
+
+<br><br>
 
 <table>
 <thead>
 <tr>
 <th>Sr.No</th>
-<th>Name</th>
-<th>Registration</th>
-<th>Qty</th>
+<th>Name Of Farmer/Society</th>
+<th>Farmer Registration</th>
+<th>Qty In Quintals (Approx)</th>
 <th>Action</th>
 </tr>
 </thead>
@@ -74,11 +74,58 @@
 </table>
 
 </div>
+
 </div>
 
-<script src="config.js"></script>
+<!-- 🔥 EDIT POPUP -->
+<div id="popup" style="display:none;">
+  <div class="popup-box">
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <h3>Edit Record</h3>
+
+    <label>Name Of Farmer/Society</label>
+    <input id="e_name">
+
+    <label>Farmer Registration</label>
+    <input id="e_reg">
+
+    <label>Qty In Quintals (Approx)</label>
+    <input id="e_qty">
+
+    <label>FOREIGN MATTER (0.75%)</label>
+    <input id="e_foreign">
+
+    <label>OTHER FOOD GRAINS (2%)</label>
+    <input id="e_other">
+
+    <label>DAMAGED GRAINS (2%)</label>
+    <input id="e_damaged2">
+
+    <label>SLIGHT DAMAGED GRAINS (4%)</label>
+    <input id="e_slight">
+
+    <label>DAMAGED GRAINS (6%)</label>
+    <input id="e_damaged6">
+
+    <label>MOISTURE (12%)</label>
+    <input id="e_moisture">
+
+    <label>Status FAQ/Non FAQ</label>
+    <select id="e_status">
+      <option>FAQ</option>
+      <option>Non-FAQ</option>
+    </select>
+
+    <label>Remark If Any</label>
+    <input id="e_remark">
+
+    <br><br>
+
+    <button onclick="saveEdit()">Update</button>
+    <button onclick="closePopup()">Cancel</button>
+
+  </div>
+</div>
 
 <script>
 
@@ -110,20 +157,18 @@ function addRow(){
     <td><button onclick="deleteRow(${rowCount})">❌</button></td>
   </tr>`;
 
-  document.getElementById("tableBody").insertAdjacentHTML("beforeend", row);
+  tableBody.insertAdjacentHTML("beforeend", row);
   updateSr();
 }
 
-// DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-// SR NO
 function updateSr(){
-  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
-    row.cells[0].innerText = i + 1;
+  document.querySelectorAll("#tableBody tr").forEach((r,i)=>{
+    r.cells[0].innerText = i+1;
   });
 }
 
@@ -136,6 +181,7 @@ function saveData(){
     let i = row.id.replace("row","");
 
     let data = {
+      id: Date.now()+i,
       name:getVal("name"+i),
       reg:getVal("reg"+i),
       qty:getVal("qty"+i),
@@ -152,30 +198,17 @@ function saveData(){
     if(data.name) rows.push(data);
   });
 
-  if(rows.length === 0){
-    alert("Fill data first");
-    return;
-  }
-
-  // SAVE LOCAL
-  localStorage.setItem("currentReport", JSON.stringify(rows));
-
-  // OPTIONAL API (ignore if fails)
-  fetch(API_MAIN,{
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body: JSON.stringify({ action:"bulkAdd", rows })
-  }).catch(()=>{});
-
-  alert("Saved ✅");
+  localStorage.setItem("surveyData", JSON.stringify(rows));
 
   renderTable();
+
+  alert("Saved ✅");
 }
 
-// RENDER TABLE
+// RENDER
 function renderTable(){
 
-  let data = JSON.parse(localStorage.getItem("currentReport")) || [];
+  let data = JSON.parse(localStorage.getItem("surveyData")) || [];
 
   let html = "";
 
@@ -190,63 +223,86 @@ function renderTable(){
     </tr>`;
   });
 
-  document.getElementById("reportBody").innerHTML = html;
+  reportBody.innerHTML = html;
+}
+
+// SEARCH
+function searchData(){
+  let val = search.value.toLowerCase();
+
+  document.querySelectorAll("#reportBody tr").forEach(row=>{
+    row.style.display =
+      row.innerText.toLowerCase().includes(val) ? "" : "none";
+  });
 }
 
 // EDIT
+let currentIndex;
+
 function editRow(i){
 
-  let data = JSON.parse(localStorage.getItem("currentReport"));
-
+  let data = JSON.parse(localStorage.getItem("surveyData"));
   let r = data[i];
 
-  r.name = prompt("Name", r.name) || r.name;
-  r.qty = prompt("Qty", r.qty) || r.qty;
+  currentIndex = i;
 
-  localStorage.setItem("currentReport", JSON.stringify(data));
+  e_name.value = r.name;
+  e_reg.value = r.reg;
+  e_qty.value = r.qty;
+  e_foreign.value = r.foreign;
+  e_other.value = r.other;
+  e_damaged2.value = r.damaged2;
+  e_slight.value = r.slight;
+  e_damaged6.value = r.damaged6;
+  e_moisture.value = r.moisture;
+  e_status.value = r.status;
+  e_remark.value = r.remark;
 
-  renderTable();
+  popup.style.display = "flex";
 }
 
-// EXPORT
-function exportExcel(){
+// UPDATE
+function saveEdit(){
 
-  let data = JSON.parse(localStorage.getItem("currentReport")) || [];
+  let data = JSON.parse(localStorage.getItem("surveyData"));
 
-  let arr = [["Sr.No","Name","Registration","Qty"]];
+  data[currentIndex] = {
+    ...data[currentIndex],
+    name:e_name.value,
+    reg:e_reg.value,
+    qty:e_qty.value,
+    foreign:e_foreign.value,
+    other:e_other.value,
+    damaged2:e_damaged2.value,
+    slight:e_slight.value,
+    damaged6:e_damaged6.value,
+    moisture:e_moisture.value,
+    status:e_status.value,
+    remark:e_remark.value
+  };
 
-  data.forEach((r,i)=>{
-    arr.push([i+1, r.name, r.reg, r.qty]);
-  });
+  localStorage.setItem("surveyData", JSON.stringify(data));
 
-  let ws = XLSX.utils.aoa_to_sheet(arr);
-  let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Report");
-
-  XLSX.writeFile(wb, "Survey.xlsx");
-
-  localStorage.removeItem("currentReport");
   renderTable();
+  closePopup();
+
+  alert("Updated ✅");
 }
 
-// GET VALUE
+// CLOSE
+function closePopup(){
+  popup.style.display = "none";
+}
+
+// HELPER
 function getVal(id){
   return document.getElementById(id)?.value || "";
-}
-
-// DATE TIME
-function updateDateTime(){
-  let now = new Date();
-  document.getElementById("dateTime").innerText =
-    now.toLocaleString();
 }
 
 // INIT
 window.onload = function(){
   addRow();
   renderTable();
-  updateDateTime();
-  setInterval(updateDateTime,1000);
 };
 
 </script>
