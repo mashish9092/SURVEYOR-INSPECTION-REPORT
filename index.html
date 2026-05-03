@@ -149,43 +149,60 @@ function updateSr(){
 }
 
 // SAVE DATA
-function saveData(){
+async function saveData(){
 
   let rows = [];
 
-  document.querySelectorAll("#tableBody tr").forEach(row=>{
-    let i = row.id.replace("row","");
+  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
 
-    let data = {
-      name:getVal("name"+i),
-      reg:getVal("reg"+i),
-      qty:getVal("qty"+i),
-      foreign:getVal("foreign"+i),
-      other:getVal("other"+i),
-      damaged2:getVal("damaged2"+i),
-      slight:getVal("slight"+i),
-      damaged6:getVal("damaged6"+i),
-      moisture:getVal("moisture"+i),
-      status:getVal("status"+i),
-      remark:getVal("remark"+i)
+    let obj = {
+      id: Date.now() + "" + i,   // 🔥 MUST
+      name: getVal("name"+(i+1)),
+      reg: getVal("reg"+(i+1)),
+      qty: getVal("qty"+(i+1)),
+      foreign: getVal("foreign"+(i+1)),
+      other: getVal("other"+(i+1)),
+      damaged2: getVal("damaged2"+(i+1)),
+      slight: getVal("slight"+(i+1)),
+      damaged6: getVal("damaged6"+(i+1)),
+      moisture: getVal("moisture"+(i+1)),
+      status: getVal("status"+(i+1)),
+      remark: getVal("remark"+(i+1))
     };
 
-    if(data.name) rows.push(data);
+    if(obj.name) rows.push(obj);
   });
 
-  let fullData = {
-    grader:grader.value,
-    warehouse:warehouse.value,
-    society:society.value,
-    date:date.value,
-    rows:rows
-  };
+  if(rows.length === 0){
+    alert("Fill data first");
+    return;
+  }
 
-  localStorage.setItem("surveyData", JSON.stringify(fullData));
+  console.log("Sending:", rows); // 🔥 DEBUG
 
-  renderTable();
+  try{
 
-  alert("Saved ✅");
+    let res = await fetch(API_MAIN,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body: JSON.stringify({
+        action:"bulkAdd",
+        rows: rows
+      })
+    });
+
+    let result = await res.json();
+
+    console.log("Response:", result);
+
+    alert("Saved Successfully ✅");
+
+  }catch(err){
+    console.error(err);
+    alert("Save Failed ❌");
+  }
 }
 
 // RENDER TABLE
