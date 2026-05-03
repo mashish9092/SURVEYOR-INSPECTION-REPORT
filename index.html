@@ -1,26 +1,88 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Survey System</title>
+<title>Survey Entry</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <link rel="stylesheet" href="style.css">
+
+<style>
+body{
+  font-family: Arial;
+  background:#f4f6f9;
+}
+
+.main{
+  width:95%;
+  max-width:1200px;
+  margin:auto;
+}
+
+.box{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  margin:20px 0;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input, select{
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+}
+
+th{
+  background:#2f6ecb;
+  color:white;
+  padding:10px;
+}
+
+td{
+  padding:5px;
+  border:1px solid #ddd;
+}
+
+button{
+  padding:10px 15px;
+  margin:10px 5px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+.add{background:#007bff;color:white;}
+.save{background:#28a745;color:white;}
+.dashboard{background:#ff9800;color:white;}
+
+.table-container{
+  overflow-x:auto;
+}
+</style>
+
 </head>
 
 <body>
 
 <div class="main">
 
-<!-- 🔴 TOP FORM -->
-<div style="text-align:center; line-height:1.5;">
-
-  <h2 style="margin:0;">R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
-  <h3 style="margin:5px 0;">SURVEYOR INSPECTION REPORT</h3>
-
-  <span>(District Narsinghpur.)</span><br>
-  <span>For Procurement Centre</span>
-
+<!-- 🔴 HEADER -->
+<div style="text-align:center;">
+  <h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+  <h3>SURVEYOR INSPECTION REPORT</h3>
+  <p>(District Narsinghpur.)</p>
+  <p>For Procurement Centre</p>
 </div>
+
+<!-- 🔵 TOP FORM -->
 <div class="box">
+
 <label>Grader/Surveyor Name</label>
 <input id="grader">
 
@@ -38,7 +100,8 @@
 </div>
 
 <!-- 🔵 ENTRY TABLE -->
-<div class="table-container">
+<div class="box table-container">
+
 <table>
 <thead>
 <tr>
@@ -61,42 +124,9 @@
 <tbody id="tableBody"></tbody>
 </table>
 
-<br>
-
-<button onclick="addRow()">➕ Add Row</button>
-<button onclick="saveData()">💾 Save</button>
-  <button onclick="updateData()">✏️ Update</button>
-
-
-</div>
-
-<!-- 🔵 DATA TABLE -->
-<div class="table-container">
-
-<h2>Saved Data</h2>
-
-<table>
-<thead>
-<tr>
-<th>Sr.No</th>
-<th>Name Of Farmer/Society</th>
-<th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN MATTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status</th>
-<th>Remark</th>
-<th>Action</th>
-</tr>
-</thead>
-
-<tbody id="reportBody"></tbody>
-  <button onclick="printReport()">🖨 Print</button>
-</table>
+<button class="add" onclick="addRow()">➕ Add Row</button>
+<button class="save" onclick="saveData()">💾 Save</button>
+<button class="dashboard" onclick="goDashboard()">📊 Dashboard</button>
 
 </div>
 
@@ -151,7 +181,7 @@ function updateSr(){
   });
 }
 
-// 💾 SAVE DATA
+// 💾 SAVE DATA (GOOGLE SHEET)
 async function saveData(){
 
   let rows = [];
@@ -159,7 +189,6 @@ async function saveData(){
   document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
 
     let obj = {
-      id: Date.now() + "" + i, // IMPORTANT
       name: getVal("name"+(i+1)),
       reg: getVal("reg"+(i+1)),
       qty: getVal("qty"+(i+1)),
@@ -177,13 +206,13 @@ async function saveData(){
   });
 
   if(rows.length === 0){
-    alert("Fill data first");
+    alert("Fill at least one row");
     return;
   }
 
   try{
 
-    await fetch(API_MAIN,{
+    let res = await fetch(API_MAIN,{
       method:"POST",
       headers:{ "Content-Type":"text/plain" },
       body: JSON.stringify({
@@ -192,127 +221,20 @@ async function saveData(){
       })
     });
 
-    // ✅ FIXED STORAGE
-    localStorage.setItem("surveyData", JSON.stringify(rows));
+    let result = await res.json();
 
-    renderTable();
+    console.log(result);
 
     alert("Saved Successfully ✅");
+
+    // 🔄 RESET TABLE
+    document.getElementById("tableBody").innerHTML = "";
+    rowCount = 0;
+    addRow();
 
   }catch(err){
     console.error(err);
     alert("Save Failed ❌");
-  }
-}
-
-// 📊 RENDER TABLE
-function renderTable(){
-
-  let data = JSON.parse(localStorage.getItem("surveyData")) || [];
-
-  let html = "";
-
-  data.forEach((r,i)=>{
-    html += `
-    <tr>
-      <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.foreign}</td>
-      <td>${r.other}</td>
-      <td>${r.damaged2}</td>
-      <td>${r.slight}</td>
-      <td>${r.damaged6}</td>
-      <td>${r.moisture}</td>
-      <td>${r.status}</td>
-      <td>${r.remark}</td>
-     <td>
-  <button onclick="editRow(${i}, '${r.id}')">Edit</button>
-</td>
-    </tr>`;
-  });
-
-  document.getElementById("reportBody").innerHTML = html;
-}
-
-// ✏️ EDIT
-function editRow(index, id){
-
-  let data = JSON.parse(localStorage.getItem("surveyData")) || [];
-
-  let r = data[index];
-
-  document.getElementById("name1").value = r.name;
-  document.getElementById("reg1").value = r.reg;
-  document.getElementById("qty1").value = r.qty;
-  document.getElementById("foreign1").value = r.foreign;
-  document.getElementById("other1").value = r.other;
-  document.getElementById("damaged21").value = r.damaged2;
-  document.getElementById("slight1").value = r.slight;
-  document.getElementById("damaged61").value = r.damaged6;
-  document.getElementById("moisture1").value = r.moisture;
-  document.getElementById("status1").value = r.status;
-  document.getElementById("remark1").value = r.remark;
-
-  // 🔥 SAVE INDEX + ID
-  localStorage.setItem("editIndex", index);
-  localStorage.setItem("editId", id);
-}
-// 🔄 UPDATE
-async function updateData(){
-
-  let index = localStorage.getItem("editIndex");
-  let id = localStorage.getItem("editId");
-
-  if(index === null){
-    alert("Select row first");
-    return;
-  }
-
-  let data = JSON.parse(localStorage.getItem("surveyData"));
-
-  let updated = {
-    id: id, // 🔥 IMPORTANT
-    name: getVal("name1"),
-    reg: getVal("reg1"),
-    qty: getVal("qty1"),
-    foreign: getVal("foreign1"),
-    other: getVal("other1"),
-    damaged2: getVal("damaged21"),
-    slight: getVal("slight1"),
-    damaged6: getVal("damaged61"),
-    moisture: getVal("moisture1"),
-    status: getVal("status1"),
-    remark: getVal("remark1")
-  };
-
-  try{
-
-    let res = await fetch(API_MAIN,{
-      method:"POST",
-      headers:{ "Content-Type":"text/plain" },
-      body: JSON.stringify({
-        action:"update",
-        ...updated
-      })
-    });
-
-    let result = await res.json();
-
-    console.log("Update Response:", result);
-
-    // 🔥 UPDATE LOCAL
-    data[index] = updated;
-    localStorage.setItem("surveyData", JSON.stringify(data));
-
-    renderTable();
-
-    alert("Updated Successfully ✅");
-
-  }catch(err){
-    console.error(err);
-    alert("Update Failed ❌");
   }
 }
 
@@ -321,13 +243,17 @@ function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
+// 📊 DASHBOARD PAGE
+function goDashboard(){
+  window.location.href = "dashboard.html";
+}
+
 // 🚀 INIT
 window.onload = function(){
   addRow();
-  renderTable();
 };
 
 </script>
-  
+
 </body>
 </html>
