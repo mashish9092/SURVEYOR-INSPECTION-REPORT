@@ -22,7 +22,7 @@ th{background:#2f6ecb;color:white;padding:10px;}
 td{padding:8px;border:1px solid #ddd;text-align:center;}
 
 button{
-  padding:6px 10px;
+  padding:6px 12px;
   border:none;
   border-radius:5px;
   cursor:pointer;
@@ -31,10 +31,15 @@ button{
 .back{background:#4caf50;color:white;margin-bottom:10px;}
 .print{background:#28a745;color:white;}
 
-input{padding:8px;width:250px;margin-bottom:10px;}
+input{
+  padding:8px;
+  width:250px;
+  margin-bottom:10px;
+}
 
 .pagination button{
   margin:3px;
+  background:#ddd;
 }
 </style>
 </head>
@@ -58,15 +63,15 @@ input{padding:8px;width:250px;margin-bottom:10px;}
 <th>Sr.No</th>
 <th>Name Of Farmer/Society</th>
 <th>Farmer Registration</th>
-<th>Qty In Quintals (Approx)</th>
-<th>FOREIGN MATTER (0.75%)</th>
-<th>OTHER FOOD GRAINS (2%)</th>
-<th>DAMAGED GRAINS (2%)</th>
-<th>SLIGHT DAMAGED GRAINS (4%)</th>
-<th>DAMAGED GRAINS (6%)</th>
-<th>MOISTURE (12%)</th>
-<th>Status FAQ/Non FAQ</th>
-<th>Remark If Any</th>
+<th>Qty</th>
+<th>Foreign</th>
+<th>Other</th>
+<th>Damaged (2%)</th>
+<th>Slight (4%)</th>
+<th>Damaged (6%)</th>
+<th>Moisture</th>
+<th>Status</th>
+<th>Remark</th>
 <th>Print</th>
 </tr>
 </thead>
@@ -90,7 +95,9 @@ let filteredData = [];
 let currentPage = 1;
 let rowsPerPage = 10;
 
-// 🔵 LOAD DATA
+// ==============================
+// LOAD DATA
+// ==============================
 async function loadData(){
   let res = await fetch(API_MAIN);
   allData = await res.json();
@@ -99,7 +106,9 @@ async function loadData(){
   renderTable();
 }
 
-// 🔵 RENDER TABLE
+// ==============================
+// RENDER TABLE
+// ==============================
 function renderTable(){
 
   let start = (currentPage-1) * rowsPerPage;
@@ -114,17 +123,17 @@ function renderTable(){
     html += `
     <tr>
       <td>${start + i + 1}</td>
-      <td>${r["Name Of Farmer/Society"]}</td>
-      <td>${r["Farmer Registration"]}</td>
-      <td>${r["Qty In Quintals (Approx)"]}</td>
-      <td>${r["FOREIGN MATTER (0.75%)"]}</td>
-      <td>${r["OTHER FOOD GRAINS (2%)"]}</td>
-      <td>${r["DAMAGED GRAINS (2%)"]}</td>
-      <td>${r["SLIGHT DAMAGED GRAINS (4%)"]}</td>
-      <td>${r["DAMAGED GRAINS (6%)"]}</td>
-      <td>${r["MOISTURE (12%)"]}</td>
-      <td>${r["Status FAQ/Non FAQ"]}</td>
-      <td>${r["Remark If Any"]}</td>
+      <td>${r["Name Of Farmer/Society"] || ""}</td>
+      <td>${r["Farmer Registration"] || ""}</td>
+      <td>${r["Qty In Quintals (Approx)"] || ""}</td>
+      <td>${r["FOREIGN MATTER (0.75%)"] || ""}</td>
+      <td>${r["OTHER FOOD GRAINS (2%)"] || ""}</td>
+      <td>${r["DAMAGED GRAINS (2%)"] || ""}</td>
+      <td>${r["SLIGHT DAMAGED GRAINS (4%)"] || ""}</td>
+      <td>${r["DAMAGED GRAINS (6%)"] || ""}</td>
+      <td>${r["MOISTURE (12%)"] || ""}</td>
+      <td>${r["Status FAQ/Non FAQ"] || ""}</td>
+      <td>${r["Remark If Any"] || ""}</td>
       <td>
         <button class="print" onclick='printRow(${JSON.stringify(r)})'>Print</button>
       </td>
@@ -136,7 +145,9 @@ function renderTable(){
   renderPagination();
 }
 
-// 🔍 SEARCH
+// ==============================
+// SEARCH
+// ==============================
 function filterData(){
 
   let val = document.getElementById("search").value.toLowerCase();
@@ -149,7 +160,9 @@ function filterData(){
   renderTable();
 }
 
-// 📄 PAGINATION
+// ==============================
+// PAGINATION
+// ==============================
 function renderPagination(){
 
   let totalPages = Math.ceil(filteredData.length / rowsPerPage);
@@ -167,62 +180,106 @@ function goPage(page){
   renderTable();
 }
 
-// 🖨 PRINT SINGLE RECORD
+// ==============================
+// PRINT FUNCTION (FINAL FORMAT)
+// ==============================
 function printRow(data){
 
-  let win = window.open('', '', 'width=900,height=700');
+  let win = window.open('', '', 'width=1200,height=800');
 
   win.document.write(`
   <html>
   <head>
   <title>Print</title>
+
   <style>
-    body{font-family:Arial;}
-    table{width:100%;border-collapse:collapse;}
-    th,td{border:1px solid #000;padding:6px;text-align:center;}
+    body{font-family:Arial;margin:10px;}
+    .box{border:2px solid black;padding:10px;}
+
+    .header{text-align:center;font-weight:bold;}
+    .title{font-size:20px;}
+    .sub{font-size:14px;}
+
+    table{width:100%;border-collapse:collapse;margin-top:10px;}
+    th, td{border:1px solid black;padding:6px;font-size:12px;text-align:center;}
+
+    .row{display:flex;justify-content:space-between;margin-top:10px;}
+    .sign{margin-top:30px;display:flex;justify-content:space-between;}
   </style>
+
   </head>
+
   <body>
 
-  <h2 style="text-align:center;">R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
-  <h3 style="text-align:center;">SURVEYOR INSPECTION REPORT</h3>
+  <div class="box">
 
-  <br>
+    <div class="header">
+      <div class="title">R B ASSOCIATES GLOBAL CONNECT PVT LTD</div>
+      <div>SURVEYOR INSPECTION REPORT</div>
+      <div class="sub">(District Narsinghpur)</div>
+      <div class="sub">For Procurement Centre</div>
+    </div>
 
-  <table>
-  <tr>
-    <th>Name</th>
-    <th>Reg</th>
-    <th>Qty</th>
-    <th>Foreign</th>
-    <th>Other</th>
-    <th>Damaged(2%)</th>
-    <th>Slight</th>
-    <th>Damaged(6%)</th>
-    <th>Moisture</th>
-    <th>Status</th>
-    <th>Remark</th>
-  </tr>
+    <br>
 
-  <tr>
-    <td>${data["Name Of Farmer/Society"]}</td>
-    <td>${data["Farmer Registration"]}</td>
-    <td>${data["Qty In Quintals (Approx)"]}</td>
-    <td>${data["FOREIGN MATTER (0.75%)"]}</td>
-    <td>${data["OTHER FOOD GRAINS (2%)"]}</td>
-    <td>${data["DAMAGED GRAINS (2%)"]}</td>
-    <td>${data["SLIGHT DAMAGED GRAINS (4%)"]}</td>
-    <td>${data["DAMAGED GRAINS (6%)"]}</td>
-    <td>${data["MOISTURE (12%)"]}</td>
-    <td>${data["Status FAQ/Non FAQ"]}</td>
-    <td>${data["Remark If Any"]}</td>
-  </tr>
-  </table>
+    <div class="row">
+      <div><b>Grader/Surveyor Name :</b> __________</div>
+    </div>
 
-  <br><br>
+    <div class="row">
+      <div><b>Warehouse Name :</b> __________</div>
+      <div><b>Date :</b> __________</div>
+    </div>
 
-  <p>Name & Signature Of Surveyor: _______________________</p>
-  <p>Name & Signature Of Warehouse Manager: ______________</p>
+    <div class="row">
+      <div><b>Society :</b> __________</div>
+    </div>
+
+    <br>
+
+    <b>COMMODITY : WHEAT</b>
+
+    <table>
+      <tr>
+        <th>Sr.No</th>
+        <th>Name</th>
+        <th>Reg</th>
+        <th>Qty</th>
+        <th>Foreign</th>
+        <th>Other</th>
+        <th>Damaged(2%)</th>
+        <th>Slight</th>
+        <th>Damaged(6%)</th>
+        <th>Moisture</th>
+        <th>Status</th>
+        <th>Remark</th>
+      </tr>
+
+      <tr>
+        <td>1</td>
+        <td>${data["Name Of Farmer/Society"]}</td>
+        <td>${data["Farmer Registration"]}</td>
+        <td>${data["Qty In Quintals (Approx)"]}</td>
+        <td>${data["FOREIGN MATTER (0.75%)"]}</td>
+        <td>${data["OTHER FOOD GRAINS (2%)"]}</td>
+        <td>${data["DAMAGED GRAINS (2%)"]}</td>
+        <td>${data["SLIGHT DAMAGED GRAINS (4%)"]}</td>
+        <td>${data["DAMAGED GRAINS (6%)"]}</td>
+        <td>${data["MOISTURE (12%)"]}</td>
+        <td>${data["Status FAQ/Non FAQ"]}</td>
+        <td>${data["Remark If Any"]}</td>
+      </tr>
+
+      ${"<tr>" + "<td></td>".repeat(12) + "</tr>".repeat(8)}
+
+    </table>
+
+    <div class="sign">
+      <div>Name & Signature Of Surveyor : __________</div>
+      <div>Name & Signature Of Warehouse Manager : __________</div>
+    </div>
+
+  </div>
 
   </body>
   </html>
@@ -232,11 +289,14 @@ function printRow(data){
   win.print();
 }
 
-// 🔙 BACK
+// ==============================
+// BACK BUTTON
+// ==============================
 function goBack(){
   window.location.href = "index.html";
 }
 
+// ==============================
 window.onload = loadData;
 
 </script>
