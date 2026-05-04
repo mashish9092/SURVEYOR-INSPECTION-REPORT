@@ -4,45 +4,112 @@
 <title>Survey Entry</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<link rel="stylesheet" href="style.css">
+
 <style>
-body{font-family:Arial;background:#f4f6f9;}
-.main{width:95%;max-width:1200px;margin:auto;}
-.box{background:white;padding:20px;border-radius:10px;margin:20px 0;}
-input,select{width:100%;padding:8px;margin:5px 0;}
-table{width:100%;border-collapse:collapse;}
-th{background:#2f6ecb;color:white;padding:10px;}
-td{padding:5px;border:1px solid #ddd;}
-button{padding:10px 15px;margin:10px 5px;border:none;border-radius:5px;cursor:pointer;}
+body{
+  font-family: Arial;
+  background:#f4f6f9;
+}
+
+.main{
+  width:95%;
+  max-width:1200px;
+  margin:auto;
+}
+
+.box{
+  background:white;
+  padding:20px;
+  border-radius:10px;
+  margin:20px 0;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input, select{
+  width:100%;
+  padding:8px;
+  margin:5px 0;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  background:white;
+}
+
+th{
+  background:#2f6ecb;
+  color:white;
+  padding:10px;
+}
+
+td{
+  padding:5px;
+  border:1px solid #ddd;
+}
+
+button{
+  padding:10px 15px;
+  margin:10px 5px;
+  border:none;
+  border-radius:5px;
+  cursor:pointer;
+}
+
 .add{background:#007bff;color:white;}
 .save{background:#28a745;color:white;}
 .dashboard{background:#ff9800;color:white;}
+
+.table-container{
+  overflow-x:auto;
+}
+  /* ✅ FOOTER STYLE */
+.footer{
+  text-align:center;
+  margin-top:30px;
+  padding:15px;
+  background:#2f6ecb;
+  color:white;
+  border-radius:8px;
+}
 </style>
+
 </head>
 
 <body>
 
 <div class="main">
 
-<h2 style="text-align:center;">R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
-<h3 style="text-align:center;">SURVEYOR INSPECTION REPORT</h3>
+<!-- 🔴 HEADER -->
+<div style="text-align:center;">
+  <h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+  <h3>SURVEYOR INSPECTION REPORT</h3>
+  <p>(District Narsinghpur.)</p>
+  <p>For Procurement Centre</p>
+</div>
 
+<!-- 🔵 TOP FORM -->
 <div class="box">
 
-<label>Grader</label>
+<label>Grader/Surveyor Name</label>
 <input id="grader">
 
-<label>Warehouse</label>
+<label>Warehouse Name & Location</label>
 <input id="warehouse">
 
-<label>Society</label>
+<label>Society/ Procurement Centre</label>
 <input id="society">
 
 <label>Date</label>
 <input type="date" id="date">
 
+<p><b>COMMODITY : WHEAT</b></p>
+
 </div>
 
-<div class="box">
+<!-- 🔵 ENTRY TABLE -->
+<div class="box table-container">
 
 <table>
 <thead>
@@ -67,20 +134,25 @@ button{padding:10px 15px;margin:10px 5px;border:none;border-radius:5px;cursor:po
 </table>
 
 <button class="add" onclick="addRow()">➕ Add Row</button>
-<button class="save" id="saveBtn" onclick="saveData()">💾 Save</button>
-<button onclick="printData()">🖨️ Print</button>
+<button class="save" onclick="saveData()">💾 Save</button>
 <button class="dashboard" onclick="goDashboard()">📊 Dashboard</button>
 
 </div>
-
+<!-- ✅ FOOTER -->
+<div class="footer">
+  © 2026 R B ASSOCIATES GLOBAL CONNECT PVT LTD  
+  <br>
+  Developed by Ashish Mehra
 </div>
+</div>
+
+<script src="config.js"></script>
 
 <script>
 
 let rowCount = 0;
-let isSaving = false;
 
-// ADD ROW
+// ➕ ADD ROW
 function addRow(){
   rowCount++;
 
@@ -110,26 +182,21 @@ function addRow(){
   updateSr();
 }
 
-// DELETE
+// ❌ DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-// SR UPDATE
+// 🔢 SR NO
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((r,i)=>{
     r.cells[0].innerText = i+1;
   });
 }
 
-// SAVE
+// 💾 SAVE DATA (GOOGLE SHEET)
 async function saveData(){
-
-  if(isSaving) return;
-
-  isSaving = true;
-  document.getElementById("saveBtn").disabled = true;
 
   let rows = [];
 
@@ -154,77 +221,48 @@ async function saveData(){
 
   if(rows.length === 0){
     alert("Fill at least one row");
-    isSaving = false;
-    document.getElementById("saveBtn").disabled = false;
     return;
   }
 
-  alert("Saved Successfully ✅");
+  try{
 
-  isSaving = false;
-  document.getElementById("saveBtn").disabled = false;
-}
+    let res = await fetch(API_MAIN,{
+      method:"POST",
+      headers:{ "Content-Type":"text/plain" },
+      body: JSON.stringify({
+        action:"bulkAdd",
+        rows: rows
+      })
+    });
 
-// PRINT
-function printData(){
+    let result = await res.json();
 
-  let rows = [];
+    console.log(result);
 
-  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
-    let obj = {
-      name: getVal("name"+(i+1)),
-      reg: getVal("reg"+(i+1)),
-      qty: getVal("qty"+(i+1)),
-      foreign: getVal("foreign"+(i+1)),
-      other: getVal("other"+(i+1)),
-      damaged2: getVal("damaged2"+(i+1)),
-      slight: getVal("slight"+(i+1)),
-      damaged6: getVal("damaged6"+(i+1)),
-      moisture: getVal("moisture"+(i+1)),
-      status: getVal("status"+(i+1)),
-      remark: getVal("remark"+(i+1))
-    };
-    if(obj.name) rows.push(obj);
-  });
+    alert("Saved Successfully ✅");
 
-  if(rows.length === 0){
-    alert("No data");
-    return;
+    // 🔄 RESET TABLE
+    document.getElementById("tableBody").innerHTML = "";
+    rowCount = 0;
+    addRow();
+
+  }catch(err){
+    console.error(err);
+    alert("Save Failed ❌");
   }
-
-  let now = new Date().toLocaleString();
-
-  let fileName = rows[0].reg + "_" + rows[0].name;
-
-  let html = "<h2>Survey Report</h2><table border='1' style='width:100%'>";
-
-  rows.forEach((r,i)=>{
-    html += `<tr>
-      <td>${i+1}</td>
-      <td>${r.name}</td>
-      <td>${r.reg}</td>
-      <td>${r.qty}</td>
-      <td>${r.remark}<br><small>${now}</small></td>
-    </tr>`;
-  });
-
-  html += "</table>";
-
-  let win = window.open("");
-  win.document.write(`<title>${fileName}</title>` + html);
-  win.print();
 }
 
-// HELPER
+// 🔎 HELPER
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
+// 📊 DASHBOARD PAGE
 function goDashboard(){
-  alert("Dashboard page open karo");
+  window.location.href = "dashboard.html";
 }
 
-// INIT
+// 🚀 INIT
 window.onload = function(){
   addRow();
 };
