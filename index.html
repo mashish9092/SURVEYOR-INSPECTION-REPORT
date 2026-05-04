@@ -267,6 +267,100 @@ window.onload = function(){
   addRow();
 };
 
+  // =====================================================
+// 🔥 NEW ADDITION: PRINT + DATE + FILE NAME
+// =====================================================
+
+function printData(){
+
+  let rows = [];
+
+  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
+
+    let obj = {
+      name: getVal("name"+(i+1)),
+      reg: getVal("reg"+(i+1)),
+      qty: getVal("qty"+(i+1)),
+      foreign: getVal("foreign"+(i+1)),
+      other: getVal("other"+(i+1)),
+      damaged2: getVal("damaged2"+(i+1)),
+      slight: getVal("slight"+(i+1)),
+      damaged6: getVal("damaged6"+(i+1)),
+      moisture: getVal("moisture"+(i+1)),
+      status: getVal("status"+(i+1)),
+      remark: getVal("remark"+(i+1))
+    };
+
+    if(obj.name) rows.push(obj);
+  });
+
+  if(rows.length === 0){
+    alert("No data to print");
+    return;
+  }
+
+  // ✅ DATE + TIME
+  let now = new Date().toLocaleString('en-IN', {
+    day:'2-digit',
+    month:'2-digit',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit'
+  });
+
+  // ✅ FILE NAME
+  let farmerName = rows[0].name || "Farmer";
+  let farmerReg = rows[0].reg || "Reg";
+  let fileName = `${farmerReg}_${farmerName}`;
+
+  let tableRows = "";
+
+  rows.forEach((r,i)=>{
+    tableRows += `
+    <tr>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.foreign}</td>
+      <td>${r.other}</td>
+      <td>${r.damaged2}</td>
+      <td>${r.slight}</td>
+      <td>${r.damaged6}</td>
+      <td>${r.moisture}</td>
+      <td>${r.status}</td>
+
+      <!-- 🔥 DATE TIME REMARK KE NICHE -->
+      <td>
+        ${r.remark}
+        <br>
+        <span style="font-size:10px;color:gray;">
+          ${now}
+        </span>
+      </td>
+    </tr>`;
+  });
+
+  let html = `
+  <html>
+  <head>
+    <title>${fileName}</title>
+  </head>
+  <body>
+  <table border="1" style="width:100%;border-collapse:collapse;">
+  ${tableRows}
+  </table>
+  </body>
+  </html>
+  `;
+
+  let win = window.open('');
+  win.document.write(html);
+  win.document.close();
+  win.print();
+}
+
+
 </script>
 
 </body>
