@@ -4,112 +4,45 @@
 <title>Survey Entry</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="style.css">
-
 <style>
-body{
-  font-family: Arial;
-  background:#f4f6f9;
-}
-
-.main{
-  width:95%;
-  max-width:1200px;
-  margin:auto;
-}
-
-.box{
-  background:white;
-  padding:20px;
-  border-radius:10px;
-  margin:20px 0;
-  box-shadow:0 2px 10px rgba(0,0,0,0.1);
-}
-
-input, select{
-  width:100%;
-  padding:8px;
-  margin:5px 0;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  background:white;
-}
-
-th{
-  background:#2f6ecb;
-  color:white;
-  padding:10px;
-}
-
-td{
-  padding:5px;
-  border:1px solid #ddd;
-}
-
-button{
-  padding:10px 15px;
-  margin:10px 5px;
-  border:none;
-  border-radius:5px;
-  cursor:pointer;
-}
-
+body{font-family:Arial;background:#f4f6f9;}
+.main{width:95%;max-width:1200px;margin:auto;}
+.box{background:white;padding:20px;border-radius:10px;margin:20px 0;}
+input,select{width:100%;padding:8px;margin:5px 0;}
+table{width:100%;border-collapse:collapse;}
+th{background:#2f6ecb;color:white;padding:10px;}
+td{padding:5px;border:1px solid #ddd;}
+button{padding:10px 15px;margin:10px 5px;border:none;border-radius:5px;cursor:pointer;}
 .add{background:#007bff;color:white;}
 .save{background:#28a745;color:white;}
 .dashboard{background:#ff9800;color:white;}
-
-.table-container{
-  overflow-x:auto;
-}
-  /* ✅ FOOTER STYLE */
-.footer{
-  text-align:center;
-  margin-top:30px;
-  padding:15px;
-  background:#2f6ecb;
-  color:white;
-  border-radius:8px;
-}
 </style>
-
 </head>
 
 <body>
 
 <div class="main">
 
-<!-- 🔴 HEADER -->
-<div style="text-align:center;">
-  <h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
-  <h3>SURVEYOR INSPECTION REPORT</h3>
-  <p>(District Narsinghpur.)</p>
-  <p>For Procurement Centre</p>
-</div>
+<h2 style="text-align:center;">R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+<h3 style="text-align:center;">SURVEYOR INSPECTION REPORT</h3>
 
-<!-- 🔵 TOP FORM -->
 <div class="box">
 
-<label>Grader/Surveyor Name</label>
+<label>Grader</label>
 <input id="grader">
 
-<label>Warehouse Name & Location</label>
+<label>Warehouse</label>
 <input id="warehouse">
 
-<label>Society/ Procurement Centre</label>
+<label>Society</label>
 <input id="society">
 
 <label>Date</label>
 <input type="date" id="date">
 
-<p><b>COMMODITY : WHEAT</b></p>
-
 </div>
 
-<!-- 🔵 ENTRY TABLE -->
-<div class="box table-container">
+<div class="box">
 
 <table>
 <thead>
@@ -135,24 +68,19 @@ button{
 
 <button class="add" onclick="addRow()">➕ Add Row</button>
 <button class="save" id="saveBtn" onclick="saveData()">💾 Save</button>
+<button onclick="printData()">🖨️ Print</button>
 <button class="dashboard" onclick="goDashboard()">📊 Dashboard</button>
 
 </div>
-<!-- ✅ FOOTER -->
-<div class="footer">
-  © 2026 R B ASSOCIATES GLOBAL CONNECT PVT LTD  
-  <br>
-  Developed by Ashish Mehra
-</div>
-</div>
 
-<script src="config.js"></script>
+</div>
 
 <script>
 
 let rowCount = 0;
+let isSaving = false;
 
-// ➕ ADD ROW
+// ADD ROW
 function addRow(){
   rowCount++;
 
@@ -182,27 +110,22 @@ function addRow(){
   updateSr();
 }
 
-// ❌ DELETE
+// DELETE
 function deleteRow(id){
   document.getElementById("row"+id)?.remove();
   updateSr();
 }
 
-// 🔢 SR NO
+// SR UPDATE
 function updateSr(){
   document.querySelectorAll("#tableBody tr").forEach((r,i)=>{
     r.cells[0].innerText = i+1;
   });
 }
 
-// 💾 SAVE DATA (GOOGLE SHEET)
-let rowCount = 0;
-let isSaving = false; // ✅ ADD THIS
-
-// 💾 SAVE DATA (GOOGLE SHEET)
+// SAVE
 async function saveData(){
 
-  // ✅ DOUBLE CLICK BLOCK
   if(isSaving) return;
 
   isSaving = true;
@@ -236,50 +159,72 @@ async function saveData(){
     return;
   }
 
-  try{
+  alert("Saved Successfully ✅");
 
-    let res = await fetch(API_MAIN,{
-      method:"POST",
-      headers:{ "Content-Type":"text/plain" },
-      body: JSON.stringify({
-        action:"bulkAdd",
-        rows: rows
-      })
-    });
-
-    let result = await res.json();
-
-    console.log(result);
-
-    alert("Saved Successfully ✅");
-
-    // 🔄 RESET TABLE
-    document.getElementById("tableBody").innerHTML = "";
-    rowCount = 0;
-    addRow();
-
-  }catch(err){
-    console.error(err);
-    alert("Save Failed ❌");
-  }
-
-  // ✅ RE-ENABLE BUTTON
   isSaving = false;
   document.getElementById("saveBtn").disabled = false;
 }
 
-// 🔎 HELPER
+// PRINT
+function printData(){
+
+  let rows = [];
+
+  document.querySelectorAll("#tableBody tr").forEach((row,i)=>{
+    let obj = {
+      name: getVal("name"+(i+1)),
+      reg: getVal("reg"+(i+1)),
+      qty: getVal("qty"+(i+1)),
+      foreign: getVal("foreign"+(i+1)),
+      other: getVal("other"+(i+1)),
+      damaged2: getVal("damaged2"+(i+1)),
+      slight: getVal("slight"+(i+1)),
+      damaged6: getVal("damaged6"+(i+1)),
+      moisture: getVal("moisture"+(i+1)),
+      status: getVal("status"+(i+1)),
+      remark: getVal("remark"+(i+1))
+    };
+    if(obj.name) rows.push(obj);
+  });
+
+  if(rows.length === 0){
+    alert("No data");
+    return;
+  }
+
+  let now = new Date().toLocaleString();
+
+  let fileName = rows[0].reg + "_" + rows[0].name;
+
+  let html = "<h2>Survey Report</h2><table border='1' style='width:100%'>";
+
+  rows.forEach((r,i)=>{
+    html += `<tr>
+      <td>${i+1}</td>
+      <td>${r.name}</td>
+      <td>${r.reg}</td>
+      <td>${r.qty}</td>
+      <td>${r.remark}<br><small>${now}</small></td>
+    </tr>`;
+  });
+
+  html += "</table>";
+
+  let win = window.open("");
+  win.document.write(`<title>${fileName}</title>` + html);
+  win.print();
+}
+
+// HELPER
 function getVal(id){
   return document.getElementById(id)?.value || "";
 }
 
-// 📊 DASHBOARD PAGE
 function goDashboard(){
-  window.location.href = "dashboard.html";
+  alert("Dashboard page open karo");
 }
 
-
-// 🚀 INIT
+// INIT
 window.onload = function(){
   addRow();
 };
