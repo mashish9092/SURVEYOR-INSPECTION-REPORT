@@ -134,7 +134,7 @@ button{
 </table>
 
 <button class="add" onclick="addRow()">➕ Add Row</button>
-<button class="save" onclick="saveData()">💾 Save</button>
+<button class="save" id="saveBtn" onclick="saveData()">💾 Save</button>
 <button class="dashboard" onclick="goDashboard()">📊 Dashboard</button>
 
 </div>
@@ -196,7 +196,17 @@ function updateSr(){
 }
 
 // 💾 SAVE DATA (GOOGLE SHEET)
+let rowCount = 0;
+let isSaving = false; // ✅ ADD THIS
+
+// 💾 SAVE DATA (GOOGLE SHEET)
 async function saveData(){
+
+  // ✅ DOUBLE CLICK BLOCK
+  if(isSaving) return;
+
+  isSaving = true;
+  document.getElementById("saveBtn").disabled = true;
 
   let rows = [];
 
@@ -221,6 +231,8 @@ async function saveData(){
 
   if(rows.length === 0){
     alert("Fill at least one row");
+    isSaving = false;
+    document.getElementById("saveBtn").disabled = false;
     return;
   }
 
@@ -250,6 +262,10 @@ async function saveData(){
     console.error(err);
     alert("Save Failed ❌");
   }
+
+  // ✅ RE-ENABLE BUTTON
+  isSaving = false;
+  document.getElementById("saveBtn").disabled = false;
 }
 
 // 🔎 HELPER
