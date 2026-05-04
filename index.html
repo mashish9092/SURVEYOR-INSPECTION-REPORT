@@ -299,8 +299,9 @@ function printData(){
     return;
   }
 
-  // ✅ DATE + TIME
+  // ✅ DAY DATE TIME (PRO FORMAT)
   let now = new Date().toLocaleString('en-IN', {
+    weekday:'short',
     day:'2-digit',
     month:'2-digit',
     year:'numeric',
@@ -329,15 +330,7 @@ function printData(){
       <td>${r.damaged6}</td>
       <td>${r.moisture}</td>
       <td>${r.status}</td>
-
-      <!-- 🔥 DATE TIME REMARK KE NICHE -->
-      <td>
-        ${r.remark}
-        <br>
-        <span style="font-size:10px;color:gray;">
-          ${now}
-        </span>
-      </td>
+      <td>${r.remark}</td>
     </tr>`;
   });
 
@@ -345,22 +338,98 @@ function printData(){
   <html>
   <head>
     <title>${fileName}</title>
+
+    <style>
+      body{font-family:Arial;}
+
+      .top{
+        display:flex;
+        justify-content:space-between;
+        margin-bottom:10px;
+        font-size:12px;
+      }
+
+      table{
+        width:100%;
+        border-collapse:collapse;
+      }
+
+      th,td{
+        border:1px solid black;
+        padding:5px;
+        font-size:12px;
+        text-align:center;
+      }
+
+      th{background:#eee;}
+    </style>
   </head>
+
   <body>
-  <table border="1" style="width:100%;border-collapse:collapse;">
-  ${tableRows}
+
+  <!-- 🔥 TOP FIX -->
+  <div class="top">
+    <div>${now}</div>
+    <div>${fileName}</div>
+  </div>
+
+  <h3 style="text-align:center;">
+    R B ASSOCIATES GLOBAL CONNECT PVT LTD
+  </h3>
+
+  <p style="text-align:center;">
+    SURVEYOR INSPECTION REPORT<br>
+    (District Narsinghpur)<br>
+    For Procurement Centre
+  </p>
+
+  <p><b>COMMODITY : WHEAT</b></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Sr.No</th>
+        <th>Name</th>
+        <th>Reg</th>
+        <th>Qty</th>
+        <th>Foreign</th>
+        <th>Other</th>
+        <th>Damaged</th>
+        <th>Slight</th>
+        <th>Damaged</th>
+        <th>Moisture</th>
+        <th>Status</th>
+        <th>Remark</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      ${tableRows}
+    </tbody>
   </table>
+
+  <br><br>
+
+  <div style="display:flex;justify-content:space-between;">
+    <div>Surveyor Sign: ________</div>
+    <div>Manager Sign: ________</div>
+  </div>
+
   </body>
   </html>
   `;
 
-  let win = window.open('');
+  let win = window.open('', '_blank');
+
+  win.document.open();
   win.document.write(html);
   win.document.close();
-  win.print();
+
+  // 🔥 IMPORTANT FIX (delay)
+  setTimeout(()=>{
+    win.print();
+  },500);
 }
-
-
 </script>
 
 </body>
