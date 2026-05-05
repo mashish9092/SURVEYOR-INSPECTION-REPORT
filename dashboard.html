@@ -163,16 +163,11 @@ function handleData(data){
 
   allData = data;
 
-  // 🔥 USER-WISE FILTER (IMPORTANT)
-  const currentUser = localStorage.getItem("username");
+  // 🔥 ROLE CHECK (future ready)
+  const role = localStorage.getItem("role");
 
-  if(currentUser === "admin"){
-    filteredData = [...allData]; // admin sab dekhega
-  }else{
-    filteredData = allData.filter(r => r["Username"] === currentUser);
-  }
-
-  filteredData.reverse();
+  // 👉 abhi dono same (no filter)
+  filteredData = [...allData].reverse();
 
   renderTable();
 }
