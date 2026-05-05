@@ -134,7 +134,7 @@ function loadData(){
 
     // 👇 Loading show
     document.getElementById("dataBody").innerHTML =
-      "<tr><td colspan='13'>Loading...</td></tr>";
+"<tr><td colspan='13'>⏳ Loading data...</td></tr>";
 
     let script = document.createElement("script");
 
@@ -162,7 +162,17 @@ function handleData(data){
   }
 
   allData = data;
-  filteredData = [...allData].reverse();
+
+  // 🔥 USER-WISE FILTER (IMPORTANT)
+  const currentUser = localStorage.getItem("username");
+
+  if(currentUser === "admin"){
+    filteredData = [...allData]; // admin sab dekhega
+  }else{
+    filteredData = allData.filter(r => r["Username"] === currentUser);
+  }
+
+  filteredData.reverse();
 
   renderTable();
 }
@@ -213,13 +223,13 @@ function filterData(){
   let val = document.getElementById("search").value.toLowerCase();
 
   filteredData = allData.filter(r =>
-    Object.values(r).join(" ").toLowerCase().includes(val)
+    JSON.stringify(r).toLowerCase().includes(val)
   );
 
-  currentPage = 1;
+  currentPage = 1; // 🔥 reset page
+
   renderTable();
 }
-
 // ==============================
 // 📄 PAGINATION
 // ==============================
@@ -229,7 +239,9 @@ function renderPagination(){
   let html = "";
 
   for(let i=1;i<=totalPages;i++){
-    html += `<button onclick="goPage(${i})">${i}</button>`;
+    html += `<button 
+      style="${i===currentPage ? 'background:#2f6ecb;color:white;' : ''}"
+      onclick="goPage(${i})">${i}</button>`;
   }
 
   document.getElementById("pagination").innerHTML = html;
