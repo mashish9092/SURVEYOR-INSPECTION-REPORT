@@ -109,7 +109,7 @@ th{
 <div class="pagination" id="pagination"></div>
 
 </div>
-  <!-- 👇 यहीं FOOTER डालना है -->
+  <!-- 👇FOOTER-->
 <div class="footer">
   © 2026 R B ASSOCIATES GLOBAL CONNECT PVT LTD  
   <br>
@@ -128,41 +128,43 @@ let rowsPerPage = 10;
 // ==============================
 // 🔵 LOAD DATA
 // ==============================
-async function loadData(){
+function loadData(){
 
   try{
 
-    let res = await fetch(API_MAIN);
+    // 👇 Loading show
+    document.getElementById("dataBody").innerHTML =
+      "<tr><td colspan='13'>Loading...</td></tr>";
 
-    let text = await res.text(); // 👈 debug
+    let script = document.createElement("script");
 
-    console.log("RAW:", text);
+    // 🔥 JSONP call
+    script.src = API_MAIN + "?callback=handleData";
 
-    let data = JSON.parse(text);
-
-    console.log("JSON:", data);
-
-    if(!Array.isArray(data)){
-      alert("API error ❌");
-      return;
-    }
-
-    allData = data;
-
-    if(allData.length === 0){
-      document.getElementById("dataBody").innerHTML =
-        "<tr><td colspan='13'>No Data Found ❌</td></tr>";
-      return;
-    }
-
-    filteredData = [...allData].reverse();
-
-    renderTable();
+    document.body.appendChild(script);
 
   }catch(err){
     console.error(err);
     alert("Dashboard Load Failed ❌");
   }
+}
+
+
+// 🔥 CALLBACK FUNCTION (IMPORTANT)
+function handleData(data){
+
+  console.log("DATA:", data);
+
+  if(!Array.isArray(data) || data.length === 0){
+    document.getElementById("dataBody").innerHTML =
+      "<tr><td colspan='13'>No Data Found ❌</td></tr>";
+    return;
+  }
+
+  allData = data;
+  filteredData = [...allData].reverse();
+
+  renderTable();
 }
 // ==============================
 // 🔵 RENDER TABLE
