@@ -254,7 +254,7 @@ async function saveData(){
       headers:{ "Content-Type":"text/plain" },
       body: JSON.stringify({
         action:"bulkAdd",
-        username: localStorage.getItem("username"), // ✅ added
+        username: localStorage.getItem("Username"), // ✅ added
         rows: rows
       })
     });
