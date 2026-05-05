@@ -73,6 +73,48 @@ button{
   color:white;
   border-radius:8px;
 }
+  .topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 20px;
+  background:#ffffff;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+  border-radius:10px;
+  margin-bottom:20px;
+}
+
+.left{
+  font-weight:600;
+}
+
+.center{
+  text-align:center;
+  flex:1;
+}
+
+.center h2{
+  margin:0;
+  font-size:20px;
+}
+
+.center p{
+  margin:2px 0;
+  font-weight:600;
+}
+
+.center small{
+  color:#666;
+}
+
+.right button{
+  background:red;
+  color:white;
+  border:none;
+  padding:8px 15px;
+  border-radius:6px;
+  cursor:pointer;
+}
 </style>
 </head>
 
@@ -87,20 +129,22 @@ if(localStorage.getItem("isLoggedIn") !== "true"){
 
 <div class="main">
 
-<div style="display:flex; justify-content:space-between; align-items:center;">
-  <div>
+<div class="topbar">
+
+  <div class="left">
     👤 <span id="loggedUser"></span>
   </div>
-  <button onclick="logout()" style="background:red;color:white;">
-    Logout
-  </button>
-</div>
 
-<div style="text-align:center;">
-  <h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
-  <h3>SURVEYOR INSPECTION REPORT</h3>
-  <p>(District Narsinghpur.)</p>
-  <p>For Procurement Centre</p>
+  <div class="center">
+    <h2>R B ASSOCIATES GLOBAL CONNECT PVT LTD</h2>
+    <p>SURVEYOR INSPECTION REPORT</p>
+    <small>(District Narsinghpur.) | For Procurement Centre</small>
+  </div>
+
+  <div class="right">
+    <button onclick="logout()">Logout</button>
+  </div>
+
 </div>
 
 <div class="box">
@@ -254,7 +298,7 @@ async function saveData(){
       headers:{ "Content-Type":"text/plain" },
       body: JSON.stringify({
         action:"bulkAdd",
-        username: localStorage.getItem("Username"), // ✅ added
+        username: localStorage.getItem("username")
         rows: rows
       })
     });
