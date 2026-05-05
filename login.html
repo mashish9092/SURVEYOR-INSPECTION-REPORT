@@ -41,6 +41,43 @@
   });
 
 }
+    <script src="config.js"></script>
+
+<script>
+function login(){
+
+  let username = document.getElementById("username").value;
+  let password = document.getElementById("password").value;
+
+  let script = document.createElement("script");
+
+  script.src = API_MAIN + 
+    "?action=login" +
+    "&username=" + encodeURIComponent(username) +
+    "&password=" + encodeURIComponent(password) +
+    "&callback=handleLogin";
+
+  document.body.appendChild(script);
+}
+
+
+// 🔥 CALLBACK
+function handleLogin(res){
+
+  console.log(res);
+
+  if(res.status === "success"){
+
+    localStorage.setItem("isLoggedIn","true");
+    localStorage.setItem("username", res.username);
+
+    window.location.href = "index.html";
+
+  }else{
+    alert("Invalid Login ❌");
+  }
+}
+</script>
   </script>
 
 </body>
