@@ -42,6 +42,16 @@ input{
   margin:10px 0;
 }
 
+  tr:hover{
+  background:#eef5ff;
+}
+
+th{
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
 .pagination button{
   background:#ddd;
 }
@@ -53,6 +63,7 @@ input{
   color:white;
   border-radius:8px;
 }
+  
 </style>
 </head>
 
@@ -118,13 +129,41 @@ let rowsPerPage = 10;
 // 🔵 LOAD DATA
 // ==============================
 async function loadData(){
-  let res = await fetch(API_MAIN);
-  allData = await res.json();
 
-  filteredData = [...allData].reverse();
-  renderTable();
+  try{
+
+    let res = await fetch(API_MAIN);
+
+    let text = await res.text(); // 👈 debug
+
+    console.log("RAW:", text);
+
+    let data = JSON.parse(text);
+
+    console.log("JSON:", data);
+
+    if(!Array.isArray(data)){
+      alert("API error ❌");
+      return;
+    }
+
+    allData = data;
+
+    if(allData.length === 0){
+      document.getElementById("dataBody").innerHTML =
+        "<tr><td colspan='13'>No Data Found ❌</td></tr>";
+      return;
+    }
+
+    filteredData = [...allData].reverse();
+
+    renderTable();
+
+  }catch(err){
+    console.error(err);
+    alert("Dashboard Load Failed ❌");
+  }
 }
-
 // ==============================
 // 🔵 RENDER TABLE
 // ==============================
@@ -139,24 +178,24 @@ function renderTable(){
 
   pageData.forEach((r,i)=>{
 
-    html += `
-    <tr>
-      <td>${start + i + 1}</td>
-      <td>${r["Name Of Farmer/Society"] || ""}</td>
-      <td>${r["Farmer Registration"] || ""}</td>
-      <td>${r["Qty In Quintals (Approx)"] || ""}</td>
-      <td>${r["FOREIGN MATTER (0.75%)"] || ""}</td>
-      <td>${r["OTHER FOOD GRAINS (2%)"] || ""}</td>
-      <td>${r["DAMAGED GRAINS (2%)"] || ""}</td>
-      <td>${r["SLIGHT DAMAGED GRAINS (4%)"] || ""}</td>
-      <td>${r["DAMAGED GRAINS (6%)"] || ""}</td>
-      <td>${r["MOISTURE (12%)"] || ""}</td>
-      <td>${r["Status FAQ/Non FAQ"] || ""}</td>
-      <td>${r["Remark If Any"] || ""}</td>
-      <td>
-        <button class="print" onclick='printRow(${JSON.stringify(r)})'>Print</button>
-      </td>
-    </tr>`;
+   html += `
+<tr>
+  <td>${start + i + 1}</td>
+  <td>${r["Name Of Farmer/Society"] ?? r.name ?? ""}</td>
+  <td>${r["Farmer Registration"] ?? r.reg ?? ""}</td>
+  <td>${r["Qty In Quintals (Approx)"] ?? r.qty ?? ""}</td>
+  <td>${r["FOREIGN MATTER (0.75%)"] ?? r.foreign ?? ""}</td>
+  <td>${r["OTHER FOOD GRAINS (2%)"] ?? r.other ?? ""}</td>
+  <td>${r["DAMAGED GRAINS (2%)"] ?? r.damaged2 ?? ""}</td>
+  <td>${r["SLIGHT DAMAGED GRAINS (4%)"] ?? r.slight ?? ""}</td>
+  <td>${r["DAMAGED GRAINS (6%)"] ?? r.damaged6 ?? ""}</td>
+  <td>${r["MOISTURE (12%)"] ?? r.moisture ?? ""}</td>
+  <td>${r["Status FAQ/Non FAQ"] ?? r.status ?? ""}</td>
+  <td>${r["Remark If Any"] ?? r.remark ?? ""}</td>
+  <td>
+    <button class="print" onclick='printRow(${JSON.stringify(r)})'>Print</button>
+  </td>
+</tr>`;
   });
 
   document.getElementById("dataBody").innerHTML = html;
