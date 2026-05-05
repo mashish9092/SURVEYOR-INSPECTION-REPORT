@@ -2,6 +2,8 @@
 <html>
 <head>
   <title>Login</title>
+    <script src="config.js"></script>
+
 </head>
 <body style="font-family: Arial; text-align:center; margin-top:100px;">
 
@@ -13,36 +15,32 @@
   <button onclick="login()">Login</button>
 
   <script>
-    const API_URL = "PASTE_YOUR_WEB_APP_URL";
 
-    function login() {
+  function login(){
 
-      fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "login",
-          username: document.getElementById("username").value,
-          password: document.getElementById("password").value
-        })
-      })
-      .then(res => res.json())
-      .then(data => {
+  fetch(API_MAIN,{
+    method:"POST",
+    body: JSON.stringify({
+      action:"login",
+      username: document.getElementById("username").value,
+      password: document.getElementById("password").value
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
 
-        if(data.status === "success"){
+    if(data.status === "success"){
+      localStorage.setItem("isLoggedIn","true");
+      localStorage.setItem("username", data.username);
 
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("username", data.username);
-          localStorage.setItem("role", data.role);
-
-          window.location.href = "index.html";
-
-        } else {
-          alert("Invalid Login!");
-        }
-
-      });
-
+      window.location.href = "index.html";
+    }else{
+      alert("Invalid Login");
     }
+
+  });
+
+}
   </script>
 
 </body>
